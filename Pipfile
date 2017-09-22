@@ -5,4 +5,8 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
+
 flask = "*"
+gunicorn = "*"
+pep8 = "*"
+
