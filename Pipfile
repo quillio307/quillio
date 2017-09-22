@@ -6,3 +6,5 @@ verify_ssl = true
 
 [packages]
 flask = "*"
+gunicorn = "*"
+
