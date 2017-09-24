@@ -20,28 +20,21 @@ def landing_page():
     return 'Welcome to quillio!'
 
 
-@app.route('/login', methods=['GET, POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         return "You are logged in!"
     elif request.method == 'GET':
-        return "Would you like to login?"
-    else:
         return "Would you like to login?"
 
 
 @app.route('/logout', methods=['POST'])
 def logout():
     if request.method == 'POST':
-        return "You are logged in!"
-    else:
-        return "Invalid operation"
+        return "Goodbye!"
 
 
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
-    if request.method == 'POST':
-        return "You are logged in!"
-    else:
-        return "Invalid operation"
-
+    if request.method == 'GET':
+        return "Here is your dashboard"
