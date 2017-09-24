@@ -1,12 +1,14 @@
-from flask import Blueprint
+from flask import Blueprint, request, render_template
+# from app.modules.auth import User
 
 
 auth = Blueprint('auth', __name__)
 
 
-@auth.route('/login')
+@auth.route('/login', methods=['GET', 'POST'])
 def auth_login():
-    pass
+    if request.method == 'GET':
+        return render_template('auth/login.html')
 
 
 @auth.route('/register')
