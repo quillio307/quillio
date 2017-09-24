@@ -8,6 +8,6 @@ verify_ssl = true
 
 flask = "*"
 gunicorn = "*"
-pep8 = "*"
-pymongo = "*"
+"pep8" = "*"
+mongoengine = "*"
 
