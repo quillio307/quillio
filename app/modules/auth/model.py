@@ -1,13 +1,7 @@
-# TODO:
-# 1) enable flask-login
-# 2) encrypt passwords
-
-from mongoengine import connect
-from mongoengine import Document
+from mongoengine import Document, connect
 from mongoengine import StringField, EmailField, BooleanField
 
 from config import MONGODB_SETTINGS
-
 
 connect(MONGODB_SETTINGS['db'], host=MONGODB_SETTINGS['host'])
 
@@ -38,16 +32,3 @@ class User(Document):
     def get_id(self):
         """ Fetches the unicode id for the User """
         return chr(User.objects(email__exact=self['email'])[0]._id)
-
-
-#def add_user(user):
-    #if user_exists(user):
-        #return 'failure'
-    #User(name=user['name'], username=user['username'], password=user['password'], email=user['email']).save()
-    #return 'success'
-
-
-#def user_exists(user):
-    #if len(User.objects(email__exact=user['email'])) != 0:
-        #return True
-    #return False
