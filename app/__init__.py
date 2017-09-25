@@ -8,7 +8,6 @@ app = Flask(__name__)
 app.register_blueprint(auth, url_prefix='/auth')
 
 login_manager = LoginManager()
-login_manager.init_app(app)
 
 
 @app.route('/')

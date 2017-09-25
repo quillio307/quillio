@@ -1,10 +1,17 @@
 from flask import Blueprint
 from flask import request, render_template, jsonify
+from flask_login import LoginManager
 
-from app import login_manager
 from app.modules.auth.model import User
 
 auth = Blueprint('auth', __name__)
+
+login_manager = LoginManager()
+
+
+@auth.record_once
+def on_load(state):
+    login_manager.init_app(state.app)
 
 
 @login_manager.user_loader
