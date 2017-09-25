@@ -1,5 +1,12 @@
 {% extends "helpers/layout.html" %}
 {% block title %} Quillio Signup {% endblock %}
+
+{% block nav_links %}
+<li class="nav-item active">
+  <a class="nav-link" href="/auth/login"> Log In <span class="sr-only">(current)</span></a>
+</li>
+{% endblock %}
+
 {% block content %}
 <div class="container">
   <form>
@@ -7,10 +14,10 @@
     <h1 class="display-5 text-center"> Signup </h1>
 
     <div class="md-form text-center">
-      <input type="text" id="name" name="name" class="form-control" placeholder="name">
-      <input type="email" id="email" name="email" class="form-control" placeholder="email">
-      <input type="text" id="username" name="username" class="form-control" placeholder="username">
-      <input type="password" id="password" name="password" class="form-control" placeholder="password">
+      <input type="text" id="name" name="name" class="form-control" placeholder="name" value="{{ request.form.name }}" required>
+      <input type="email" id="email" name="email" class="form-control" placeholder="email" value="{{ request.form.email }}" required>
+      <input type="text" id="username" name="username" class="form-control" placeholder="username" value="{{ request.form.username }}" required>
+      <input type="password" id="password" name="password" class="form-control" placeholder="password" value="{{ request.form.password }}" required>
       <button type="submit" class="btn btn-default" formmethod="post"> Signup </button>
     </div>
   </form>

@@ -1,3 +1,7 @@
+from flask_login import LoginManager
+
+login_manager = LoginManager()
+
 # Set up MongoDB Settings to work with mongoengine
 MONGODB_SETTINGS = {
     'db': 'heroku_4b10n3s4',
