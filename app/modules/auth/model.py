@@ -1,4 +1,5 @@
 # HERE IS WHERE WE DEFINE USER
+# NOTE: for those working with flask authentication, be sure to set user.authenticated = true upon successful login 
 from mongoengine import *
 
 connect('pyroute_db')
