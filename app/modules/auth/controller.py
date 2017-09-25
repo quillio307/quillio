@@ -1,8 +1,8 @@
 from flask import Blueprint
-from flask import request, render_template, jsonify
+from flask import request, render_template, jsonify, flash, redirect, url_for
 from flask_login import LoginManager
 
-from app.modules.auth.model import User
+from app.modules.auth.model import User, SignupForm
 
 auth = Blueprint('auth', __name__)
 
@@ -34,17 +34,14 @@ def auth_login():
 
 @auth.route('/signup', methods=['GET', 'POST'])
 def auth_register():
+    form = SignupForm(request.form)
     if request.method == 'GET':
-        return render_template('auth/signup.html')
-    name = request.form['name']
-    email = request.form['email']
-    username = request.form['username']
-    password = request.form['password']
-    User(name=name, email=email, username=username, password=password).save()
-    return jsonify({'info': dir(app)})
-    #return jsonify({
-        #'name': name,
-        #'email': email,
-        #'username': username,
-        #'password': password
-        #})
+        return render_template('auth/signup.html', form=form)
+    if form.validate():
+        try:
+            User(name=form.name.data, username=form.username.data, email=form.email.data, password=form.password.data).save()
+            return redirect(url_for('auth_login'))
+        except:
+            return 'failure'
+        return 'success'
+    return 'invalid form'
