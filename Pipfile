@@ -10,4 +10,4 @@ flask = "*"
 gunicorn = "*"
 "pep8" = "*"
 mongoengine = "*"
-
+"flask-login" = "*"
