@@ -1,28 +1,33 @@
-import wtforms
-from mongoengine import Document, connect
-from mongoengine import StringField, EmailField, BooleanField
+from setup import db
 
-from config import MONGODB_SETTINGS
-
-connect(MONGODB_SETTINGS['db'], host=MONGODB_SETTINGS['host'])
+from flask_security import MongoEngineUserDatastore, UserMixin, RoleMixin
+from wtforms import Form, validators
+from wtforms import StringField, PasswordField
 
 
-class User(Document):
-    """ Definition for the User document. """
-    name = StringField(required=True, min_length=2, max_length=50)
-    email = EmailField(required=True, min_length=5, unique=True)
-    username = StringField(required=True, min_length=3, max_length=20)
-    password = StringField(required=True, min_length=6, max_length=35)
-    authenticated = BooleanField(required=False, default=False)
+class Role(db.Document, RoleMixin):
+    """ Definition for a Role Document needed by Flask Security """
+    name = db.StringField(max_length=80, unique=True)
+    description = db.StringField(max_length=255)
+
+
+class User(db.Document, UserMixin):
+    """ Definition for a User """
+    email = db.EmailField(required=True, unique=True,
+                          min_length=3, max_length=35)
+    name = db.StringField(required=True, min_length=4, max_length=20)
+    password = db.StringField(required=True, min_length=5, max_length=35)
+    active = db.BooleanField(default=True)
+    authenticated = db.BooleanField(required=False, default=False)
+    roles = db.ListField(db.ReferenceField(Role), default=[])
 
     def is_authenticated(self):
         """ Determines if a User is authenticated """
         return self['authenticated']
 
-    # TODO
     def is_active(self):
         """ Determines if a User is currently active """
-        return False
+        return self['active']
 
     # NOTE: always returns false, anonymous users are not supported
     def is_anonymous(self):
@@ -31,17 +36,19 @@ class User(Document):
         return False
 
     def get_id(self):
-        """ Fetches the unicode id for the User """
+        """ Fetches the unicode id for the Usera """
         return str(User.objects(email__exact=self['email'])[0].id)
 
 
-class SignupForm(wtforms.Form):
-    name = wtforms.StringField('Full Name', [wtforms.validators.Length(min=3, max=30)])
-    email = wtforms.StringField('Email Address', [wtforms.validators.Length(min=6, max=35)])
-    username = wtforms.StringField('Username', [wtforms.validators.Length(min=4, max=25)])
-    password = wtforms.PasswordField('New Password', [wtforms.validators.DataRequired()])
+user_datastore = MongoEngineUserDatastore(db, User, Role)
 
 
-class LoginForm(wtforms.Form):
-    username = wtforms.StringField('Username', [wtforms.validators.Length(min=4, max=25)])
-    password = wtforms.PasswordField('New Password', [wtforms.validators.DataRequired()])
+class SignupForm(Form):
+    email = StringField('Email', [validators.Length(min=6, max=35)])
+    name = StringField('Name', [validators.Length(min=4, max=25)])
+    password = PasswordField('Password', [validators.DataRequired()])
+
+
+class LoginForm(Form):
+    email = StringField('Email', [validators.Length(min=4, max=25)])
+    password = PasswordField('Password', [validators.DataRequired()])
