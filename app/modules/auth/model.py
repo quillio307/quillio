@@ -1,8 +1,8 @@
-from setup import db
-
 from flask_security import MongoEngineUserDatastore, UserMixin, RoleMixin
 from wtforms import Form, validators
 from wtforms import StringField, PasswordField
+
+from app.setup import db
 
 
 class Role(db.Document, RoleMixin):
