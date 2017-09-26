@@ -6,12 +6,14 @@
 <div class="container">
     <form>
         <br>
-        <h1 class="display-5 text-center"> Login </h1>
+        <h1 class="text-center"> Login </h1>
 
         <div class="md-form text-center">
-            <input type="email" id="email" name="email" placeholder="Email" floatPlaceholder="auto" class="form-control" value="{{ request.form.email }}" required><br>
-            <input type="password" id="password" name="password" class="form-control" placeholder="Password" value="{{ request.form.password }}" required>
-            <button type="submit" class="btn btn-default" formmethod="post">Login</button>
+            <div class="offset-md-2 col-md-6">
+                <input type="email" id="email" name="email" placeholder="Email" floatPlaceholder="auto" class="form-control" value="{{ request.form.email }}" required><br>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Passwords" value="{{ request.form.password }}" required>
+                <button type="submit" class="btn btn-default" formmethod="post">Login</button>
+            </div>
         </div>
     </form>
 </div>
