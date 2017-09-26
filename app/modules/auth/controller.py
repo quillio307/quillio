@@ -1,13 +1,13 @@
 from flask import Blueprint
-from flask import request, render_template
-from flask import flash, url_for, redirect
-from flask_login import login_user, logout_user, login_required
-from mongoengine import connect
+from flask import request, redirect, url_for
+from flask import render_template, flash
+from flask_security import current_user, login_user, logout_user, \
+                            login_required, roles_required
+from setup import login_manager
+from app.modules.auth.model import User
+from app.modules.auth.model import SignupForm, LoginForm
 
-from app.modules.auth.model import User, SignupForm, LoginForm
-from config import login_manager, MONGODB_SETTINGS
-
-connect(MONGODB_SETTINGS['db'], host=MONGODB_SETTINGS['host'])
+from app.modules.auth.model import user_datastore
 
 auth = Blueprint('auth', __name__)
 
@@ -28,12 +28,24 @@ def signup():
         return render_template('auth/signup.html', form=form)
     if form.validate():
         try:
-            User(name=form.name.data, email=form.email.data, username=form.username.data, password=form.password.data).save()
-            flash('Thanks for joining! Please login to continue.')
-        except Exception:
-            flash('User already exists.')
-        return redirect(url_for('auth.login'))
-    flash('Invalid Username or Password')
+            # add user to the database
+            user = user_datastore.create_user(
+                                        email=form.email.data,
+                                        name=form.name.data,
+                                        password=form.password.data)
+
+            # set the user to have unregistered and default permissions
+            unreg = user_datastore.find_or_create_role('unregistered')
+            default = user_datastore.find_or_create_role('default')
+            user_datastore.add_role_to_user(user, unreg)
+            user_datastore.add_role_to_user(user, default)
+
+            login_user(user)
+            return redirect(request.args.get('next') or url_for('home'))
+        except Exception as e:
+            flash('A Problem has Occured, Please Try Again!')
+        return redirect(url_for('auth.signup'))
+    flash('Invalid Email or Password')
     return redirect(url_for('auth.signup'))
 
 
@@ -43,15 +55,15 @@ def login():
     if request.method == 'GET':
         return render_template('auth/login.html', form=form)
     if form.validate():
-        username = form.username.data
-        query = User.objects(username__exact=username)
+        email = form.email.data
+        query = User.objects(email__exact=email)
         if len(query) != 0:
             user = query[0]
             if user.password == form.password.data:
                 login_user(user)
                 flash('Logged in successfully, {}'.format(user.get_id()))
                 return redirect(request.args.get('next') or url_for('home'))
-    flash('Invalid Username or Password')
+    flash('Invalid Email or Password')
     return redirect(url_for('auth.login'))
 
 

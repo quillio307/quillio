@@ -1,8 +1,10 @@
-from flask_login import LoginManager
+import os
 
-login_manager = LoginManager()
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+CONFIG_PATH = os.path.join(ROOT_DIR, 'config.py')
 
-# Set up MongoDB Settings to work with mongoengine
+SECRET_KEY = '8616775396515539'
+
 MONGODB_SETTINGS = {
     'db': 'heroku_4b10n3s4',
     'host': 'mongodb://heroku_4b10n3s4:ldlbj6d3it0u3n5un9kb9d38n9@ds147884.mlab.com:47884/heroku_4b10n3s4'
