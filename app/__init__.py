@@ -1,12 +1,14 @@
-# Setup
 from flask import Flask, render_template
 from flask_security import Security, login_required
 
-from app import config
 # Blueprints
 from app.modules.auth.controller import auth
+
 # Security
 from app.modules.auth.model import user_datastore
+
+# Setup
+from app import config
 from app.setup import login_manager, db
 
 app = Flask(__name__)

@@ -1,12 +1,10 @@
-from flask import Blueprint
-from flask import render_template, flash
-from flask import request, redirect, url_for
-from flask_security import login_user, logout_user, \
-    login_required
+from flask import Blueprint, render_template, flash, request, redirect, url_for
+from flask_security import login_user, logout_user, login_required
 
 from app.modules.auth.model import SignupForm, LoginForm
 from app.modules.auth.model import User
 from app.modules.auth.model import user_datastore
+
 from app.setup import login_manager
 
 auth = Blueprint('auth', __name__)
