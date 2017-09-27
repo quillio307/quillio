@@ -1,35 +1,30 @@
-{% extends "helpers/layout.html" %} 
-{% block title %} Quillio Login {% endblock %}
-
-{% block nav_links %}
+{% extends "helpers/layout.html" %} {% block title %} Quillio Login {% endblock %} {% block nav_links %}
 <li class="nav-item active">
     <a class="nav-link" align="right" href="/auth/signup">Sign Up</a>
 </li>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div style="max-width:800px; margin:0 auto" class="container">
-  <form>
-    <br>
-    <h1 class="display-5 text-center"> Login to Quillio </h1>
+    <form>
+        <br>
+        <h1 class="display-5 text-center"> Login to Quillio </h1>
 
-    <div class="text-center">
-      <img style="max-width:400px; height:auto" src="/../static/img/logo/quillioBlack.png">
-      <br>
-      <div class="md-form">
-        <input type="email" id="email" name="email" class="form-control validate" value="{{ request.form.email }}" required>
-        <label for="email" data-error="Invalid email"> Enter your email </label>
-      </div>
+        <div class="text-center">
+            <img style="max-width:400px; height:auto" src="/../static/img/logo/quillioBlack.png">
+            <br>
+            <div class="md-form">
+                <input type="email" id="email" name="email" class="form-control validate" value="{{ request.form.email }}" required>
+                <label for="email" data-error="Invalid email"> Enter your email </label>
+            </div>
 
-      <br>
-      <div class="md-form">
-        <input type="password" id="password" name="password" class="form-control" value="{{ request.form.password }}" required>
-        <label for="password"> Enter your password </label>
-      </div>
+            <br>
+            <div class="md-form">
+                <input type="password" id="password" name="password" class="form-control" value="{{ request.form.password }}" required>
+                <label for="password"> Enter your password </label>
+            </div>
 
-      <button type="submit" class="btn btn-default" formmethod="post"> Login </button>
-    </div>
+            <button type="submit" class="btn btn-unique" formmethod="post"> Login </button>
+        </div>
 
-  </form>
+    </form>
 </div>
 {% endblock %}
