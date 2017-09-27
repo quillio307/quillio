@@ -1,16 +1,15 @@
-# Setup
-import config
-from setup import login_manager, db
-
 from flask import Flask, render_template
-from flask_security import Security, login_required, \
-                            roles_required, roles_accepted
+from flask_security import Security, login_required
 
 # Blueprints
 from app.modules.auth.controller import auth
 
 # Security
 from app.modules.auth.model import user_datastore
+
+# Setup
+from app import config
+from app.setup import login_manager, db
 
 app = Flask(__name__)
 app.config.from_pyfile(config.CONFIG_PATH)

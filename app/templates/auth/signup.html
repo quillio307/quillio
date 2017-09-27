@@ -1,4 +1,5 @@
 {% extends "helpers/layout.html" %}
+
 {% block title %} Quillio Signup {% endblock %}
 
 {% block nav_links %}
@@ -10,25 +11,30 @@
 {% block content %}
 <div class="container">
   <form>
+    <!--img src="../../static/img/quillioBlack.png"-->
+    <!-- the above tag will be replaced with a better sized image, comment out for now-->
     <br>
-    <h1 class="display-5 text-center">Create a Quillio Account</h1>
+    <h2 class="display-5 text-left">Create a Quillio Account</h1><br>
 
-    <div class="md-form text-center">
-   
-      <!--label for="name">First and Last Name</label-->
-      <md-form-field>
-      <input type="text" id="name" name="name" placeholder="NAME" floatPlaceholder="auto" class="form-control" value="{{ request.form.name }}" required><br>
-      </md-form-field>
-      <!--label for="email">Email Address</label-->
-      <input type="email" id="email" name="email" placeholder="EMAIL" floatPlaceholder="auto" class="form-control" value="{{ request.form.email }}" required><br>
+    <div class="md-form" >
 
-      <!--label for="password">Password</label-->
-      <input type="password" id="password" name="password" placeholder="PASSWORD" floatPlaceholder="auto" class="form-control" value="{{ request.form.password }}" required><br>
+      
+      <input type="text" id="name" name="name" class="form-control" value="{{ request.form.name }}" required>
+      <label for="name">First and Last Name</label>
+    </div>
 
-      <button type="submit" class="btn btn-default" formmethod="post">Create Account</button>
+    <div class="md-form">
+      <input type="email" id="email" name="email" class="form-control" value="{{ request.form.email }}" required>
+      <label for="email">Email Address</label>
+    </div>
+
+    <div class="md-form">
+      <input type="password" id="password" name="password" class="form-control" value="{{ request.form.password }}" required><br>
+      <label for="password">Password</label>
+    </div>
+    <div class="md-form">
+      <button type="submit" class="btn btn-unique" formmethod="post">Create Account</button>
     </div>
   </form>
 </div>
 {% endblock %}
-
-
