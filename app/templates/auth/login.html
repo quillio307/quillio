@@ -1,21 +1,17 @@
 {% extends "helpers/layout.html" %} {% block title %} Quillio Login {% endblock %} {% block nav_links %}
 <li class="nav-item active">
-    <a class="nav-link" href="/auth/signup"> Sign Up <span class="sr-only">(current)</span></a>
+    <a class="nav-link" href="/auth/signup">Sign Up</a>
 </li>
 {% endblock %} {% block content %}
 <div style="max-width:800px; margin:0 auto">
     <div class="container">
-        <form>
-            <br>
-            <!-- <h1 class="display-5 text-center"> Login </h1> -->
-
-            <div class="md-form text-center">
-                <img style="max-width:500px; height:auto" src="/../static/img/logo/quillioBlack.png">
-                <input type="email" id="email" name="email" placeholder="Email" floatPlaceholder="auto" class="form-control" value="{{ request.form.email }}" required><br>
-                <input type="password" id="password" name="password" class="form-control" placeholder="Password" value="{{ request.form.password }}" required>
-                <button type="submit" class="btn btn-default" formmethod="post"> Login </button>
-            </div>
-        </form>
+        <br>
+        <div class="md-form text-center">
+            <img style="max-width:400px; height:auto" src="/../static/img/logo/quillioBlack.png">
+            <input type="email" id="email" name="email" placeholder="EMAIL" floatPlaceholder="auto" class="form-control" value="{{ request.form.email }}" required><br>
+            <input type="password" id="password" name="password" class="form-control" placeholder="PASSWORD" value="{{ request.form.password }}" required>
+            <button type="submit" class="btn btn-default" formmethod="post"> Login </button>
+        </div>
     </div>
 </div>
 {% endblock %}
