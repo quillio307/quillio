@@ -19,6 +19,7 @@
 
 <body>
     <!--Navbar-->
+    {% block navbar %}
     <nav class="navbar navbar-expand-lg navbar-dark unique-color-dark">
 
         <!-- Navbar brand -->
@@ -37,6 +38,7 @@
         </div>
         <!-- Collapsible content -->
     </nav>
+    {% endblock %}
 
     <!-- Flashed Messages -->
     {% with messages = get_flashed_messages() %} {% if messages %}
