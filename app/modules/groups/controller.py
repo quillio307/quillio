@@ -11,10 +11,13 @@ groups = Blueprint('groups', __name__)
 
 @groups.route('/create', methods=['POST'])
 @login_required
-def createGroup():
-    content = request.get_json(silent=True)
-    res = {'user': current_user.email, 'req': content}
+def create_group():
+    req = request.get_json(silent=True)
+    grp = Group(name=req['name'], members=[current_user._get_current_object()], admins=[current_user._get_current_object()])
+    grp.save()
+    res = {'user': current_user.email, 'req': req}
     return json.dumps(res)
+
 '''
 @groups.route('/', methods=['POST'])
 def createGroup():
