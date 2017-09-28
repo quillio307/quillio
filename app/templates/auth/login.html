@@ -1,11 +1,4 @@
-{% extends "helpers/layout.html" %} {% block title %} Quillio Login {% endblock %} {% block nav_links %}
-<li class="nav-item active">
-    <a class="nav-link" style="float:right" href="/auth/signup">Sign Up</a>
-    <li class="nav-item">
-        <a class="nav-link" href="#">Link</a>
-    </li>
-</li>
-{% endblock %} {% block content %}
+{% extends "helpers/layout.html" %} {% block title %} Quillio Login {% endblock %} {% block content %}
 <div style="max-width:800px; margin:0 auto" class="container">
     <form>
         <br>
@@ -16,16 +9,13 @@
                 <input type="email" id="email" name="email" class="form-control validate" value="{{ request.form.email }}" required>
                 <label for="email" data-error="Invalid email"> Enter your email </label>
             </div>
-
             <br>
             <div class="md-form">
                 <input type="password" id="password" name="password" class="form-control" value="{{ request.form.password }}" required>
                 <label for="password"> Enter your password </label>
             </div>
-
             <button type="submit" class="btn btn-unique" formmethod="post"> Login </button>
         </div>
-
     </form>
 </div>
 {% endblock %}
