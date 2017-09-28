@@ -1,4 +1,6 @@
-{% extends "helpers/layout.html" %} {% block title %} Quillio Login {% endblock %} {% block content %}
+{% extends "helpers/layout.html" %} {% block title %} Quillio Login {% endblock %}{% block navbar %}
+<nav style="height:50px" class="navbar navbar-expand-lg navbar-dark unique-color-dark"></nav>
+{% endblock %}{% block content %}
 <div style="max-width:800px; margin:0 auto" class="container">
     <form>
         <br>
@@ -14,7 +16,10 @@
                 <input type="password" id="password" name="password" class="form-control" value="{{ request.form.password }}" required>
                 <label for="password"> Enter your password </label>
             </div>
-            <button type="submit" class="btn btn-unique" formmethod="post"> Login </button>
+            <ul>
+                <button type="submit" style="width:120px" class="btn btn-unique" formmethod="post"> Login </button>
+                <button type="submit" style="width:120px" class="btn btn-unique" href="/auth/signup"> Sign Up </button>
+            </ul>
         </div>
     </form>
 </div>
