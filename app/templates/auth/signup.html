@@ -1,8 +1,4 @@
-{% extends "helpers/layout.html" %} {% block title %} Quillio Signup {% endblock %} {% block navbar %} {{super()}} {% endblock %} {% block nav_links %}
-<li class="nav-item active">
-    <a class="nav-link" href="/auth/login"> Log In <span class="sr-only">(current)</span></a>
-</li>
-{% endblock %} {% block content %}
+{% extends "helpers/layout.html" %} {% block title %} Quillio Signup {% endblock %} {% block navbar %} {{super()}} {% endblock %} {% block nav_links %} {% endblock %} {% block content %}
 <div style="max-width:800px; margin:0 auto" class="container">
     <form>
         <br>
@@ -23,7 +19,7 @@
                 <div class="md-form">
                     <button type="submit" class="btn btn-unique" formmethod="post">Create Account</button>
                 </div>
-                <a>Already have an account? Log In Here!</a>
+                <a href="/auth/login">Already have an account? Log In Here!</a>
         </div>
     </form>
 </div>
