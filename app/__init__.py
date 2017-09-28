@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_security import Security, login_required
-#from flask_bcrypt import Bcrypt
+
 # Blueprints
 from app.modules.auth.controller import auth
 
@@ -12,7 +12,6 @@ from app import config
 from app.setup import login_manager, db
 
 app = Flask(__name__)
-#bcrypt = Bcrypt(app)
 app.config.from_pyfile(config.CONFIG_PATH)
 
 app.register_blueprint(auth, url_prefix='/auth')
