@@ -20,6 +20,7 @@ class User(db.Document, UserMixin):
     active = db.BooleanField(default=True)
     authenticated = db.BooleanField(required=False, default=False)
     roles = db.ListField(db.ReferenceField(Role), default=[])
+    groups = db.ListField(db.ReferenceField('Group'), default=[])
 
     def is_authenticated(self):
         """ Determines if a User is authenticated """

@@ -23,12 +23,15 @@ def create_group():
     for email in req['members']:
         query = User.objects(email=email)
         if len(query) == 0:
-            req.members.remove(email)
+            req['members'].remove(email)
         else:
             members.append(query[0])
 
     if usr.email not in req['members']:
         members.append(usr)
+
+    if len(members) <= 1:
+        abort(400)
 
     admins = []
 
@@ -42,5 +45,11 @@ def create_group():
 
     grp = Group(name=req['name'], members=members, admins=admins)
     grp.save()
+
+    for member in members:
+        member.groups.append(grp)
+        member.save()
+
     res = {'message': "Success"}
     return json.dumps(res)
+
