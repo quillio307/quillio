@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template, flash, request, redirect, url_for
 from flask_security import login_user, logout_user, login_required
+from passlib.hash import bcrypt
 
 from app.modules.auth.model import SignupForm, LoginForm
 from app.modules.auth.model import User
 from app.modules.auth.model import user_datastore
-
 from app.setup import login_manager
 
 auth = Blueprint('auth', __name__)
@@ -13,10 +13,10 @@ auth = Blueprint('auth', __name__)
 @login_manager.user_loader
 def user_loader(user_id):
     """ Reloads the user object from the user ID stored in the session. """
-    query = User.objects(id__exact=user_id)
-    if len(query) == 0:
-        return None
-    return query[0]
+    user = user_datastore.find_user(id=user_id)
+    if user is not None:
+        return user
+    return None
 
 
 @auth.route('/signup', methods=['GET', 'POST'])
@@ -27,10 +27,11 @@ def signup():
     if form.validate():
         try:
             # add user to the database
+            pwd_hash = bcrypt.encrypt(form.password.data)
             user = user_datastore.create_user(
-                                        email=form.email.data,
-                                        name=form.name.data,
-                                        password=form.password.data)
+                email=form.email.data,
+                name=form.name.data,
+                password=pwd_hash)
 
             # set the user to have unregistered and default permissions
             unreg = user_datastore.find_or_create_role('unregistered')
@@ -41,8 +42,8 @@ def signup():
             login_user(user)
             return redirect(request.args.get('next') or url_for('home'))
         except Exception as e:
-            flash('A Problem has Occured, Please Try Again!')
-        return redirect(url_for('auth.signup'))
+            flash('A Problem has Occured, Please Try Again! {}'.format(e))
+            return redirect(url_for('auth.signup'))
     flash('Invalid Email or Password')
     return redirect(url_for('auth.signup'))
 
@@ -53,13 +54,11 @@ def login():
     if request.method == 'GET':
         return render_template('auth/login.html', form=form)
     if form.validate():
-        email = form.email.data
-        query = User.objects(email__exact=email)
-        if len(query) != 0:
-            user = query[0]
-            if user.password == form.password.data:
+        user = user_datastore.find_user(email=form.email.data)
+        if user is not None:
+            if bcrypt.verify(form.password.data, user.password):
                 login_user(user)
-                flash('Logged in successfully, {}'.format(user.get_id()))
+                flash('Logged in successfully, {}'.format(user.name))
                 return redirect(request.args.get('next') or url_for('home'))
     flash('Invalid Email or Password')
     return redirect(url_for('auth.login'))
