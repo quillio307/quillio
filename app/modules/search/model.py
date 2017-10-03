@@ -1,0 +1,1 @@
+from app.modules.auth.model import User

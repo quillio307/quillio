@@ -3,6 +3,7 @@ from flask_security import Security, login_required
 
 # Blueprints
 from app.modules.auth.controller import auth
+from app.modules.search.controller import search
 
 # Security
 from app.modules.auth.model import user_datastore
@@ -15,6 +16,8 @@ app = Flask(__name__)
 app.config.from_pyfile(config.CONFIG_PATH)
 
 app.register_blueprint(auth, url_prefix='/auth')
+
+app.register_blueprint(search, url_prefix='/search')
 
 
 login_manager.init_app(app)
