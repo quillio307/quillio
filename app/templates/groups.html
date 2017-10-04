@@ -9,27 +9,29 @@
 {% endblock %}
 
 {% block content %}
-<div style="max-width:800px; margin:0 auto" class="container">
+<div class="container">
+<br>
+<div class="row">
+    {% for group in groups %}
+        <div class="col-lg-4 col-md-6">
+            <div class="card">
 
-    <form>
-        <br>
-        <div class="text-center">
-            <img style="max-width:400px; height:auto" src="/../static/img/logo/quillioBlack.png">
-            <br>
-            <div class="md-form">
-                <input type="email" id="email" name="email" class="form-control validate" value="{{ request.form.email }}" required>
-                <label for="email" data-error="Invalid email"> Enter your email </label>
+                <!--Card image-->
+                <img class="img-fluid" src="https://maxcdn.icons8.com/Share/icon/Users//groups1600.png" alt="Card image cap">
+
+                <!--Card content-->
+                <div class="card-body">
+                    <!--Title-->
+                    <h4 class="card-title">{{ group.name }}</h4>
+                    <!--Text-->
+                    <p class="card-text">This is a group.</p>
+                    <a href="#" class="btn btn-primary">Button</a>
+                </div>
+
             </div>
-            <br>
-            <div class="md-form">
-                <input type="password" id="password" name="password" class="form-control" value="{{ request.form.password }}" required>
-                <label for="password"> Enter your password </label>
-            </div>
-            <ul>
-                <button type="submit" style="width:120px" class="btn btn-unique" formmethod="post"> Login </button>
-                <a style="width:120px" href="/auth/signup" class="btn btn-unique">Sign Up</a>
-            </ul>
         </div>
-    </form>
+    {% endfor %}
+    <a class="btn-floating btn-lg black" style="position: fixed; right:35px; bottom:35px;"><i class="fa fa-plus"></i></a>
+</div>
 </div>
 {% endblock %}

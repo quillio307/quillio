@@ -53,6 +53,7 @@ def create_group():
     res = {'message': "Success"}
     return json.dumps(res)
 
+
 @groups.route('/all', methods=['GET'])
 @login_required
 def all_groups():
@@ -65,9 +66,9 @@ def all_groups():
 
 @groups.route('/', methods=['GET'])
 @login_required
-def groups():
+def groups_page():
     usr = current_user._get_current_object()
     res = []
     for group in usr.groups:
         res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
-    return render_template('groups.html', )
+    return render_template('groups.html', groups=res)
