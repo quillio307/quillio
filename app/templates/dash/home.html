@@ -1,5 +1,7 @@
-{% extends "helpers/layout.html" %} {% block title %} Quillio Dashboard {% endblock %} {% block bodyheader %}
+{% extends "helpers/layout.html" %}
+{% block title %} Quillio Dashboard {% endblock %}
 
+{% block bodyheader %}
 <body class="fixed-sn white-skin">
     <header>
         <ul id="slide-out" class="side-nav fixed sn-bg-1 custom-scrollbar">
@@ -54,7 +56,8 @@
             </li>
             <div class="sidenav-bg mask-strong"></div>
         </ul>
-        {% endblock %} {% block navbar %}
+        {% endblock %}
+    {% block navbar %}
         <nav class="navbar fixed-top navbar-toggleable-md navbar-expand-lg scrolling-navbar double-nav">
             <div class="float-left">
                 <a href="#" data-activates="slide-out" class="button-collapse"><i class="fa fa-bars"></i></a>
@@ -82,7 +85,9 @@
             </ul>
         </nav>
     </header>
-    {% endblock %} {% block nav_links %} {% endblock %} {% block content %}
+    {% endblock %}
+
+{% block content %}
     <header>
         <ul id="slide-out" class="side-nav fixed sn-bg-1 custom-scrollbar">
             <li>
@@ -270,8 +275,10 @@
             </div>
         </div>
     </main>
-    {% endblock %} {% block jsaddition %}
+{% endblock %}
+
+{% block jsaddition %}
     <script>
         $(".button-collapse").sideNav(show);
     </script>
-    {% endblock %}
+{% endblock %}

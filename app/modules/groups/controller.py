@@ -71,4 +71,4 @@ def groups_page():
     res = []
     for group in usr.groups:
         res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
-    return render_template('groups.html', groups=res)
+    return render_template('helpers/dashboard.html', groups=res)

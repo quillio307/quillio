@@ -16,10 +16,8 @@
     <!-- Custom Styles -->
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
-{% block bodyheader %}
 
-<body>
-    {% endblock %}
+<body class="{% block class_style %}{%  endblock %}">
     <!--Navbar-->
     {% block navbar %}
     <nav class="navbar navbar-expand-lg navbar-dark unique-color-dark">
@@ -41,6 +39,8 @@
         <!-- Collapsible content -->
     </nav>
     {% endblock %}
+
+    {% block sidenav %} {% endblock %}
 
     <!-- Flashed Messages -->
     {% with messages = get_flashed_messages() %} {% if messages %}
