@@ -18,6 +18,9 @@ def user_loader(user_id):
         return user
     return None
 
+@auth.route('/dashboard', methods=['GET', 'POST'])
+def dashboard():
+    return render_template('auth/dashboard.html')
 
 @auth.route('/signup', methods=['GET', 'POST'])
 def signup():

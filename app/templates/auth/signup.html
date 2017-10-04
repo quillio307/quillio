@@ -1,4 +1,4 @@
-{% extends "helpers/layout.html" %} {% block title %} Quillio Signup {% endblock %} {% block navbar %}
+{% extends "helpers/layout.html" %} {% block title %} Quillio Signup {% endblock %} {% block bodyheader %}{{ super() }}{% endblock %}{% block navbar %}
 <nav style="height:50px" class="navbar navbar-expand-lg navbar-dark unique-color-dark"></nav>
 {% endblock %}{% block content %}
 <div style="max-width:800px; margin:0 auto" class="container">
@@ -27,4 +27,4 @@
         </div>
     </form>
 </div>
-{% endblock %}
+{% endblock %} {% block jsaddition %}{{ super() }}{% endblock %}
