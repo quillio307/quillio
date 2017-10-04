@@ -7,13 +7,16 @@ from app.setup import db
 from app.modules.auth.model import User
 from app.modules.note.model import Note
 
-class Meeting(db.Document):
-    name = db.StringField(required=True, min_length=3, max_length=50) #title for meeting
-    owner_id = db.ReferenceField(User) #connect to user object (whoever created the meeting)
-    meeting_data = db.ReferenceField(Note) #connect to corresponding note object
 
+class Meeting(db.Document):
+    name = db.StringField(required=True, min_length=3, max_length=50)
+    owner_id = db.ReferenceField(User)
+    members = db.ListField(db.ReferenceField(User))
+    meeting_data = db.ReferenceField(Note)
 
 
 class MeetingForm(Form):
-    name = StringField('Meeting Name', [validators.Length(min=3, max=50), validators.DataRequired()])
-    members = ListField(EmailField('Email Addresses', [validators.DataRequired()]))
+    name = StringField('Meeting Name', [validators.Length(min=3, max=50),
+                                        validators.DataRequired()])
+    members = ListField(EmailField('Email Addresses',
+                                   [validators.DataRequired()]))

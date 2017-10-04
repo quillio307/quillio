@@ -4,9 +4,8 @@ from wtforms import StringField, PasswordField
 
 from app.setup import db
 
+
 class Note(db.Document):
-    transcript = db.StringField(min_length=100)
+    transcript = db.StringField()
     summary = db.StringField()
     recording = db.StringField()
-
-
