@@ -1,6 +1,6 @@
 {% extends "helpers/layout.html" %} {% block title %} Quillio Login {% endblock %} {% block bodyheader %}
 
-<body class="fixed-sn light-blue-skin">
+<body class="fixed-sn white-skin">
     <header>
         <ul id="slide-out" class="side-nav fixed sn-bg-1 custom-scrollbar">
             <li>
@@ -8,13 +8,6 @@
                     <a href="#"><img src="/../static/img/logo/whiteQuil.png" class="img-fluid flex-center"></a>
                 </div>
             </li>
-            <li>
-                <form class="search-form" role="search">
-                    <div class="form-group waves-light">
-                        <input type="text" class="form-control" placeholder="Search">
-                    </div>
-                </form>
-            </li>>
             <li>
                 <ul class="collapsible collapsible-accordion">
                     <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-chevron-right"></i> Submit blog<i class="fa fa-angle-down rotate-icon"></i></a>
@@ -64,7 +57,7 @@
         {% endblock %} {% block navbar %}
         <nav class="navbar fixed-top navbar-toggleable-md navbar-expand-lg scrolling-navbar double-nav">
             <div class="float-left">
-                <a href="#" data-activates="slide-out" class="button-collapse"><i class="fa fa-bars"></i></a>
+                <a href="#" data-activates="slide-out" class="btn-unique button-collapse"><i class="fa fa-bars"></i></a>
             </div>
             <div class="breadcrumb-dn mr-auto">
                 <p>Quillio</p>
@@ -97,15 +90,8 @@
         <ul id="slide-out" class="side-nav fixed sn-bg-1 custom-scrollbar">
             <li>
                 <div class="logo-wrapper waves-light">
-                    <a href="#"><img src="https://mdbootstrap.com/img/logo/mdb-transparent.png" class="img-fluid flex-center"></a>
+                    <a href="#"><img src="/../static/img/logo/whiteQuil.png" class="img-fluid flex-center"></a>
                 </div>
-            </li>
-            <li>
-                <form class="search-form" role="search">
-                    <div class="form-group waves-light">
-                        <input type="text" class="form-control" placeholder="Search">
-                    </div>
-                </form>
             </li>
             <li>
                 <ul class="collapsible collapsible-accordion">
@@ -153,12 +139,9 @@
             </li>
             <div class="sidenav-bg mask-strong"></div>
         </ul>
-        <nav class="navbar fixed-top navbar-toggleable-md navbar-expand-lg scrolling-navbar double-nav">
+        <nav class="navbar navbar-dark bg-grey fixed-top navbar-toggleable-md navbar-expand-lg scrolling-navbar double-nav">
             <div class="float-left">
                 <a href="#" data-activates="slide-out" class="button-collapse"><i class="fa fa-bars"></i></a>
-            </div>
-            <div class="breadcrumb-dn mr-auto">
-                <p>Material Design for Bootstrap</p>
             </div>
             <ul class="nav navbar-nav nav-flex-icons ml-auto">
                 <li class="nav-item">
@@ -170,26 +153,109 @@
                 <li class="nav-item">
                     <a class="nav-link"><i class="fa fa-user"></i> <span class="clearfix d-none d-sm-inline-block">Account</span></a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <div class="dropdown-menu dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                </li>
             </ul>
         </nav>
     </header>
     <main>
-        <div class="container-fluid mt-5">
-            <h2>Advanced Double Navigation with fixed SideNav & fixed Navbar:</h2>
+        <div class="container-fluid ">
+            <h3 class="text-center">Meetings</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="view overlay hm-white-slight">
+                            <img src="https://mdbootstrap.com/img/Photos/Others/food.jpg" class="img-fluid" alt="">
+                            <a>
+                                <div class="mask"></div>
+                            </a>
+                        </div>
+                        <a class="btn-floating btn-action"><i class="fa fa-chevron-right"></i></a>
+                        <div class="card-body">
+                            <h4 class="card-title">Meeting 1</h4>
+                            <hr>
+                            <p class="card-text">Some weird summary of meeting.</p>
+                        </div>
+                        <div class="card-data">
+                            <ul>
+                                <li><i class="fa fa-clock-o"></i> 05/10/2015</li>
+                                <li><a href="#"><i class="fa fa-comments-o"></i>12</a></li>
+                                <li><a href="#"><i class="fa fa-users"> </i>21</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="view overlay hm-white-slight">
+                            <img src="https://mdbootstrap.com/img/Photos/Others/food.jpg" class="img-fluid" alt="">
+                            <a>
+                                <div class="mask"></div>
+                            </a>
+                        </div>
+                        <a class="btn-floating btn-action"><i class="fa fa-chevron-right"></i></a>
+                        <div class="card-body">
+                            <h4 class="card-title">Meeting 2</h4>
+                            <hr>
+                            <p class="card-text">Short summary of meeting</p>
+                        </div>
+                        <div class="card-data">
+                            <ul>
+                                <li><i class="fa fa-clock-o"></i>05/10/2015</li>
+                                <li><a href="#"><i class="fa fa-comments-o"></i>12</a></li>
+                                <li><a href="#"><i class="fa fa-users"> </i>3</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <br>
-            <h5>1. Fixed side menu, hidden on small devices.</h5>
-            <h5>2. Fixed Navbar. It will always stay visible on the top, even when you scroll down.</h5>
-            <div style="height: 2000px"></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="view overlay hm-white-slight">
+                            <img src="https://mdbootstrap.com/img/Photos/Others/food.jpg" class="img-fluid" alt="">
+                            <a>
+                                <div class="mask"></div>
+                            </a>
+                        </div>
+                        <a class="btn-floating btn-action"><i class="fa fa-chevron-right"></i></a>
+                        <div class="card-body">
+                            <h4 class="card-title">Meeting 3</h4>
+                            <hr>
+                            <p class="card-text">Short summary of your meeting.</p>
+                        </div>
+                        <div class="card-data">
+                            <ul>
+                                <li><i class="fa fa-clock-o"></i> 05/10/2015</li>
+                                <li><a href="#"><i class="fa fa-comments-o"></i>12</a></li>
+                                <li><a href="#"><i class="fa fa-users"> </i>21</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="view overlay hm-white-slight">
+                            <img src="https://mdbootstrap.com/img/Photos/Others/food.jpg" class="img-fluid" alt="">
+                            <a>
+                                <div class="mask"></div>
+                            </a>
+                        </div>
+                        <a class="btn-floating btn-action"><i class="fa fa-chevron-right"></i></a>
+                        <div class="card-body">
+                            <h4 class="card-title">Meeting 4</h4>
+                            <hr>
+                            <p class="card-text">Short summary of meeting</p>
+                        </div>
+                        <div class="card-data">
+                            <ul>
+                                <li><i class="fa fa-clock-o"></i>05/10/2015</li>
+                                <li><a href="#"><i class="fa fa-comments-o"></i>12</a></li>
+                                <li><a href="#"><i class="fa fa-users"> </i>3</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
-    {% endblock %} {% block jsaddition %} {% endblock %}
+    {% endblock %} {% block jsaddition %}{% endblock %}
