@@ -7,6 +7,8 @@ from app.modules.auth.model import User
 from app.modules.auth.model import user_datastore
 from app.setup import login_manager
 
+
+
 auth = Blueprint('auth', __name__)
 
 
