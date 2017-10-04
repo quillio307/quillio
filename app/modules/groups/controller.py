@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, request
+from flask import Blueprint, abort, request, render_template
 from flask_security import Security, login_required
 from app.modules.auth.model import User
 from app.modules.groups.model import Group
@@ -61,3 +61,13 @@ def all_groups():
     for group in usr.groups:
         res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
     return json.dumps(res)
+
+
+@groups.route('/', methods=['GET'])
+@login_required
+def groups():
+    usr = current_user._get_current_object()
+    res = []
+    for group in usr.groups:
+        res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
+    return render_template('groups.html', )
