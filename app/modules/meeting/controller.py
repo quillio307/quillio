@@ -13,7 +13,7 @@ def new():
     if form.validate():
         try: 
             #create the meeting and add to the invited user's meeting ids
-
+            pass
         except Exception as e:
             flash('A problem has occurred, please try again! {}'.format(e))
             return redirect(url_for('meeting.new'))
