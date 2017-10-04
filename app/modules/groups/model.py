@@ -7,6 +7,7 @@ class Group(db.Document):
     name = db.StringField(max_length=80)
     members = db.ListField(field=db.ReferenceField(User), default=[])
     admins = db.ListField(field=db.ReferenceField(User), default=[])
+    meta = {'strict': False}
 
     def user_is_admin(self, user):
         """ Determines if a User is authenticated """
