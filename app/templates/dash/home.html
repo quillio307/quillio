@@ -57,7 +57,7 @@
         {% endblock %} {% block navbar %}
         <nav class="navbar fixed-top navbar-toggleable-md navbar-expand-lg scrolling-navbar double-nav">
             <div class="float-left">
-                <a href="#" data-activates="slide-out" class="btn-unique button-collapse"><i class="fa fa-bars"></i></a>
+                <a href="#" data-activates="slide-out" class="button-collapse"><i class="fa fa-bars"></i></a>
             </div>
             <div class="breadcrumb-dn mr-auto">
                 <p>Quillio</p>
@@ -123,10 +123,10 @@
         </nav>
     </header>
     <main>
-        <div class="container-fluid ">
-            <h3 class="text-center">Meetings</h3>
-            <div class="row">
-                <div class="col-md-4">
+        <h3 class="text-center">Meetings</h3>
+        <div class="container-fluid flex-center">
+            <div class="row flex-center">
+                <div class="card-deck">
                     <div class="card">
                         <div class="view overlay hm-white-slight">
                             <img src="https://mdbootstrap.com/img/Photos/Others/food.jpg" class="img-fluid" alt="">
@@ -138,7 +138,7 @@
                         <div class="card-body">
                             <h4 class="card-title">Meeting 1</h4>
                             <hr>
-                            <p class="card-text">Some weird summary of meeting.</p>
+                            <p class="card-text">Short summary of meeting.</p>
                         </div>
                         <div class="card-data">
                             <ul>
@@ -148,8 +148,6 @@
                             </ul>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
                     <div class="card">
                         <div class="view overlay hm-white-slight">
                             <img src="https://mdbootstrap.com/img/Photos/Others/food.jpg" class="img-fluid" alt="">
@@ -171,8 +169,6 @@
                             </ul>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
                     <div class="card">
                         <div class="view overlay hm-white-slight">
                             <img src="https://mdbootstrap.com/img/Photos/Others/food.jpg" class="img-fluid" alt="">
@@ -195,10 +191,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-md-4">
+                <br>
+                <div class="card-deck">
                     <div class="card">
                         <div class="view overlay hm-white-slight">
                             <img src="https://mdbootstrap.com/img/Photos/Others/food.jpg" class="img-fluid" alt="">
@@ -210,7 +204,7 @@
                         <div class="card-body">
                             <h4 class="card-title">Meeting 4</h4>
                             <hr>
-                            <p class="card-text">Short summary of your meeting.</p>
+                            <p class="card-text">Short summary of meeting.</p>
                         </div>
                         <div class="card-data">
                             <ul>
@@ -220,8 +214,6 @@
                             </ul>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
                     <div class="card">
                         <div class="view overlay hm-white-slight">
                             <img src="https://mdbootstrap.com/img/Photos/Others/food.jpg" class="img-fluid" alt="">
@@ -243,8 +235,6 @@
                             </ul>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
                     <div class="card">
                         <div class="view overlay hm-white-slight">
                             <img src="https://mdbootstrap.com/img/Photos/Others/food.jpg" class="img-fluid" alt="">
@@ -270,4 +260,4 @@
             </div>
         </div>
     </main>
-    {% endblock %} {% block jsaddition %}{% endblock %}
+    {% endblock %} {% block jsaddition %} {% endblock %}
