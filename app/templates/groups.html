@@ -31,7 +31,61 @@
             </div>
         </div>
     {% endfor %}
-    <a class="btn-floating btn-lg black" style="position: fixed; right:35px; bottom:35px;"><i class="fa fa-plus"></i></a>
+    <a class="btn-floating btn-lg black" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm"><i class="fa fa-plus"></i></a>
 </div>
 </div>
+<!--Modal: Contact form-->
+<div class="modal fade" id="createGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
+    <div class="modal-dialog cascading-modal" role="document">
+        <!--Content-->
+        <div class="modal-content">
+
+            <!--Header-->
+            <div class="modal-header light-blue darken-3 white-text">
+                <h4 class="title"><i class="fa fa-pencil"></i>Create Group</h4>
+                <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!--Body-->
+            <div class="modal-body mb-0">
+                <div class="md-form form-sm">
+                    <input type="text" id="form19" class="form-control">
+                    <label for="form19">Group Name</label>
+                </div>
+
+                <div class="md-form form-sm chips chips-placeholder" id="form20"></div>
+
+                <div class="md-form form-sm chips chips-placeholder" id="form21"></div>
+
+                <div class="md-form form-sm">
+                    <textarea type="text" id="form8" class="md-textarea mb-0"></textarea>
+                    <label for="form8">Description</label>
+                </div>
+
+                <div class="text-center mt-1-half">
+                    <button class="btn btn-info mb-2">Create<i class="fa fa-send ml-1"></i></button>
+                </div>
+
+            </div>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
+<!--Modal: Contact form-->
+
+{% endblock %}
+
+{% block js_import %}
+<script type="text/javascript" src="/static/js/quillio.js"></script>
+<script>
+    $('.chips-placeholder#form20').material_chip({
+        placeholder: 'Add Members',
+        secondaryPlaceholder: '+Member Emails',
+    });
+    $('.chips-placeholder#form21').material_chip({
+        placeholder: 'Add Admins',
+        secondaryPlaceholder: '+Admin Emails',
+    });
+</script>
 {% endblock %}
