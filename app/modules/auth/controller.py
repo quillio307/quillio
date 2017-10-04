@@ -18,9 +18,7 @@ def user_loader(user_id):
         return user
     return None
 
-@auth.route('/dashboard', methods=['GET', 'POST'])
-def dashboard():
-    return render_template('auth/dashboard.html')
+
 
 @auth.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -43,7 +41,7 @@ def signup():
             user_datastore.add_role_to_user(user, default)
 
             login_user(user)
-            return redirect(request.args.get('next') or url_for('home'))
+            return redirect(request.args.get('next') or url_for('dash.home'))
         except Exception as e:
             flash('A Problem has Occured, Please Try Again! {}'.format(e))
             return redirect(url_for('auth.signup'))
@@ -62,7 +60,7 @@ def login():
             if bcrypt.verify(form.password.data, user.password):
                 login_user(user)
                 flash('Logged in successfully, {}'.format(user.name))
-                return redirect(request.args.get('next') or url_for('home'))
+                return redirect(request.args.get('next') or url_for('dash.home'))
     flash('Invalid Email or Password')
     return redirect(url_for('auth.login'))
 
