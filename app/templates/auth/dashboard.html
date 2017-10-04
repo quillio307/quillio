@@ -1,31 +1,195 @@
-{% extends "helpers/layout.html" %} {% block title %} Quillio Login {% endblock %} {% block nav_links %}
-<li class="nav-item active">
-    <a class="nav-link" style="float:right" href="/auth/signup">Sign Up</a>
-    <li class="nav-item">
-        <a class="nav-link" href="#">Link</a>
-    </li>
-</li>
-{% endblock %} {% block content %}
-<div style="max-width:800px; margin:0 auto" class="container">
-    <form>
-        <br>
-        <div class="text-center">
-            <img style="max-width:400px; height:auto" src="/../static/img/logo/quillioBlack.png">
-            <br>
-            <div class="md-form">
-                <input type="email" id="email" name="email" class="form-control validate" value="{{ request.form.email }}" required>
-                <label for="email" data-error="Invalid email"> Enter your email </label>
-            </div>
+{% extends "helpers/layout.html" %} {% block title %} Quillio Login {% endblock %} {% block bodyheader %}
 
-            <br>
-            <div class="md-form">
-                <input type="password" id="password" name="password" class="form-control" value="{{ request.form.password }}" required>
-                <label for="password"> Enter your password </label>
+<body class="fixed-sn light-blue-skin">
+    <header>
+        <ul id="slide-out" class="side-nav fixed sn-bg-1 custom-scrollbar">
+            <li>
+                <div class="logo-wrapper waves-light">
+                    <a href="#"><img src="/../static/img/logo/whiteQuil.png" class="img-fluid flex-center"></a>
+                </div>
+            </li>
+            <li>
+                <form class="search-form" role="search">
+                    <div class="form-group waves-light">
+                        <input type="text" class="form-control" placeholder="Search">
+                    </div>
+                </form>
+            </li>>
+            <li>
+                <ul class="collapsible collapsible-accordion">
+                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-chevron-right"></i> Submit blog<i class="fa fa-angle-down rotate-icon"></i></a>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="#" class="waves-effect">Submit listing</a>
+                                </li>
+                                <li><a href="#" class="waves-effect">Registration form</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-hand-pointer-o"></i> Instruction<i class="fa fa-angle-down rotate-icon"></i></a>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="#" class="waves-effect">For bloggers</a>
+                                </li>
+                                <li><a href="#" class="waves-effect">For authors</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-eye"></i> About<i class="fa fa-angle-down rotate-icon"></i></a>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="#" class="waves-effect">Introduction</a>
+                                </li>
+                                <li><a href="#" class="waves-effect">Monthly meetings</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-envelope-o"></i> Contact me<i class="fa fa-angle-down rotate-icon"></i></a>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="#" class="waves-effect">FAQ</a>
+                                </li>
+                                <li><a href="#" class="waves-effect">Write a message</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <div class="sidenav-bg mask-strong"></div>
+        </ul>
+        {% endblock %} {% block navbar %}
+        <nav class="navbar fixed-top navbar-toggleable-md navbar-expand-lg scrolling-navbar double-nav">
+            <div class="float-left">
+                <a href="#" data-activates="slide-out" class="button-collapse"><i class="fa fa-bars"></i></a>
             </div>
-
-            <button type="submit" class="btn btn-unique" formmethod="post"> Login </button>
+            <div class="breadcrumb-dn mr-auto">
+                <p>Quillio</p>
+            </div>
+            <ul class="nav navbar-nav nav-flex-icons ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link"><i class="fa fa-envelope"></i> <span class="clearfix d-none d-sm-inline-block">Contact</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"><i class="fa fa-comments-o"></i> <span class="clearfix d-none d-sm-inline-block">Support</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"><i class="fa fa-user"></i> <span class="clearfix d-none d-sm-inline-block">Account</span></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Dropdown
+                        </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    {% endblock %} {% block nav_links %} {% endblock %} {% block content %}
+    <header>
+        <ul id="slide-out" class="side-nav fixed sn-bg-1 custom-scrollbar">
+            <li>
+                <div class="logo-wrapper waves-light">
+                    <a href="#"><img src="https://mdbootstrap.com/img/logo/mdb-transparent.png" class="img-fluid flex-center"></a>
+                </div>
+            </li>
+            <li>
+                <form class="search-form" role="search">
+                    <div class="form-group waves-light">
+                        <input type="text" class="form-control" placeholder="Search">
+                    </div>
+                </form>
+            </li>
+            <li>
+                <ul class="collapsible collapsible-accordion">
+                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-chevron-right"></i> Submit blog<i class="fa fa-angle-down rotate-icon"></i></a>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="#" class="waves-effect">Submit listing</a>
+                                </li>
+                                <li><a href="#" class="waves-effect">Registration form</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-hand-pointer-o"></i> Instruction<i class="fa fa-angle-down rotate-icon"></i></a>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="#" class="waves-effect">For bloggers</a>
+                                </li>
+                                <li><a href="#" class="waves-effect">For authors</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-eye"></i> About<i class="fa fa-angle-down rotate-icon"></i></a>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="#" class="waves-effect">Introduction</a>
+                                </li>
+                                <li><a href="#" class="waves-effect">Monthly meetings</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-envelope-o"></i> Contact me<i class="fa fa-angle-down rotate-icon"></i></a>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="#" class="waves-effect">FAQ</a>
+                                </li>
+                                <li><a href="#" class="waves-effect">Write a message</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <div class="sidenav-bg mask-strong"></div>
+        </ul>
+        <nav class="navbar fixed-top navbar-toggleable-md navbar-expand-lg scrolling-navbar double-nav">
+            <div class="float-left">
+                <a href="#" data-activates="slide-out" class="button-collapse"><i class="fa fa-bars"></i></a>
+            </div>
+            <div class="breadcrumb-dn mr-auto">
+                <p>Material Design for Bootstrap</p>
+            </div>
+            <ul class="nav navbar-nav nav-flex-icons ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link"><i class="fa fa-envelope"></i> <span class="clearfix d-none d-sm-inline-block">Contact</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"><i class="fa fa-comments-o"></i> <span class="clearfix d-none d-sm-inline-block">Support</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"><i class="fa fa-user"></i> <span class="clearfix d-none d-sm-inline-block">Account</span></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Dropdown
+                    </a>
+                    <div class="dropdown-menu dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="container-fluid mt-5">
+            <h2>Advanced Double Navigation with fixed SideNav & fixed Navbar:</h2>
+            <br>
+            <h5>1. Fixed side menu, hidden on small devices.</h5>
+            <h5>2. Fixed Navbar. It will always stay visible on the top, even when you scroll down.</h5>
+            <div style="height: 2000px"></div>
         </div>
-
-    </form>
-</div>
-{% endblock %}
+    </main>
+    {% endblock %} {% block jsaddition %} {% endblock %}
