@@ -50,12 +50,19 @@ def create():
 
 
 @meeting.route('/active/<string:meeting_id>', methods=['GET'])
+@login_required
 def get_active_meeting(meeting_id):
+    # validate meeting id
     if len(meeting_id) == 24 and all(c in string.hexdigits for c in meeting_id):
         query = Meeting.objects(id__exact=meeting_id)
         if len(query) > 0:
+            # assert that the current user has access to the given meeting
+            if current_user not in query[0].members:
+                flash('You are not a member of that meeting.')
+                return redirect(url_for('meeting.meetings_page'))
             return jsonify({'Meeting': query})
-        else: 
+        else:
             flash('Meeting Not found')
-            return jsonify({'get': 'fucked'})
-    return jsonify({'still': 'fucked'})
+            return redirect(url_for('meeting.meetings_page'))
+    flash('Invalid Meeting Id.')
+    return redirect(url_for('meeting.meetings_page'))
