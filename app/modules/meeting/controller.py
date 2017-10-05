@@ -13,7 +13,6 @@ from app.setup import db
 
 meeting = Blueprint('meeting', __name__)
 
-
 @meeting.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
@@ -39,7 +38,7 @@ def create():
                     u.save()
                 flash('New meeting created with member(s): {}'
                       .format(query_emails))
-                return redirect(url_for('dash.home'))
+                return redirect(url_for('meetings_page'))
             # show the invalid users
             else:
                 invalid = list(set(emails) - set(query_emails))
@@ -49,7 +48,7 @@ def create():
             flash('A problem has occurred, please try again! {}'.format(e))
             return redirect(url_for('meeting.create'))
     flash('Please list a meeting name between 3 and 50 characters in length!')
-    return redirect(url_for('dash.home'))
+    return redirect(url_for('meeting.meetings_page'))
 
 
 @meeting.route('/active/<string:meeting_id>', methods=['GET'])
@@ -62,13 +61,13 @@ def get_active_meeting(meeting_id):
             # assert that the current user has access to the given meeting
             if current_user not in query[0].members:
                 flash('You are not a member of that meeting.')
-                return redirect(url_for('dash.home'))
+                return redirect(url_for('meeting.meetings_page'))
             return jsonify({'Meeting': query})
         else: 
             flash('Meeting Not found')
-            return redirect(url_for('dash.home'))
+            return redirect(url_for('meeting.meetings_page'))
     flash('Invalid Meeting Id.')
-    return redirect(url_for('dash.home'))
+    return redirect(url_for('meeting.meetings_page'))
 
 
 @meeting.route('/search/<string:meeting_title>')
@@ -83,8 +82,8 @@ def search(meeting_title):
 def all_meetings():
     usr = current_user._get_current_object()
     res = []
-    for meet in usr.meeting:
-        res.append({'name': meet.name, 'admin': meet.user_is_admin(usr)})
+    for meet in usr.meetings:
+        res.append({'name': meet.name})
     return json.dumps(res)
 
 @meeting.route('/', methods=['GET'])
@@ -92,6 +91,6 @@ def all_meetings():
 def meetings_page():
     usr = current_user._get_current_object()
     res = []
-    for meet in usr.meeting:
-        res.append({'name': meet.name, 'admin': meet.user_is_admin(usr)})
-    return render_template('meeting.html', meeting=res)
+    for meet in usr.meetings:
+        res.append({'name': meet.name})
+    return render_template('meeting.html', meetings=res)
