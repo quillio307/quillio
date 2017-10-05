@@ -1,5 +1,4 @@
-import string
-import json
+import json, string
 
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
@@ -53,7 +52,8 @@ def home():
         except Exception as e:
             flash('A problem has occurred, please try again! {}'.format(e))
             return redirect(url_for('meeting.home'))
-    return 'name: {0}, emails: {1}'.format(form.name.data, form.emails.data)
+    flash('Invalid input.  Please try again!')
+    return redirect(url_for('meeting.home'))
 
 
 @meeting.route('/active/<string:meeting_id>', methods=['GET'])
@@ -93,17 +93,3 @@ def all_meetings():
     for meet in usr.meetings:
         res.append({'name': meet.name})
     return json.dumps(res)
-
-
-# @meeting.route('/', methods=['GET', 'POST'])
-# @login_required
-# def meetings_page():
-#     form = MeetingForm(request.form)
-#     if request.method == 'GET':
-#         usr = current_user._get_current_object()
-#         res = []
-#         for meet in usr.meetings:
-#             res.append({'name': meet.name})
-#         return render_template('meeting.html', meetings=res)
-
-#     return json.dumps({'emails': request.form['emails']})

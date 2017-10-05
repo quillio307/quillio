@@ -1,3 +1,6 @@
+from wtforms import Form, validators
+from wtforms import StringField
+
 from app.setup import db
 from app.modules.auth.model import User
 
@@ -15,3 +18,10 @@ class Group(db.Document):
             if admin == user:
                 return True
         return False
+
+
+class GroupForm(Form):
+    name = StringField('Meeting Name', [validators.Length(min=3, max=100),
+                                        validators.DataRequired()])
+    emails = StringField('Emails', [validators.DataRequired()])
+    admin_emails = StringField('Admin Emails')
