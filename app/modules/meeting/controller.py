@@ -33,7 +33,10 @@ def create():
 
             # validate that all the members exist
             if len(emails) == len(query):
-                Meeting(name=form.name.data, members=query, active=True).save()
+                m = Meeting(name=form.name.data, members=query, active=True).save()
+                for u in query:
+                    u.Meetings.append(m)
+                    u.save()
                 flash('New meeting created with member(s): {}'
                       .format(query_emails))
                 return redirect(url_for('dash.home'))
