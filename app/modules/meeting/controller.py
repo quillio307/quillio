@@ -66,3 +66,62 @@ def get_active_meeting(meeting_id):
             return redirect(url_for('dash.home'))
     flash('Invalid Meeting Id.')
     return redirect(url_for('dash.home'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@meeting.route('/search/<string:meeting_title>')
+@login_required
+def search(meeting_title):
+    query = Meeting.objects(name__iexact=meeting_title)
+    return jsonify({'results': query})
