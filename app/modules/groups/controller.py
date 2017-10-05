@@ -13,6 +13,76 @@ from app.setup import login_manager, db
 groups = Blueprint('groups', __name__)
 
 
+@groups.route('/', methods=['GET', 'POST'])
+@login_required
+def home():
+    form = GroupForm(request.form)
+    if request.method == 'GET':
+        usr = current_user._get_current_object()
+        res = []
+        for group in usr.groups:
+            res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
+        return render_template('groups.html', groups=res, form=form)
+
+    if form.validate():
+        try:
+            emails = form.emails.data.split(" ")
+            emails.append(current_user.email)
+
+            query = User.objects(email__in=emails)
+            query_emails = [u.email for u in query]
+
+            if len(emails) == len(query):
+                g = Group(name=form.name.data,
+                          members=query, admins=[]).save()
+
+                for u in query:
+                    u.groups.append(g)
+                    u.save()
+                flash('New Group created with member(s): {}'
+                      .format(query_emails))
+                return redirect(url_for('groups.home'))
+            else:
+                invalid = list(set(emails) - set(query_emails))
+                flash('Could not find user(s): {}'.format(invalid))
+                return redirect(url_for('groups.home'))
+        except Exception as e:
+            flash('A problem has occurred, please try again! {}'.format(e))
+            return redirect(url_for('groups.home'))
+
+    flash('Invalid input.  Please try again!')
+    return redirect(url_for('groups.home'))
+
+
+@groups.route('/get/<string:group_id>')
+@login_required
+def get_group_by_id(group_id):
+    if len(group_id) == 24 and all(c in string.hexdigits for c in group_id):
+        query = Group.objects(id__exact=group_id)
+        if len(query) > 0:
+            if current_user not in query[0].members:
+                flash('You are not a member of that group.')
+                return redirect(url_for('groups.home'))
+            return jsonify({'Group': query})
+        else:
+            flash('Group not found')
+            return redirect(url_for('groups.home'))
+    flash('Invalid Group Id.')
+    return redirect(url_for('groups.home'))
+
+
+# AMMO CODE
+
+# @groups.route('/all', methods=['GET'])
+# @login_required
+# def all_groups():
+#     usr = current_user._get_current_object()
+#     res = []
+#     for group in usr.groups:
+#         res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
+#     return json.dumps(res)
+
+
 #@groups.route('/create', methods=['POST'])
 #@login_required
 # def create_group():
@@ -56,54 +126,3 @@ groups = Blueprint('groups', __name__)
 #
 #    res = {'message': "Success"}
 #    return json.dumps(res)
-
-
-@groups.route('/all', methods=['GET'])
-@login_required
-def all_groups():
-    usr = current_user._get_current_object()
-    res = []
-    for group in usr.groups:
-        res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
-    return json.dumps(res)
-
-
-@groups.route('/', methods=['GET', 'POST'])
-@login_required
-def home():
-    form = GroupForm(request.form)
-    if request.method == 'GET':
-        usr = current_user._get_current_object()
-        res = []
-        for group in usr.groups:
-            res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
-        return render_template('groups.html', groups=res, form=form)
-
-    if form.validate():
-        try:
-            emails = form.emails.data.split(" ")
-            emails.append(current_user.email)
-
-            query = User.objects(email__in=emails)
-            query_emails = [u.email for u in query]
-
-            if len(emails) == len(query):
-                g = Group(name=form.name.data,
-                          members=query, admins=[]).save()
-
-                for u in query:
-                    u.groups.append(g)
-                    u.save()
-                flash('New Group created with member(s): {}'
-                      .format(query_emails))
-                return redirect(url_for('groups.home'))
-            else:
-                invalid = list(set(emails) - set(query_emails))
-                flash('Could not find user(s): {}'.format(invalid))
-                return redirect(url_for('groups.home'))
-        except Exception as e:
-            flash('A problem has occurred, please try again! {}'.format(e))
-            return redirect(url_for('groups.home'))
-
-    flash('Invalid input.  Please try again!')
-    return redirect(url_for('groups.home'))
