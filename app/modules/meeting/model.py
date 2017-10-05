@@ -17,8 +17,5 @@ class Meeting(db.Document):
 
 
 class MeetingForm(Form):
-    name = StringField('Meeting Name', [validators.Length(min=3, max=50),
-                                        validators.DataRequired()])
-    emails = StringField('Emails', [validators.DataRequired()])
-    description = StringField('Description', [validators.Length(min=3,
-                                                                max=100)])
+    name = StringField('Meeting Name')
+    emails = StringField('Emails')

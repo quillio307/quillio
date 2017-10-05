@@ -13,12 +13,16 @@ from app.setup import db
 meeting = Blueprint('meeting', __name__)
 
 
-@meeting.route('/create', methods=['GET', 'POST'])
+@meeting.route('/', methods=['GET', 'POST'])
 @login_required
-def create():
+def home():
     form = MeetingForm(request.form)
     if request.method == 'GET':
-        return render_template('meeting/create.html', form=form)
+        usr = current_user._get_current_object()
+        res = []
+        for meet in usr.meetings:
+            res.append({'name': meet.name})
+        return render_template('meeting.html', meetings=res, form=form)
 
     if form.validate():
         try:
@@ -40,17 +44,16 @@ def create():
                     u.save()
                 flash('New meeting created with member(s): {}'
                       .format(query_emails))
-                return redirect(url_for('meeting.meetings_page'))
+                return redirect(url_for('meeting.home'))
             # show the invalid users
             else:
                 invalid = list(set(emails) - set(query_emails))
                 flash('Could not find user(s): {}'.format(invalid))
-                return redirect(url_for('meeting.create'))
+                return redirect(url_for('meeting.home'))
         except Exception as e:
             flash('A problem has occurred, please try again! {}'.format(e))
-            return redirect(url_for('meeting.create'))
-    flash('Please list a meeting name between 3 and 50 characters in length!')
-    return redirect(url_for('meeting.meetings_page'))
+            return redirect(url_for('meeting.home'))
+    return 'name: {0}, emails: {1}'.format(form.name.data, form.emails.data)
 
 
 @meeting.route('/active/<string:meeting_id>', methods=['GET'])
@@ -92,15 +95,15 @@ def all_meetings():
     return json.dumps(res)
 
 
-@meeting.route('/', methods=['GET', 'POST'])
-@login_required
-def meetings_page():
-    form = MeetingForm(request.form)
-    if request.method == 'GET':
-        usr = current_user._get_current_object()
-        res = []
-        for meet in usr.meetings:
-            res.append({'name': meet.name})
-        return render_template('meeting.html', meetings=res)
+# @meeting.route('/', methods=['GET', 'POST'])
+# @login_required
+# def meetings_page():
+#     form = MeetingForm(request.form)
+#     if request.method == 'GET':
+#         usr = current_user._get_current_object()
+#         res = []
+#         for meet in usr.meetings:
+#             res.append({'name': meet.name})
+#         return render_template('meeting.html', meetings=res)
 
-    return json.dumps({'emails': request.form['emails']})
+#     return json.dumps({'emails': request.form['emails']})

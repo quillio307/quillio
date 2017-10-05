@@ -30,10 +30,10 @@
             {% endfor %}
         </div>
     </div>
-    <a class="btn-floating btn-lg black" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm"><i class="fa fa-plus"></i></a>
+    <a class="btn-floating btn-lg unique" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm"><i class="fa fa-plus"></i></a>
 </div>
 <!--Modal: Contact form-->
-<div class="modal fade" id="createGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
+<div class="modal fade" id="createMeetingForm" tabindex="-1" role="dialog" aria-labelledby="createMeetingForm" aria-hidden="true">
     <div class="modal-dialog cascading-modal" role="document">
         <!--Content-->
         <div class="modal-content">
@@ -49,24 +49,18 @@
             <form id="create-meeting">
                 <div class="modal-body mb-0">
                     <div class="md-form form-sm">
-                        <input type="text" id="form19" name="name" value="{{ request.form.name }}" class="form-control" required>
+                        <input type="text" id="name" name="name" value="{{ request.form.name }}" class="form-control" required>
                         <label for="form19"> Meeting Name </label>
                     </div>
 
                     <!-- <div class="md-form form-sm chips chips-placeholder" id="form20"></div> -->
-                    <div id="form20" class="md-form form-sm chips chips-placeholder">
-                        <input type="text" id="form20" value="{{ request.form.emails}}" required>
-                        <label for="form20"> User Emails </label>
-                    </div>
-
-
                     <div class="md-form form-sm">
-                        <textarea type="text" id="form8" name="description" value="{{ request.form.description }}" class="md-textarea mb-0"></textarea>
-                        <label for="form8"> Description </label>
+                        <input type="text" id="emails" name="emails" value="{{ request.form.emails }}" class="form-control" required>
+                        <label for="emails"> Memeber Emails </label>
                     </div>
 
                     <div class="text-center mt-1-half">
-                        <button type="submit" class="btn btn-info mdb-2" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button>
+                        <button id="meetingCreateButton" type="submit" class="btn btn-info mdb-2" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button>
                     </div>
                 </div>
             </form>
@@ -77,14 +71,6 @@
 <!--Modal: Contact form-->
 {% endblock %} {% block js_import %}
 <script type="text/javascript" src="/static/js/quillio.js"></script>
-
-<script>
-    $('.chips-placeholder#form20').material_chip({
-        placeholder: 'Add Members',
-        value: '{{ request.form.emails }}',
-        secondaryPlaceholder: '+Member Emails'
-    });
-</script>
 
 <script>
     $(".button-collapse").sideNav();
