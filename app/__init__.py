@@ -26,6 +26,7 @@ app.register_blueprint(meeting, url_prefix='/meeting')
 app.register_blueprint(dash)
 
 
+
 login_manager.init_app(app)
 db.init_app(app)
 security = Security(app, user_datastore)
