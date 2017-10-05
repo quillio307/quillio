@@ -5,7 +5,7 @@ from passlib.hash import bcrypt
 from app.modules.auth.model import SignupForm, LoginForm
 from app.modules.auth.model import User
 from app.modules.auth.model import user_datastore
-from app.modules.meeting.model import meeting
+from app.modules.meeting.controller import meeting
 from app.setup import login_manager
 
 

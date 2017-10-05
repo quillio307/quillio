@@ -20,3 +20,5 @@ class MeetingForm(Form):
     name = StringField('Meeting Name', [validators.Length(min=3, max=50),
                                         validators.DataRequired()])
     emails = StringField('Emails', [validators.DataRequired()])
+    description = StringField('Description', [validators.Length(min=3,
+                                                                max=100)])
