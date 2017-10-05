@@ -47,7 +47,6 @@
     </li>
     <div class="sidenav-bg mask-strong"></div>
 </ul>
-
 <main>
     <h3 class="text-center">Meetings</h3>
     <div class="container-fluid flex-center">
@@ -186,8 +185,8 @@
         </div>
     </div>
 </main>
-{% endblock %} {% block jsaddition %}
+{% endblock %} {% block js_import %}
 <script>
-    $(".button-collapse").sideNav(show);
+    $(".button-collapse").sideNav();
 </script>
 {% endblock %}
