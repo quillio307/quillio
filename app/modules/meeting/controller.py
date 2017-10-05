@@ -19,7 +19,7 @@ meeting = Blueprint('meeting', __name__)
 def create():
     form = MeetingForm(request.form)
     if request.method == 'GET':
-        return render_template('meeting/new.html', form=form)
+        return render_template('meeting/create.html', form=form)
 
     if form.validate():
         try:
@@ -35,7 +35,7 @@ def create():
             if len(emails) == len(query):
                 m = Meeting(name=form.name.data, members=query, active=True).save()
                 for u in query:
-                    u.Meetings.append(m)
+                    u.meetings.append(m)
                     u.save()
                 flash('New meeting created with member(s): {}'
                       .format(query_emails))
@@ -44,10 +44,10 @@ def create():
             else:
                 invalid = list(set(emails) - set(query_emails))
                 flash('Could not find user(s): {}'.format(invalid))
-                return redirect(url_for('meeting.new'))
+                return redirect(url_for('meeting.create'))
         except Exception as e:
             flash('A problem has occurred, please try again! {}'.format(e))
-            return redirect(url_for('meeting.new'))
+            return redirect(url_for('meeting.create'))
     flash('Please list a meeting name between 3 and 50 characters in length!')
     return redirect(url_for('dash.home'))
 
