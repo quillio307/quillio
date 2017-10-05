@@ -56,9 +56,9 @@ def home():
     return redirect(url_for('meeting.home'))
 
 
-@meeting.route('/active/<string:meeting_id>', methods=['GET'])
+@meeting.route('/get/<string:meeting_id>', methods=['GET'])
 @login_required
-def get_active_meeting(meeting_id):
+def get_meeting_by_id(meeting_id):
     # validate meeting id
     if len(meeting_id) == 24 and all(c in string.hexdigits for c in meeting_id):
         query = Meeting.objects(id__exact=meeting_id)
@@ -66,13 +66,13 @@ def get_active_meeting(meeting_id):
             # assert that the current user has access to the given meeting
             if current_user not in query[0].members:
                 flash('You are not a member of that meeting.')
-                return redirect(url_for('meeting.meetings_page'))
+                return redirect(url_for('meeting.home'))
             return jsonify({'Meeting': query})
         else:
             flash('Meeting Not found')
-            return redirect(url_for('meeting.meetings_page'))
+            return redirect(url_for('meeting.home'))
     flash('Invalid Meeting Id.')
-    return redirect(url_for('meeting.meetings_page'))
+    return redirect(url_for('meeting.home'))
 
 
 @meeting.route('/search/<string:meeting_title>')
