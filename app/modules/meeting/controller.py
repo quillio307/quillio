@@ -1,11 +1,15 @@
+import string
+
 from flask import Blueprint, render_template, flash, request, redirect, \
-    url_for
+    url_for, jsonify
 from flask_security import current_user, login_required
 
 from app.modules.auth.model import User
 from app.modules.meeting.model import MeetingForm
 from app.modules.meeting.model import Meeting
 from app.modules.dash.controller import dash
+
+from app.setup import db
 
 meeting = Blueprint('meeting', __name__)
 
@@ -43,3 +47,15 @@ def create():
             return redirect(url_for('meeting.new'))
     flash('Please list a meeting name between 3 and 50 characters in length!')
     return redirect(url_for('dash.home'))
+
+
+@meeting.route('/active/<string:meeting_id>', methods=['GET'])
+def get_active_meeting(meeting_id):
+    if len(meeting_id) == 24 and all(c in string.hexdigits for c in meeting_id):
+        query = Meeting.objects(id__exact=meeting_id)
+        if len(query) > 0:
+            return jsonify({'Meeting': query})
+        else: 
+            flash('Meeting Not found')
+            return jsonify({'get': 'fucked'})
+    return jsonify({'still': 'fucked'})
