@@ -1,5 +1,7 @@
 import string
+import time
 
+from datetime import datetime, timedelta
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
 from flask_security import current_user, login_required
@@ -64,18 +66,30 @@ def get_active_meeting(meeting_id):
                 flash('You are not a member of that meeting.')
                 return redirect(url_for('dash.home'))
             return jsonify({'Meeting': query})
-        else: 
+        else:
             flash('Meeting Not found')
             return redirect(url_for('dash.home'))
     flash('Invalid Meeting Id.')
     return redirect(url_for('dash.home'))
 
 
+@meeting.route('/search/<string:date_from>/to/<string:date_to>')
+@login_required
+def search_date(date_from, date_to):
+    start_time = datetime.strptime(date_from,'%b.%d.%Y')
+    end_time = datetime.strptime(date_to, '%b.%d.%Y')
+    end_time += timedelta(days=1)
+    meetings = current_user.meetings
+    filtered = list(filter(lambda x: x.created_at >= start_time and x.created_at <= end_time, meetings))
+    return jsonify({'results': filtered})
+
+
 @meeting.route('/search/<string:meeting_title>')
 @login_required
 def search(meeting_title):
-    query = Meeting.objects(name__iexact=meeting_title)
-    return jsonify({'results': query})
+    meetings = current_user.meetings
+    filtered = list(filter(lambda x: x.name == meeting_title, meetings))
+    return jsonify({'results': filtered})
 
 
 @meeting.route('/all', methods=['GET'])
