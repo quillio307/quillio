@@ -66,3 +66,21 @@ def get_active_meeting(meeting_id):
             return redirect(url_for('dash.home'))
     flash('Invalid Meeting Id.')
     return redirect(url_for('dash.home'))
+
+@meeting.route('/all', methods=['GET'])
+@login_required
+def all_meetings():
+    usr = current_user._get_current_object()
+    res = []
+    for meet in usr.meeting:
+        res.append({'name': meet.name, 'admin': meet.user_is_admin(usr)})
+    return json.dumps(res)
+
+@meeting.route('/', methods=['GET'])
+@login_required
+def meetings_page():
+    usr = current_user._get_current_object()
+    res = []
+    for meet in usr.meeting:
+        res.append({'name': meet.name, 'admin': meet.user_is_admin(usr)})
+    return render_template('meeting.html', meeting=res)
