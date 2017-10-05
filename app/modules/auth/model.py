@@ -21,6 +21,7 @@ class User(db.Document, UserMixin):
     authenticated = db.BooleanField(required=False, default=False)
     roles = db.ListField(db.ReferenceField(Role), default=[])
     groups = db.ListField(db.ReferenceField('Group'), default=[])
+    meetings = db.ListField(db.ReferenceField('Meeting'), default=[])
     meta = {'strict': False}
 
     def is_authenticated(self):
