@@ -1,3 +1,5 @@
+from datetime import datetime as dt
+
 from flask_security import MongoEngineUserDatastore
 from wtforms import Form, validators
 from wtforms import StringField
@@ -11,6 +13,7 @@ class Meeting(db.Document):
     name = db.StringField(required=True, min_length=3, max_length=50)
     members = db.ListField(db.ReferenceField(User))
     active = db.BooleanField()
+    created_at = db.DateTimeField(default=dt.now())
 
 
 class MeetingForm(Form):
