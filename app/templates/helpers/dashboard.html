@@ -1,10 +1,4 @@
-{% extends "helpers/layout.html" %}
-
-{% block class_style %} white-skin {% endblock %}
-
-{% block navbar %} {{ super() }} {% endblock %}
-
-{% block sidenav %}
+{% extends "helpers/layout.html" %} {% macro body(class="white-skin", value='', type='text') -%} {%- endmacro %} {% block navbar %} {{ super() }} {% endblock %} {% block sidenav %}
 
 <!-- SideNav slide-out button -->
 <a href="#" data-activates="slide-out" class="btn btn-primary p-3 button-collapse"><i class="fa fa-bars"></i></a>
@@ -80,11 +74,9 @@
 
 </ul>
 <!-- SideNav Menu -->
-{% endblock %}
-
-{% block content %}
-    <main>
+{% endblock %} {% block content %}
+<main>
     {% block main %} {% endblock %}
-    </main>
+</main>
 
 {% endblock %}

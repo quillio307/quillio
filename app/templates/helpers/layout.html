@@ -17,7 +17,7 @@
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
 
-<body class="{% block class_style %}{%  endblock %}">
+<body class="{{ '' if login_signup == 'loginorsignup' else 'white-skin' }}">
     <!--Navbar-->
     {% block navbar %}
     <nav class="navbar navbar-expand-lg navbar-dark unique-color-dark">
@@ -38,9 +38,7 @@
         </div>
         <!-- Collapsible content -->
     </nav>
-    {% endblock %}
-
-    {% block sidenav %} {% endblock %}
+    {% endblock %} {% block sidenav %} {% endblock %}
 
     <!-- Flashed Messages -->
     {% with messages = get_flashed_messages() %} {% if messages %}
@@ -54,8 +52,6 @@
     {% endif %} {% endwith %}
 
     <div id="content">{% block content %}{% endblock %}</div>
-
-    {% block jsaddition %}{% endblock %}
     <!-- SCRIPTS -->
     <!-- JQuery -->
 
