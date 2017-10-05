@@ -1,0 +1,30 @@
+{% extends "helpers/layout.html" %}
+{% block title %}Create a Meeting{% endblock %}
+
+{% block navbar %}
+    <nav style="height:50px" class="navbar navbar-expand-lg navbar-dark unique-color-dark"></nav>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:800px; margin:0 auto;" class="container">
+    <form>
+        <br>
+        <div class="text-center">
+            <div class="md-form">
+                <input type="text" id="name" class="form-control" name="name" value="{{ request.form.name }}" required>
+                <label for="name"> Meeting Name </label>
+            </div>
+
+            <div class="md-form">
+                <input type="text" id="emails" class="form-control" name="emails" value="{{ request.form.emails }}" required>
+                <label for="emails"> Invite Users by Email </label>
+            </div>
+            
+            <div class="md-form">
+                <button type="submit" class="btn btn-unique" formmethod="post"> Create Meeting </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+{% endblock %}
