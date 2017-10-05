@@ -3,12 +3,9 @@ from flask_security import Security, login_required
 
 # Blueprints
 from app.modules.auth.controller import auth
-
 from app.modules.groups.controller import groups
-
 from app.modules.meeting.controller import meeting
 from app.modules.dash.controller import dash
-#from app.modules.note.controller import note
 
 
 # Security
