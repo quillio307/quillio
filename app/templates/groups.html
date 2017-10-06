@@ -26,7 +26,8 @@
                     <div class="mask"></div>
                 </a>
             </div>
-            <a class="btn-floating btn-action" id="{{ group.id }}" onclick="admin_modal_show(this)" ><i class="fa fa-chevron-right"></i></a>
+
+            <a class="btn-floating btn-action" id="{{ group.id }}" onclick="group_modal_show(this)"><i class="fa fa-chevron-right"></i></a>
             <div class="card-body">
                 <h4 class="card-title"> {{ group.name }}</h4>
                 <hr>
@@ -35,8 +36,10 @@
             <div class="card-data">
                 <ul>
                     <li><i class="fa fa-clock-o"></i></li>
-                    <li><a href="#"><i class="fa fa-comments-o"></i>12</a></li>
-                    <li><a href="#"><i class="fa fa-users"> </i>21</a></li>
+                    <li><a href="#"><i class="fa fa-users"> </i></a></li>
+                    {% if current_user in group.admins %}
+                    <li><a data-toggle="modal" data-target="#editGroupForm">edit</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -85,6 +88,46 @@
         <!--/.Content-->
     </div>
 </div>
+<div class="modal fade" id="editGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
+    <div class="modal-dialog cascading-modal" role="document">
+        <!--Content-->
+        <div class="modal-content">
+
+            <!--Header-->
+            <div class="modal-header darken-3 white-text" style="background-color: #45526E">
+                <h4 class="title"><i class="fa fa-pencil"></i>Edit Group</h4>
+                <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+            </div>
+            <!--Body-->
+            <form>
+                <div class="modal-body mb-0">
+                    <div class="md-form form-sm">
+                        <input type="text" id="name" name="name" value="{{ request.form.name }}" class="form-control" required>
+                        <label for="name"> Group Name </label>
+                    </div>
+
+                    <div class="md-form form-sm">
+                        <input type="text" id="emails" name="emails" value="{{ request.form.emails }}" class="form-control" required>
+                        <label for="emails"> Member Emails </label>
+                    </div>
+
+                    <div class="md-form form-sm">
+                        <input type="text" id="description" name="description" value="{{ request.form.description }}" class="form-control">
+                        <label for="description"> Description </label>
+                    </div>
+
+                    <div class="text-center mt-1-half">
+                        <button id="groupEditButton" type="submit" name="submit" value="put" class="btn btn-mdb mdb-2" formmethod="put"> Update <i class="fa fa-send ml-1"></i></button>
+                        <button id="groupDeleteButton" type="submit" name="submit" value="delete" class="btn btn-danger mdb-2" formmethod="delete"> Delete Group <i class="fa fa-send ml-1"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
 <div class="modal fade right" id="adminAccess" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-full-height modal-right" role="document">
         <div class="modal-content">
@@ -104,10 +147,10 @@
         </div>
     </div>
 </div>
+
 {% endblock %} {% block js_import %}
 <script>
-
-    function admin_modal_show(el) {
+    function group_modal_show(el) {
         id = $(el).attr("id")
         url = '/groups/is/admin/' + id
 
@@ -120,10 +163,8 @@
         })
 
     }
-
 </script>
 <script>
     $(".button-collapse").sideNav();
-
 </script>
 {% endblock %}
