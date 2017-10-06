@@ -1,7 +1,7 @@
 {% extends "helpers/dashboard.html" %} {% block title %} Quillio Groups {% endblock %} {% block main %}
 <h3 class="text-center">Groups</h3>
 {% for group_row in groups | batch(3) %}
-<div class="container-fluid">
+<div class="container">
     <br>
     <div class="row">
         {% for group in group_row %}
@@ -30,7 +30,7 @@
     </div>
 </div>{% endfor %}
 </div>
-<a class="btn-floating btn-lg unique" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm"><i class="fa fa-plus"></i></a>
+<a class="btn-floating btn-lg btn-unique" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm"><i class="fa fa-plus"></i></a>
 <!--Modal: Contact form-->
 <div class="modal fade" id="createGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
     <div class="modal-dialog cascading-modal" role="document">

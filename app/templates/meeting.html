@@ -1,7 +1,7 @@
 {% extends"helpers/dashboard.html" %} {% block title %} Quillio Meetings {% endblock %} {% block main %}
 <h3 class="text-center">Meetings</h3>
 {% for meeting_row in meetings | batch(3) %}
-<div class="container-fluid">
+<div class="container">
     <br>
     <div class="row">
         {% for meeting in meeting_row %}
@@ -31,7 +31,7 @@
     </div>
 </div>{% endfor %}
 </div>
-<a class="btn-floating btn-lg unique" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm"><i class="fa fa-plus"></i></a>
+<a class="btn-floating btn-lg btn-unique" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm"><i class="fa fa-plus"></i></a>
 <!--Modal: Contact form-->
 <div class="modal fade" id="createMeetingForm" tabindex="-1" role="dialog" aria-labelledby="createMeetingForm" aria-hidden="true">
     <div class="modal-dialog cascading-modal" role="document">
