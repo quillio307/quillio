@@ -43,7 +43,7 @@ def home():
             for u in users:
                 uq = User.objects(email__iexact=u[1:])
                 if len(uq) != 0:
-                    groups = list(filter(lambda x: uq[0] in x.members, meetings))
+                    meetings = list(filter(lambda x: uq[0] in x.members, meetings))
 
             return render_template('meeting.html', meetings=meetings, form=create_form)
     
