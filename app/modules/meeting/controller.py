@@ -40,7 +40,7 @@ def home():
     if create_form.validate():
         try:
             # generate list of users that will be in the meeting
-            emails = form.emails.data.split(" ")
+            emails = create_form.emails.data.split(" ")
             emails.append(current_user.email)
 
             # grab the list of valid users
@@ -50,7 +50,7 @@ def home():
             # validate that all the members exist
             if len(emails) == len(query):
                 # add the meeting to each user's meetings list
-                m = Meeting(name=form.name.data,
+                m = Meeting(name=create_form.name.data,
                             members=query, active=True).save()
                 for u in query:
                     u.meetings.append(m)
