@@ -33,5 +33,6 @@ class GroupUpdateForm(Form):
     group_id = StringField('Group ID')
     name = StringField('Name')
     add_emails = StringField('Add Users')
+    add_admin_emails = StringField('Add Admins')
     del_emails = StringField('Remove Users')
     description = StringField('Description')

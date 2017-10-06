@@ -108,17 +108,21 @@
                 <div class="modal-body mb-0">
 
                     <div class="md-form form-sm">
-                        <input type="text" name="group_id" id="group_id" value="{{ request.form.group_id }}" class="form-control">
+                        <input type="text" name="group_id" id="group_id" value="{{ request.form.group_id }}" class="form-control" readonly>
                     </div>
 
                     <div class="md-form form-sm">
                         <input type="text" id="update_name" name="name" value="{{ request.form.name }}" class="form-control">
-                        <label for="name"> New Name </label>
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" id="update_emails" name="emails" value="{{ request.form.emails }}" class="form-control">
-                        <label for="emails"> New User Emails </label>
+                        <input type="text" id="add_emails" name="add_emails" value="{{ request.form.add_emails }}" class="form-control">
+                        <label for="add_emails"> New User Emails </label>
+                    </div>
+
+                    <div class="md-form form-sm">
+                        <input type="text" id="add_admin_emails" name="add_admin_emails" value="{{ request.form.add_admin_emails }}" class="form-control">
+                        <label for="add_admin_emails"> New Admin Emails </label>
                     </div>
 
                     <div class="md-form form-sm">
@@ -128,7 +132,7 @@
 
                     <div class="md-form form-sm">
                         <input type="text" id="update_description" name="description" value="{{ request.form.description }}" class="form-control">
-                        <label for="description"> New Description </label>
+                        <label for="update_description"> New Description </label>
                     </div>
 
                     <div class="text-center mt-1-half">
