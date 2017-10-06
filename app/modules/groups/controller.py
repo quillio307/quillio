@@ -30,9 +30,20 @@ def home():
         search_form = GroupSearchForm(request.form)
         if search_form.validate():
             criterium = search_form.criteria.data.split(" ")
+            users = list(filter(lambda x: "@" in x, criterium))
+            criterium = list(filter(lambda x: "@" not in x, criterium))
             groups = usr.groups
+
+            # search by name 
             for c in criterium:
                 groups = list(filter(lambda x: c.lower() in x.name.lower(), groups))
+
+            # search by user
+            for u in users:
+                flash('seing if {} is in any groups'.format(u[1:]))
+                uq = User.objects(email__iexact=u[1:])
+                if len(uq) != 0:
+                    groups = list(filter(lambda x: uq[0] in x.members, groups))
 
             return render_template('groups.html', groups=groups, form=create_form)
 
@@ -40,7 +51,66 @@ def home():
     if request.form['submit'] == 'update':
         update_form = GroupUpdateForm(request.form)
         if update_form.validate():
-            flash('Id: {}'.format(request.form.get('group_id')))
+            query = Group.objects(id__exact=request.form.get('group_id'))
+            if len(query) != 0:
+                group = query[0]
+
+                # update name and description
+                group.name = request.form.get('name')
+                group.description = request.form.get('description')
+
+                del_user_emails = request.form.get('del_emails')
+                new_user_emails = request.form.get('add_emails')
+                new_admin_emails = request.form.get('add_admin_emails')
+
+                # delete the users
+                members = group.members
+
+                if len(del_user_emails) != 0:
+                    del_list = del_user_emails.split(" ")
+                    del_users = User.objects(email__in=del_list)
+                    # remove group from user
+                    for u in del_users:
+                        if group in u.groups:
+                            flash('removed {0} from {1}'.format(group.name, u.name))
+                            u.groups.remove(group)
+                            u.save()
+
+                    members = list(filter(lambda x: x not in del_users, members))
+                
+                # add the users
+                if len(new_user_emails) != 0:
+                    new_list = new_user_emails.split(" ")
+                    new_users = User.objects(email__in=new_list)
+                    for u in new_users:
+                        if u not in members:
+                            members.append(u)
+                            # add group to user
+                            if group not in u.groups:
+                                u.groups.append(group)
+                                u.save()
+                
+                admins = group.admins
+
+                # add the admins
+                if len(new_admin_emails) != 0:
+                    new_admin_list = new_admin_emails.split(" ")
+                    new_admins = User.objects(email__in=new_admin_list)
+
+                    for a in new_admins:
+                        if a not in admins:
+                            admins.append(a)
+                        if a not in members:
+                            members.append(a)
+                        if group not in a.groups:
+                            a.groups.append(group)
+
+                group.members = members
+                group.admins = admins
+                group.save()
+                flash('successfully updated group!')
+                return redirect(url_for('groups.home'))
+            flash('could not find the group')
             return redirect(url_for('groups.home')) 
         else:
             flash('Invalid Input, Please try again!')
