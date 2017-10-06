@@ -17,10 +17,6 @@ class Group(db.Document):
         if user in self.admins:
             return True
         return False
-        # for admin in self.admins:
-            # if admin == user:
-                # return True
-        # return False
 
 
 class GroupCreateForm(Form):
@@ -31,3 +27,11 @@ class GroupCreateForm(Form):
 
 class GroupSearchForm(Form):
     criteria = StringField('Criteria')
+
+
+class GroupUpdateForm(Form):
+    group_id = StringField('Group ID')
+    name = StringField('Name')
+    add_emails = StringField('Add Users')
+    del_emails = StringField('Remove Users')
+    description = StringField('Description')

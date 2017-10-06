@@ -37,7 +37,7 @@
                 <ul>
                     <li><a href="#"><i class="fa fa-users"></i>{{ group.members|length }}</a></li>
                     {% if current_user in group.admins %}
-                    <li><a data-toggle="modal" data-target="#editGroupForm">edit</a></li>
+                    <li><a data-toggle="modal" data-target="#editGroupForm" id="{{ group.id }}" onclick="set_group('{{ group.id }}', '{{ group.name }}', '{{ group.description }}')"> edit </a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -87,6 +87,7 @@
         <!--/.Content-->
     </div>
 </div>
+
 <div class="modal fade" id="editGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
     <div class="modal-dialog cascading-modal" role="document">
         <!--Content-->
@@ -99,26 +100,37 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
             </div>
+
             <!--Body-->
             <form>
                 <div class="modal-body mb-0">
+
                     <div class="md-form form-sm">
-                        <input type="text" id="name" name="name" value="{{ request.form.name }}" class="form-control" required>
-                        <label for="name"> Group Name </label>
+                        <input type="text" name="group_id" id="group_id" value="{{ request.form.group_id }}" class="form-control">
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" id="emails" name="emails" value="{{ request.form.emails }}" class="form-control" required>
-                        <label for="emails"> Member Emails </label>
+                        <input type="text" id="update_name" name="name" value="{{ request.form.name }}" class="form-control">
+                        <label for="name"> New Name </label>
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" id="description" name="description" value="{{ request.form.description }}" class="form-control">
-                        <label for="description"> Description </label>
+                        <input type="text" id="update_emails" name="emails" value="{{ request.form.emails }}" class="form-control">
+                        <label for="emails"> New User Emails </label>
+                    </div>
+
+                    <div class="md-form form-sm">
+                        <input type="text" id="del_emails" name="del_emails" value="{{ request.form.del_emails }}" class="form-control">
+                        <label for="del_emails"> User's to remove </label>
+                    </div>
+
+                    <div class="md-form form-sm">
+                        <input type="text" id="update_description" name="description" value="{{ request.form.description }}" class="form-control">
+                        <label for="description"> New Description </label>
                     </div>
 
                     <div class="text-center mt-1-half">
-                        <button id="groupEditButton" type="submit" name="submit" value="put" class="btn btn-mdb mdb-2" formmethod="put"> Update <i class="fa fa-send ml-1"></i></button>
+                        <button id="groupEditButton" type="submit" name="submit" value="update" class="btn btn-mdb mdb-2" formmethod="post"> Update <i class="fa fa-send ml-1"></i></button>
                         <button id="groupDeleteButton" type="submit" name="submit" value="delete" class="btn btn-danger mdb-2" formmethod="delete"> Delete Group <i class="fa fa-send ml-1"></i></button>
                     </div>
                 </div>
@@ -153,17 +165,24 @@
         id = $(el).attr("id")
         url = '/groups/is/admin/' + id
 
-        $.get(url, function(data) {
+        $.get(url, function (data) {
             if (data['is_admin']) {
                 alert('User is admin for this group')
             } else {
                 alert('User does not have the permissions to edit')
             }
         })
-
     }
+
+    function set_group(id, name, description) {
+        document.getElementById('group_id').value = id
+        document.getElementById('update_name').value = name
+        document.getElementById('update_description').value = description
+    }
+
 </script>
 <script>
     $(".button-collapse").sideNav();
+
 </script>
 {% endblock %}
