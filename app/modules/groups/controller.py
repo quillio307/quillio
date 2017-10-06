@@ -6,7 +6,7 @@ from flask import Blueprint, abort, request, render_template, flash, redirect, \
 from flask_security import Security, login_required
 
 from app.modules.auth.model import User
-from app.modules.groups.model import Group, GroupForm
+from app.modules.groups.model import Group, GroupCreateForm, GroupSearchForm
 from flask_login import current_user
 from app.setup import login_manager, db
 
@@ -16,25 +16,36 @@ groups = Blueprint('groups', __name__)
 @groups.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    form = GroupForm(request.form)
+    create_form = GroupCreateForm(request.form)
     if request.method == 'GET':
         usr = current_user._get_current_object()
         res = []
         for group in usr.groups:
             res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
-        return render_template('groups.html', groups=res, form=form)
+        return render_template('groups.html', groups=usr.groups, form=create_form)
 
-    if form.validate():
+    if request.form['submit'] == 'search':
+        search_form = GroupSearchForm(request.form)
+        if search_form.validate():
+            usr = current_user._get_current_object()
+            criterium = search_form.criteria.data.split(" ")
+            groups = usr.groups
+            for c in criterium:
+                groups = list(filter(lambda x: c.lower() in x.name.lower(), groups))
+
+            return render_template('groups.html', groups=groups, form=create_form)
+
+    if create_form.validate():
         try:
-            emails = form.emails.data.split(" ")
+            emails = create_form.emails.data.split(" ")
             emails.append(current_user.email)
 
             query = User.objects(email__in=emails)
             query_emails = [u.email for u in query]
 
             if len(emails) == len(query):
-                g = Group(name=form.name.data,
-                          members=query, admins=[]).save()
+                g = Group(name=create_form.name.data,
+                          members=query, admins=[current_user._get_current_object()]).save()
 
                 for u in query:
                     u.groups.append(g)
@@ -52,6 +63,20 @@ def home():
 
     flash('Invalid input.  Please try again!')
     return redirect(url_for('groups.home'))
+
+
+@groups.route('/is/admin/<string:group_id>')
+@login_required
+def get_group_admins(group_id):
+    if len(group_id) == 24 and all(c in string.hexdigits for c in group_id):
+        query = Group.objects(id__exact=group_id)
+        if len(query) > 0:
+            if current_user in query[0].admins:
+                return jsonify({'is_admin': True, 'status': 200})
+            return jsonify({'is_admin': False, 'status': 200})
+        else:
+            return jsonify({'status': 404})
+    return jsonify({'status': 400}) 
 
 
 @groups.route('/get/<string:group_id>')

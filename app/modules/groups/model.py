@@ -14,14 +14,20 @@ class Group(db.Document):
 
     def user_is_admin(self, user):
         """ Determines if a User is authenticated """
-        for admin in self.admins:
-            if admin == user:
-                return True
+        if user in self.admins:
+            return True
         return False
+        # for admin in self.admins:
+            # if admin == user:
+                # return True
+        # return False
 
 
-class GroupForm(Form):
+class GroupCreateForm(Form):
     name = StringField('Meeting Name', [validators.Length(min=3, max=100),
                                         validators.DataRequired()])
     emails = StringField('Emails', [validators.DataRequired()])
-    admin_emails = StringField('Admin Emails')
+
+
+class GroupSearchForm(Form):
+    criteria = StringField('Criteria')
