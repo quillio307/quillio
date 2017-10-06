@@ -1,4 +1,4 @@
-{% extends "helpers/dashboard.html" %} {% block title %} Quillio Groups {% endblock %} {% block main %}
+{% extends"helpers/dashboard.html" %} {% block title %} Quillio Groups {% endblock %} {% block main %}
 <h3 class="text-center">Groups</h3>
 {% for group_row in groups | batch(3) %}
 <div class="container">
@@ -12,7 +12,7 @@
                     <div class="mask"></div>
                 </a>
             </div>
-            <a class="btn-floating btn-action"><i class="fa fa-chevron-right"></i></a>
+            <a data-toggle="modal" data-target="#adminAccess" class="btn-floating btn-action"><i class="fa fa-chevron-right"></i></a>
             <div class="card-body">
                 <h4 class="card-title"> {{ group.name }}</h4>
                 <hr>
@@ -20,7 +20,7 @@
             </div>
             <div class="card-data">
                 <ul>
-                    <li><i class="fa fa-clock-o"></i> 05/10/2015</li>
+                    <li><i class="fa fa-clock-o"></i></li>
                     <li><a href="#"><i class="fa fa-comments-o"></i>12</a></li>
                     <li><a href="#"><i class="fa fa-users"> </i>21</a></li>
                 </ul>
@@ -30,7 +30,7 @@
     </div>
 </div>{% endfor %}
 </div>
-<a class="btn-floating btn-lg btn-unique" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm"><i class="fa fa-plus"></i></a>
+<a class="btn-floating btn-lg pkColor" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm"><i class="fa fa-plus"></i></a>
 <!--Modal: Contact form-->
 <div class="modal fade" id="createGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
     <div class="modal-dialog cascading-modal" role="document">
@@ -38,7 +38,7 @@
         <div class="modal-content">
 
             <!--Header-->
-            <div class="modal-header light-blue darken-3 white-text">
+            <div class="modal-header darken-3 white-text" style="background-color: #45526E">
                 <h4 class="title"><i class="fa fa-pencil"></i>Create Group</h4>
                 <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -63,42 +63,35 @@
                     </div>
 
                     <div class="text-center mt-1-half">
-                        <button id="groupCreateButton" type="submit" class="btn btn-info mdb-2" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button>
+                        <button id="groupCreateButton" type="submit" class="btn btn-mdb mdb-2" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button>
                     </div>
-
-                    <!-- <div class="text-center mt-1-half"> -->
-                    <!-- <button class="btn btn-info mb-2"> Create <i class="fa fa-send ml-1"></i></button> -->
-                    <!-- </div> -->
-
-                    <!-- <div class="text-center mt-1-half"> -->
-                    <!-- <button id="meetingCreateButton" type="submit" class="btn btn-info mdb-2" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button> -->
-                    <!-- </div> -->
-
-                    <!-- <div class="md-form form-sm"> -->
-                    <!-- <textarea type="text" id="form8" class="md-textarea mb-0"></textarea> -->
-                    <!-- <label for="form8">Description</label> -->
-                    <!-- </div> -->
-
-
                 </div>
             </form>
         </div>
         <!--/.Content-->
     </div>
 </div>
-<!--Modal: Contact form-->
+<div class="modal fade right" id="adminAccess" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-full-height modal-right" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title w-100" id="myModalLabel">Group Settings</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %} {% block js_import %}
-<script type="text/javascript" src="/static/js/quillio.js"></script>
-<script>
-    $('.chips-placeholder#form20').material_chip({
-        placeholder: 'Add Members',
-        secondaryPlaceholder: '+Member Emails',
-    });
-    $('.chips-placeholder#form21').material_chip({
-        placeholder: 'Add Admins',
-        secondaryPlaceholder: '+Admin Emails',
-    });
-</script>
+<!-- <script type="text/javascript" src="/static/js/quillio.js"></script> -->
 <script>
     $(".button-collapse").sideNav();
 </script>

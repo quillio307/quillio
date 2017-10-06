@@ -36,8 +36,8 @@
             </div>
             <div class="card-data">
                 <ul>
-                    <li><i class="fa fa-clock-o"></i> {{ meeting.created_at }}</li>
-                    <li><a href="#"><i class="fa fa-users"> </i>{{ meeting.members | length }}</a></li>
+                    <li><i class="fa fa-clock-o"></i> {{ meeting.created_atString }}</li>
+                    <li><a href="#"><i class="fa fa-users"> </i>{{ meeting.members|length }}</a></li>
                 </ul>
             </div>
         </div>
@@ -45,15 +45,15 @@
     </div>
 </div>{% endfor %}
 </div>
-<a class="btn-floating btn-lg btn-unique" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm"><i class="fa fa-plus"></i></a>
+<a class="btn-floating btn-lg pkColor" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm"><i class="fa fa-plus"></i></a>
 <!--Modal: Contact form-->
 <div class="modal fade" id="createMeetingForm" tabindex="-1" role="dialog" aria-labelledby="createMeetingForm" aria-hidden="true">
     <div class="modal-dialog cascading-modal" role="document">
         <!--Content-->
         <div class="modal-content">
             <!--Header-->
-            <div class="modal-header light-blue darken-3 white-text">
-                <h4 class="title"><i class="fa fa-pencil"></i>Create Meeting</h4>
+            <div class="modal-header darken-3 white-text" style="background-color: #45526E">
+                <h4 class=" title"><i class="fa fa-pencil"></i>Create Meeting</h4>
                 <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -72,7 +72,7 @@
                     </div>
 
                     <div class="text-center mt-1-half">
-                        <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-info mdb-2" value="create" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button>
+                        <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="create" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button>
                     </div>
                 </div>
             </form>
@@ -86,6 +86,5 @@
 
 <script>
     $(".button-collapse").sideNav();
-
 </script>
 {% endblock %}
