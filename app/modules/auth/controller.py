@@ -5,10 +5,11 @@ from passlib.hash import bcrypt
 from app.modules.auth.model import SignupForm, LoginForm
 from app.modules.auth.model import User
 from app.modules.auth.model import user_datastore
+from app.modules.meeting.controller import meeting
 from app.setup import login_manager
 
-auth = Blueprint('auth', __name__)
 
+auth = Blueprint('auth', __name__)
 
 @login_manager.user_loader
 def user_loader(user_id):
@@ -17,7 +18,6 @@ def user_loader(user_id):
     if user is not None:
         return user
     return None
-
 
 
 @auth.route('/signup', methods=['GET', 'POST'])
@@ -41,7 +41,7 @@ def signup():
             user_datastore.add_role_to_user(user, default)
 
             login_user(user)
-            return redirect(request.args.get('next') or url_for('dash.home'))
+            return redirect(request.args.get('next') or url_for('meeting.home'))
         except Exception as e:
             flash('A Problem has Occured, Please Try Again! {}'.format(e))
             return redirect(url_for('auth.signup'))
@@ -60,7 +60,7 @@ def login():
             if bcrypt.verify(form.password.data, user.password):
                 login_user(user)
                 flash('Logged in successfully, {}'.format(user.name))
-                return redirect(request.args.get('next') or url_for('dash.home'))
+                return redirect(request.args.get('next') or url_for('meeting.home'))
     flash('Invalid Email or Password')
     return redirect(url_for('auth.login'))
 
@@ -69,4 +69,5 @@ def login():
 @login_required
 def logout():
     logout_user()
+    flash('logged out')
     return redirect(url_for('auth.login'))

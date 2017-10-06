@@ -1,0 +1,20 @@
+{% extends "helpers/layout.html" %} {% block title %} Quillio User Search {% endblock %}{% block navbar %}
+<nav style="height:50px" class="navbar navbar-expand-lg navbar-dark unique-color-dark"></nav>
+{% endblock %}{% block content %}
+<div style="max-width:800px; margin:0 auto" class="container">
+  <form>
+    <br>
+    <div class="text-center">
+      <img style="max-width:400px; height:auto" src="/../static/img/logo/quillioBlack.png">
+      <br>
+      <div class="md-form">
+        <input type="email" id="email" name="email" class="form-control validate" value="{{ request.form.email }}" required>
+        <label for="password"> Enter an Email </label>
+      </div>
+      <ul>
+        <button type="submit" style="width:120px" class="btn btn-unique" formmethod="post"> Search </button>
+      </ul>
+    </div>
+  </form>
+</div>
+{% endblock %}

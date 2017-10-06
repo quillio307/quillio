@@ -1,5 +1,5 @@
-{% extends "helpers/layout.html" %} {% block title %} Quillio Login {% endblock %}{% block bodyheader %}{{ super() }}{% endblock %}{% block navbar %}
-<nav style="height:50px" class="navbar navbar-expand-lg navbar-dark unique-color-dark"></nav>
+{% set login_signup = "loginorsignup" %}{% extends "helpers/layout.html" %} {% block title %} Quillio Login {% endblock %}{% block bodyheader %}{{ super() }}{% endblock %}{% block navbar %}
+<nav style="height:50px" class="navbar navbar-expand-lg pkColor"></nav>
 {% endblock %}{% block content %}
 <div style="max-width:800px; margin:0 auto" class="container">
     <form>
@@ -18,8 +18,8 @@
                 <label for="password"> Enter your password </label>
             </div>
             <ul>
-                <button type="submit" style="width:120px" class="btn btn-unique" formmethod="post"> Login </button>
-                <a style="width:120px" href="/auth/signup" class="btn btn-unique">Sign Up</a>
+                <button type="submit" style="width:120px" class="btn btn-default" formmethod="post"> Login </button>
+                <a style="width:120px" href="/auth/signup" class="btn btn-default">Sign Up</a>
             </ul>
         </div>
     </form>

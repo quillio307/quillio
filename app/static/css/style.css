@@ -1,7 +1,8 @@
 /* YOUR CUSTOM STYLES */
+
 .quickPledgeBlock {
-	margin-top: 20px;
-	margin-bottom: 100px;
+    margin-top: 20px;
+    margin-bottom: 100px;
 }
 
 .quickPledgeItem {
@@ -23,11 +24,11 @@
 }
 
 .card-img-left {
-  border-bottom-left-radius: calc(.25rem - 1px);
-  border-top-left-radius: calc(.25rem - 1px);
-  float: left;
-  padding-right: 1em;
-  margin-bottom: -1.25em;
+    border-bottom-left-radius: calc(.25rem - 1px);
+    border-top-left-radius: calc(.25rem - 1px);
+    float: left;
+    padding-right: 1em;
+    margin-bottom: -1.25em;
 }
 
 .payee_image_nav {
@@ -42,23 +43,22 @@
     height: auto;
 }
 
-
-.dashboard-image{
-    float:left;
+.dashboard-image {
+    float: left;
     max-width: 200px;
     height: auto;
 }
 
 .card_anchor {
-	position: absolute;
-	top: 0; 
-	left: 0;
-	height: 100%; 
-	width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
 }
 
 .card_anchor:hover {
-	box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);	
+    box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
 }
 
 .noMargin {
@@ -70,8 +70,8 @@
 }
 
 .inputLabel {
-    width:100%;
-    text-align:left;
+    width: 100%;
+    text-align: left;
 }
 
 .inputCustom {
@@ -110,7 +110,6 @@
     border-bottom: none;
 }
 
-
 .right-info-box {
     border: 0.5px;
     border-color: #ddd;
@@ -119,7 +118,9 @@
     margin-bottom: 20px;
 }
 
+
 /* Center the loader */
+
 #wait {
     position: absolute;
     left: 50%;
@@ -136,16 +137,26 @@
 }
 
 @-webkit-keyframes spin {
-    0% { -webkit-transform: rotate(0deg); }
-    100% { -webkit-transform: rotate(360deg); }
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
+
 /* Add animation to "page content" */
+
 .animate-bottom {
     position: relative;
     -webkit-animation-name: animatebottom;
@@ -155,60 +166,73 @@
 }
 
 @-webkit-keyframes animatebottom {
-    from { bottom:-100px; opacity:0 }
-    to { bottom:0px; opacity:1 }
+    from {
+        bottom: -100px;
+        opacity: 0
+    }
+    to {
+        bottom: 0px;
+        opacity: 1
+    }
 }
 
 @keyframes animatebottom {
-    from{ bottom:-100px; opacity:0 }
-    to{ bottom:0; opacity:1 }
+    from {
+        bottom: -100px;
+        opacity: 0
+    }
+    to {
+        bottom: 0;
+        opacity: 1
+    }
 }
 
-.dropdown-content li > span {
+.dropdown-content li>span {
     color: black;
 }
 
-[type="radio"]:checked + label:after {
-  border: 2px solid #aa66cc;
-  background-color: #aa66cc;
+[type="radio"]:checked+label:after {
+    border: 2px solid #aa66cc;
+    background-color: #aa66cc;
 }
 
 .signUpAccountLogo {
-    max-width:100px;
-    max-height:100px;
-    height:auto;
-    width:auto;
+    max-width: 100px;
+    max-height: 100px;
+    height: auto;
+    width: auto;
 }
 
 .accountCoverImage {
-    max-width:200px;
-    max-height:100px;
-    height:auto;
-    width:auto;
+    max-width: 200px;
+    max-height: 100px;
+    height: auto;
+    width: auto;
 }
 
 .accountLogo {
-    max-width:100px;
-    max-height:100px;
-    height:auto;
-    width:auto;
+    max-width: 100px;
+    max-height: 100px;
+    height: auto;
+    width: auto;
 }
 
 .campaignCoverImage {
-    max-width:100px;
-    max-height:50px;
-    height:auto;
-    width:auto;
+    max-width: 100px;
+    max-height: 50px;
+    height: auto;
+    width: auto;
 }
 
 .popupContainer {
-    background-color:white;
+    background-color: white;
     padding-right: 0px;
     padding-left: 0px;
-    box-shadow: 0 0 0 1px rgba(0,0,0,.1), 0 2px 3px rgba(0,0,0,.2);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .1), 0 2px 3px rgba(0, 0, 0, .2);
 }
 
-.borderless td, .borderless th {
+.borderless td,
+.borderless th {
     border: none;
 }
 
@@ -263,8 +287,8 @@
 }
 
 .campaign-list-image {
-    width:230px;
-    height:auto;
+    width: 230px;
+    height: auto;
 }
 
 .campaign-list-qrcode {
@@ -280,21 +304,18 @@
     background-color: #9ec0c7;
 }
 
-
 .hp-section-heading {
-    padding-top:20px;
+    padding-top: 20px;
     padding-bottom: 20px;
     animation-name: fadeIn;
     animation-delay: 0.2s;
 }
 
 .hp-faq-heading {
-    color:#f48e5c;
+    color: #f48e5c;
 }
 
-.pp-qrcode-url {
-
-}
+.pp-qrcode-url {}
 
 .pp-qrcode-url:before {
     border-top: 0.5px solid #a4a4a4;
@@ -304,10 +325,7 @@
     margin-left: 15%;
 }
 
-
-.download-qrcode-url {
-
-}
+.download-qrcode-url {}
 
 .download-qrcode-url:before {
     border-top: 0.5px solid #a4a4a4;
@@ -318,10 +336,10 @@
 }
 
 .side-nav .collapsible a {
-  font-weight: 300;
-  font-size: 0.9rem;
-  height: 45px;
-  line-height: 45px;
+    font-weight: 300;
+    font-size: 0.9rem;
+    height: 45px;
+    line-height: 45px;
 }
 
 .side-nav a {
@@ -334,14 +352,13 @@
     background-color: rgba(0, 0, 0, 0.0);
 }
 
-
 .side-nav-background {
     /*background-image: url(http://mdbootstrap.com/img/Photos/Others/sidenav1.jpg);*/
-    background:linear-gradient(rgba(49, 133, 148, 0.8), rgba(49, 133, 148, 0.8)), url(../images/sidenav1.jpg)
+    background: linear-gradient(rgba(49, 133, 148, 0.8), rgba(49, 133, 148, 0.8)), url(../images/sidenav1.jpg)
 }
 
 side-nav-sub-item-background {
-    background-color: rgba(0,0,0,0);
+    background-color: rgba(0, 0, 0, 0);
 }
 
 .picker__header select {
@@ -354,4 +371,12 @@ side-nav-sub-item-background {
 
 .card .card-body h4 {
     font-weight: 300;
+}
+
+.pkColor {
+    background-color: #45526E !important;
+}
+
+.pkButton {
+    background-color: #2BBBAD !important;
 }
