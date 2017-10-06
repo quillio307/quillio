@@ -6,10 +6,12 @@
 <!-- Search Bar -->
 <div class="container flex-center text-center">
     <div class="col"></div>
-    <div class="col-sm-6">
+    <div class="col-md-6">
         <form>
-            <input class="form-control w-100" name="criteria" type="text" placeholder="Search" value="{{ request.form.criteria }}">
-            <button type="submit" class="btn btn-default" name="submit" value="search" formmethod="post"> Search </button>
+            <div>
+                <input class="form-control" name="criteria" type="text" placeholder="Search" value="{{ request.form.criteria }}">
+                <button type="submit" class="btn btn-default" name="submit" value="search" formmethod="post"> Search </button>
+            </div>
         </form>
     </div>
     <div class="col"></div>
@@ -34,9 +36,9 @@
                 <hr>
                 <p class="card-text">{{ meeting.description }}</p>
             </div>
-            <div class="card-data">
+            <div class="card-data flex-center">
                 <ul>
-                    <li><i class="fa fa-clock-o"></i> {{ meeting.created_atString }}</li>
+                    <li><i class="fa fa-clock-o"></i>{{ meeting.created_at_str }}</li>
                     <li><a href="#"><i class="fa fa-users"> </i>{{ meeting.members|length }}</a></li>
                 </ul>
             </div>
