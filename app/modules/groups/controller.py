@@ -22,7 +22,7 @@ def home():
         res = []
         for group in usr.groups:
             res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
-        return render_template('groups.html', groups=res, form=create_form)
+        return render_template('groups.html', groups=usr.groups, form=create_form)
 
     if request.form['submit'] == 'search':
         search_form = GroupSearchForm(request.form)
@@ -45,7 +45,7 @@ def home():
 
             if len(emails) == len(query):
                 g = Group(name=create_form.name.data,
-                          members=query, admins=[]).save()
+                          members=query, admins=[current_user._get_current_object()]).save()
 
                 for u in query:
                     u.groups.append(g)
@@ -63,6 +63,20 @@ def home():
 
     flash('Invalid input.  Please try again!')
     return redirect(url_for('groups.home'))
+
+
+@groups.route('/is/admin/<string:group_id>')
+@login_required
+def get_group_admins(group_id):
+    if len(group_id) == 24 and all(c in string.hexdigits for c in group_id):
+        query = Group.objects(id__exact=group_id)
+        if len(query) > 0:
+            if current_user in query[0].admins:
+                return jsonify({'is_admin': True, 'status': 200})
+            return jsonify({'is_admin': False, 'status': 200})
+        else:
+            return jsonify({'status': 404})
+    return jsonify({'status': 400}) 
 
 
 @groups.route('/get/<string:group_id>')
