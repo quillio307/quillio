@@ -8,7 +8,7 @@ from flask_security import current_user, login_required
 
 from app.modules.auth.model import User
 from app.modules.meeting.model import Meeting, MeetingCreateForm, \
-    MeetingSearchForm
+    MeetingSearchForm, MeetingUpdateForm
 
 from app.setup import db
 
@@ -18,14 +18,15 @@ meeting = Blueprint('meeting', __name__)
 @meeting.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
+    usr = current_user._get_current_object()
     create_form = MeetingCreateForm(request.form)
     if request.method == 'GET':
-        usr = current_user._get_current_object()
         res = []
         for meet in usr.meetings:
             res.append({'name': meet.name})
-        return render_template('meeting.html', meetings=res, form=create_form)
+        return render_template('meeting.html', meetings=usr.meetings, form=create_form)
 
+    # user requests a search
     if request.form['submit'] == 'search':
         search_form = MeetingSearchForm(request.form)
         if search_form.validate():
@@ -36,6 +37,57 @@ def home():
                 meetings = list(filter(lambda x: c.lower() in x.name.lower(), meetings))
 
             return render_template('meeting.html', meetings=meetings, form=create_form)
+    
+    if request.form['submit'] == 'update':
+        update_form = MeetingUpdateForm(request.form)
+        if update_form.validate():
+            query = Meeting.objects(id__exact=request.form.get('meeting_id'))
+            if len(query) != 0:
+                meeting = query[0]
+
+                # update name
+                meeting.name = request.form.get('name')
+                flash('Successfully updated meeting!')
+
+                del_user_emails = request.form.get('del_emails')                
+                new_user_emails = request.form.get('add_emails')
+
+                members = meeting.members
+
+                # delete
+
+                if len(del_user_emails) != 0:
+                    del_list = del_user_emails.split(" ")
+                    del_users = User.objects(email__in=del_list)
+
+                    for u in del_users:
+                        if meeting in u.meetings:
+                            u.meetings.remove(meeting)
+                            u.save() 
+                
+                    members = list(filter(lambda x: x not in del_users, members))
+                
+                if len(new_user_emails) != 0:
+                    new_list = new_user_emails.split(" ")
+                    new_users = User.objects(email__in=new_list)
+
+                    for u in new_users:
+                        if u not in members:
+                            members.append(u)
+
+                            if meeting not in u.meetings:
+                                u.meetings.append(meeting)
+                                u.save()
+                
+                meeting.members = members
+                meeting.save()
+                return redirect(url_for('meeting.home'))
+            else:
+                flash('Could not find Meeting')
+                return redirect(url_for('meeting.home'))
+        flash('Invalid Input')
+        return redirect(url_for('meeting.home'))
+
 
     if create_form.validate():
         try:

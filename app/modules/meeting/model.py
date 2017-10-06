@@ -13,9 +13,11 @@ class Meeting(db.Document):
     name = db.StringField(required=True, min_length=3, max_length=50)
     members = db.ListField(db.ReferenceField(User))
     active = db.BooleanField()
-    created_at_str = db.StringField(default=dt.now().strftime('%b %d %Y'))
+    # created_at_str = db.StringField(default=dt.now().strftime('%b %d %Y'))
     created_at = db.DateTimeField(default=dt.now())
-    
+    created_at_str = db.StringField(default=dt.now().strftime('%m-%d-%Y'))
+    meta = {'strict': False}
+
 
 class MeetingCreateForm(Form):
     name = StringField('Meeting Name', [validators.Length(min=3, max=100),
@@ -25,3 +27,10 @@ class MeetingCreateForm(Form):
 
 class MeetingSearchForm(Form):
     criteria = StringField('Criteria')
+
+
+class MeetingUpdateForm(Form):
+    meeting_id = StringField('Meeting ID')
+    name = StringField('Name')
+    add_emails = StringField('Add Users')
+    del_emails = StringField('Remove Users')
