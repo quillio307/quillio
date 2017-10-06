@@ -5,7 +5,7 @@
     <div class="col-sm-6">
         <form>
             <input class="form-control w-100" name="criteria" type="text" placeholder="Search" value="{{ request.form.criteria }}">
-            <button type="submit" class="btn btn-default" name="submit" value="search" formmethod="post"> Search </button>
+            <button type="submit" class="btn pkButton" name="submit" value="search" formmethod="post"> Search </button>
         </form>
     </div>
     <div class="col"></div>
@@ -42,7 +42,7 @@
     </div>
 </div>{% endfor %}
 </div>
-<a class="btn-floating btn-lg pkColor" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm"><i class="fa fa-plus"></i></a>
+<a class="btn-floating btn-lg pkButton" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm"><i class="fa fa-plus"></i></a>
 <div class="modal fade" id="createGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
     <div class="modal-dialog cascading-modal" role="document">
         <div class="modal-content">
