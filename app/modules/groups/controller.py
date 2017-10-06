@@ -40,7 +40,6 @@ def home():
 
             # search by user
             for u in users:
-                flash('seing if {} is in any groups'.format(u[1:]))
                 uq = User.objects(email__iexact=u[1:])
                 if len(uq) != 0:
                     groups = list(filter(lambda x: uq[0] in x.members, groups))

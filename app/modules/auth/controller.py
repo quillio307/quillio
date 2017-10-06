@@ -69,4 +69,5 @@ def login():
 @login_required
 def logout():
     logout_user()
+    flash('logged out')
     return redirect(url_for('auth.login'))
