@@ -1,6 +1,6 @@
-import string
-import json
+import json, string, time
 
+from datetime import datetime, timedelta
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
 from flask_security import current_user, login_required
@@ -53,12 +53,13 @@ def home():
         except Exception as e:
             flash('A problem has occurred, please try again! {}'.format(e))
             return redirect(url_for('meeting.home'))
-    return 'name: {0}, emails: {1}'.format(form.name.data, form.emails.data)
+    flash('Invalid input.  Please try again!')
+    return redirect(url_for('meeting.home'))
 
 
-@meeting.route('/active/<string:meeting_id>', methods=['GET'])
+@meeting.route('/get/<string:meeting_id>', methods=['GET'])
 @login_required
-def get_active_meeting(meeting_id):
+def get_meeting_by_id(meeting_id):
     # validate meeting id
     if len(meeting_id) == 24 and all(c in string.hexdigits for c in meeting_id):
         query = Meeting.objects(id__exact=meeting_id)
@@ -66,23 +67,33 @@ def get_active_meeting(meeting_id):
             # assert that the current user has access to the given meeting
             if current_user not in query[0].members:
                 flash('You are not a member of that meeting.')
-                return redirect(url_for('meeting.meetings_page'))
+                return redirect(url_for('meeting.home'))
             return jsonify({'Meeting': query})
         else:
             flash('Meeting Not found')
-            return redirect(url_for('meeting.meetings_page'))
+            return redirect(url_for('meeting.home'))
     flash('Invalid Meeting Id.')
-    return redirect(url_for('meeting.meetings_page'))
+    return redirect(url_for('meeting.home'))
+
+
+@meeting.route('/search/<string:date_from>/to/<string:date_to>')
+@login_required
+def search_date(date_from, date_to):
+    start_time = datetime.strptime(date_from,'%b.%d.%Y')
+    end_time = datetime.strptime(date_to, '%b.%d.%Y')
+    end_time += timedelta(days=1)
+    meetings = current_user.meetings
+    filtered = list(filter(lambda x: x.created_at >= start_time and x.created_at <= end_time, meetings))
+    return jsonify({'results': filtered})
 
 
 @meeting.route('/search/<string:meeting_title>')
 @login_required
 def search(meeting_title):
-    query = Meeting.objects(name__iexact=meeting_title)
-    hits = list(filter(lambda x: current_user in x, query))
-    if len(hits) > 0:
-        return jsonify(hits)
-    return jsonify({'error': 'no matching meetings'})
+    meetings = current_user.meetings
+    filtered = list(filter(lambda x: x.name == meeting_title, meetings))
+    return jsonify({'results': filtered})
+
 
 
 @meeting.route('/all', methods=['GET'])
@@ -93,17 +104,3 @@ def all_meetings():
     for meet in usr.meetings:
         res.append({'name': meet.name})
     return json.dumps(res)
-
-
-# @meeting.route('/', methods=['GET', 'POST'])
-# @login_required
-# def meetings_page():
-#     form = MeetingForm(request.form)
-#     if request.method == 'GET':
-#         usr = current_user._get_current_object()
-#         res = []
-#         for meet in usr.meetings:
-#             res.append({'name': meet.name})
-#         return render_template('meeting.html', meetings=res)
-
-#     return json.dumps({'emails': request.form['emails']})
