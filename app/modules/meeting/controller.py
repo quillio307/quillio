@@ -30,11 +30,20 @@ def home():
     if request.form['submit'] == 'search':
         search_form = MeetingSearchForm(request.form)
         if search_form.validate():
-            usr = current_user._get_current_object()
             criterium = search_form.criteria.data.split(" ")
+            users = list(filter(lambda x: "@" in x, criterium))
+            criterium = list(filter(lambda x: "@" not in x, criterium))
             meetings = usr.meetings
+
+            # search by name
             for c in criterium:
                 meetings = list(filter(lambda x: c.lower() in x.name.lower(), meetings))
+            
+            # search by users
+            for u in users:
+                uq = User.objects(email__iexact=u[1:])
+                if len(uq) != 0:
+                    groups = list(filter(lambda x: uq[0] in x.members, meetings))
 
             return render_template('meeting.html', meetings=meetings, form=create_form)
     
