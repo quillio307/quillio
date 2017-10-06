@@ -13,7 +13,7 @@ class Meeting(db.Document):
     members = db.ListField(db.ReferenceField(User))
     active = db.BooleanField()
     created_at = db.DateTimeField(default=dt.now())
-    created_at_str = db.StringField(default='RANDOM TEXT')
+    created_at_str = db.StringField(default=dt.now().strftime('%b %d %Y'))
 
 class MeetingCreateForm(Form):
     name = StringField('Meeting Name', [validators.Length(min=3, max=100),
