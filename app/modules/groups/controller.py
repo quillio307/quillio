@@ -6,7 +6,8 @@ from flask import Blueprint, abort, request, render_template, flash, redirect, \
 from flask_security import Security, login_required
 
 from app.modules.auth.model import User
-from app.modules.groups.model import Group, GroupCreateForm, GroupSearchForm
+from app.modules.groups.model import Group, GroupCreateForm, GroupSearchForm, \
+    GroupUpdateForm
 from flask_login import current_user
 from app.setup import login_manager, db
 
@@ -16,18 +17,18 @@ groups = Blueprint('groups', __name__)
 @groups.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
+    usr = current_user._get_current_object()
     create_form = GroupCreateForm(request.form)
     if request.method == 'GET':
-        usr = current_user._get_current_object()
         res = []
         for group in usr.groups:
             res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
         return render_template('groups.html', groups=usr.groups, form=create_form)
 
+    # user requests a search
     if request.form['submit'] == 'search':
         search_form = GroupSearchForm(request.form)
         if search_form.validate():
-            usr = current_user._get_current_object()
             criterium = search_form.criteria.data.split(" ")
             groups = usr.groups
             for c in criterium:
@@ -35,6 +36,17 @@ def home():
 
             return render_template('groups.html', groups=groups, form=create_form)
 
+    # user requests an update
+    if request.form['submit'] == 'update':
+        update_form = GroupUpdateForm(request.form)
+        if update_form.validate():
+            flash('Id: {}'.format(request.form.get('group_id')))
+            return redirect(url_for('groups.home')) 
+        else:
+            flash('Invalid Input, Please try again!')
+            return redirect(url_for('groups.home'))
+
+    # user requests a new group
     if create_form.validate():
         try:
             emails = create_form.emails.data.split(" ")
