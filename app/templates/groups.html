@@ -165,7 +165,7 @@
         id = $(el).attr("id")
         url = '/groups/is/admin/' + id
 
-        $.get(url, function(data) {
+        $.get(url, function (data) {
             if (data['is_admin']) {
                 alert('User is admin for this group')
             } else {
@@ -175,12 +175,14 @@
     }
 
     function set_group(id, name, description) {
-        document.getElementById('group_id').value = id 
+        document.getElementById('group_id').value = id
         document.getElementById('update_name').value = name
         document.getElementById('update_description').value = description
     }
+
 </script>
 <script>
     $(".button-collapse").sideNav();
+
 </script>
 {% endblock %}
