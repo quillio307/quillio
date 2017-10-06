@@ -9,11 +9,13 @@ from app.modules.note.model import Note
 
 
 class Meeting(db.Document):
+    owner = db.ReferenceField(User, required=True)
     name = db.StringField(required=True, min_length=3, max_length=50)
     members = db.ListField(db.ReferenceField(User))
     active = db.BooleanField()
-    created_at = db.DateTimeField(default=dt.now())
     created_at_str = db.StringField(default=dt.now().strftime('%b %d %Y'))
+    created_at = db.DateTimeField(default=dt.now())
+    
 
 class MeetingCreateForm(Form):
     name = StringField('Meeting Name', [validators.Length(min=3, max=100),

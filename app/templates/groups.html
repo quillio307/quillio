@@ -88,8 +88,10 @@
     </div>
 </div>
 
-<div class="modal fade" id="editGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
-    <div class="modal-dialog cascading-modal" role="document">
+<!-- <div class="modal fade" id="editGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
+    <div class="modal-dialog cascading-modal" role="document"> -->
+<div class="modal fade right" id="adminAccess" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-full-height modal-right" role="document">
         <!--Content-->
         <div class="modal-content">
 
@@ -165,7 +167,7 @@
         id = $(el).attr("id")
         url = '/groups/is/admin/' + id
 
-        $.get(url, function (data) {
+        $.get(url, function(data) {
             if (data['is_admin']) {
                 alert('User is admin for this group')
             } else {
@@ -179,10 +181,8 @@
         document.getElementById('update_name').value = name
         document.getElementById('update_description').value = description
     }
-
 </script>
 <script>
     $(".button-collapse").sideNav();
-
 </script>
 {% endblock %}

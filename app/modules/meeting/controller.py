@@ -51,7 +51,7 @@ def home():
             if len(emails) == len(query):
                 # add the meeting to each user's meetings list
                 m = Meeting(name=create_form.name.data,
-                            members=query, active=True).save()
+                            members=query, owner=current_user._get_current_object(), active=True).save()
                 for u in query:
                     u.meetings.append(m)
                     u.save()
