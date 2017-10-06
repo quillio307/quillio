@@ -20,14 +20,12 @@
             </div>
             <div class="card-data">
                 <ul>
-                    <li><i class="fa fa-clock-o"></i> 05/10/2015</li>
-                    <li><a href="#"><i class="fa fa-comments-o"></i>12</a></li>
-                    <li><a href="#"><i class="fa fa-users"> </i>21</a></li>
+                    <li><i class="fa fa-clock-o"></i> {{ meeting.created_at }}</li>
+                    <li><a href="#"><i class="fa fa-users"> </i>{{ meeting.members | length }}</a></li>
                 </ul>
             </div>
         </div>
         {% endfor %}
-        <!-- </div> -->
     </div>
 </div>{% endfor %}
 </div>
@@ -37,7 +35,6 @@
     <div class="modal-dialog cascading-modal" role="document">
         <!--Content-->
         <div class="modal-content">
-
             <!--Header-->
             <div class="modal-header light-blue darken-3 white-text">
                 <h4 class="title"><i class="fa fa-pencil"></i>Create Meeting</h4>
