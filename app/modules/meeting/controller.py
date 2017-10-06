@@ -69,10 +69,9 @@ def home():
     flash('Invalid input.  Please try again!')
     return redirect(url_for('meeting.home'))
 
-
-@meeting.route('/get/<string:meeting_id>', methods=['GET'])
+@meeting.route('/active/<string:meeting_id>', methods=['GET'])
 @login_required
-def get_meeting_by_id(meeting_id):
+def get_active_meeting(meeting_id):
     # validate meeting id
     if len(meeting_id) == 24 and all(c in string.hexdigits for c in meeting_id):
         query = Meeting.objects(id__exact=meeting_id)
@@ -80,40 +79,10 @@ def get_meeting_by_id(meeting_id):
             # assert that the current user has access to the given meeting
             if current_user not in query[0].members:
                 flash('You are not a member of that meeting.')
-                return redirect(url_for('meeting.home'))
+                return redirect(url_for('meeting.meetings_page'))
             return jsonify({'Meeting': query})
         else:
             flash('Meeting Not found')
-            return redirect(url_for('meeting.home'))
+            return redirect(url_for('meeting.meetings_page'))
     flash('Invalid Meeting Id.')
-    return redirect(url_for('meeting.home'))
-
-
-@meeting.route('/search/<string:date_from>/to/<string:date_to>')
-@login_required
-def search_date(date_from, date_to):
-    start_time = datetime.strptime(date_from, '%b.%d.%Y')
-    end_time = datetime.strptime(date_to, '%b.%d.%Y')
-    end_time += timedelta(days=1)
-    meetings = current_user.meetings
-    filtered = list(filter(lambda x: x.created_at >=
-                           start_time and x.created_at <= end_time, meetings))
-    return jsonify({'results': filtered})
-
-
-@meeting.route('/search/<string:meeting_title>')
-@login_required
-def search(meeting_title):
-    meetings = current_user.meetings
-    filtered = list(filter(lambda x: x.name == meeting_title, meetings))
-    return jsonify({'results': filtered})
-
-
-@meeting.route('/all', methods=['GET'])
-@login_required
-def all_meetings():
-    usr = current_user._get_current_object()
-    res = []
-    for meet in usr.meetings:
-        res.append({'name': meet.name})
-    return json.dumps(res)
+    return redirect(url_for('meeting.meetings_page'))
