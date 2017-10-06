@@ -1,5 +1,21 @@
 {% extends"helpers/dashboard.html" %} {% block title %} Quillio Meetings {% endblock %} {% block main %}
+
+
 <h3 class="text-center">Meetings</h3>
+
+<!-- Search Bar -->
+<div class="container flex-center text-center">
+    <div class="col"></div>
+    <div class="col-sm-6">
+        <form>
+            <input class="form-control w-100" name="criteria" type="text" placeholder="Search" value="{{ request.form.criteria }}">
+            <button type="submit" class="btn btn-default" name="submit" value="search" formmethod="post"> Search </button>
+        </form>
+    </div>
+    <div class="col"></div>
+</div>
+<!-- Search Bar -->
+
 {% for meeting_row in meetings | batch(3) %}
 <div class="container">
     <br>
@@ -43,7 +59,7 @@
                     </button>
             </div>
             <!--Body-->
-            <form id="create-meeting">
+            <form>
                 <div class="modal-body mb-0">
                     <div class="md-form form-sm">
                         <input type="text" id="name" name="name" value="{{ request.form.name }}" class="form-control" required>
@@ -56,7 +72,7 @@
                     </div>
 
                     <div class="text-center mt-1-half">
-                        <button id="meetingCreateButton" type="submit" class="btn btn-info mdb-2" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button>
+                        <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-info mdb-2" value="create" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button>
                     </div>
                 </div>
             </form>
@@ -70,5 +86,6 @@
 
 <script>
     $(".button-collapse").sideNav();
+
 </script>
 {% endblock %}

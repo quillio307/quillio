@@ -16,7 +16,11 @@ class Meeting(db.Document):
     created_at = db.DateTimeField(default=dt.now())
 
 
-class MeetingForm(Form):
+class MeetingCreateForm(Form):
     name = StringField('Meeting Name', [validators.Length(min=3, max=100),
                                         validators.DataRequired()])
     emails = StringField('Emails', [validators.DataRequired()])
+
+
+class MeetingSearchForm(Form):
+    criteria = StringField('Criteria')
