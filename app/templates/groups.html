@@ -1,7 +1,5 @@
 {% extends"helpers/dashboard.html" %} {% block title %} Quillio Groups {% endblock %} {% block main %}
 <h3 class="text-center">Groups</h3>
-
-<!-- Search Bar -->
 <div class="container flex-center text-center">
     <div class="col"></div>
     <div class="col-sm-6">
@@ -12,8 +10,6 @@
     </div>
     <div class="col"></div>
 </div>
-<!-- Search Bar -->
-
 {% for group_row in groups | batch(3) %}
 <div class="container">
     <br>
@@ -47,20 +43,15 @@
 </div>{% endfor %}
 </div>
 <a class="btn-floating btn-lg pkColor" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm"><i class="fa fa-plus"></i></a>
-<!--Modal: Contact form-->
 <div class="modal fade" id="createGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
     <div class="modal-dialog cascading-modal" role="document">
-        <!--Content-->
         <div class="modal-content">
-
-            <!--Header-->
             <div class="modal-header darken-3 white-text" style="background-color: #45526E">
                 <h4 class="title"><i class="fa fa-pencil"></i>Create Group</h4>
                 <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
             </div>
-            <!--Body-->
             <form>
                 <div class="modal-body mb-0">
                     <div class="md-form form-sm">
@@ -84,26 +75,18 @@
                 </div>
             </form>
         </div>
-        <!--/.Content-->
     </div>
 </div>
 
-<!-- <div class="modal fade" id="editGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
-    <div class="modal-dialog cascading-modal" role="document"> -->
-<div class="modal fade right" id="adminAccess" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-full-height modal-right" role="document">
-        <!--Content-->
+<div class="modal fade" id="editGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
+    <div class="modal-dialog cascading-modal" role="document">
         <div class="modal-content">
-
-            <!--Header-->
             <div class="modal-header darken-3 white-text" style="background-color: #45526E">
                 <h4 class="title"><i class="fa fa-pencil"></i>Edit Group</h4>
                 <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
             </div>
-
-            <!--Body-->
             <form>
                 <div class="modal-body mb-0">
 
@@ -143,25 +126,6 @@
             </form>
         </div>
         <!--/.Content-->
-    </div>
-</div>
-<div class="modal fade right" id="adminAccess" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-full-height modal-right" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title w-100" id="myModalLabel">Group Settings</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                ...
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-        </div>
     </div>
 </div>
 
