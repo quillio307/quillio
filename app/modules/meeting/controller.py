@@ -40,7 +40,7 @@ def home():
     if create_form.validate():
         try:
             # generate list of users that will be in the meeting
-            emails = form.emails.data.split(" ")
+            emails = create_form.emails.data.split(" ")
             emails.append(current_user.email)
 
             # grab the list of valid users
