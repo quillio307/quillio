@@ -1,5 +1,19 @@
-{% extends "helpers/dashboard.html" %} {% block title %} Quillio Groups {% endblock %} {% block main %}
+{% extends"helpers/dashboard.html" %} {% block title %} Quillio Groups {% endblock %} {% block main %}
 <h3 class="text-center">Groups</h3>
+
+<!-- Search Bar -->
+<div class="container flex-center text-center">
+    <div class="col"></div>
+    <div class="col-sm-6">
+        <form>
+            <input class="form-control w-100" name="criteria" type="text" placeholder="Search" value="{{ request.form.criteria }}">
+            <button type="submit" class="btn btn-default" name="submit" value="search" formmethod="post"> Search </button>
+        </form>
+    </div>
+    <div class="col"></div>
+</div>
+<!-- Search Bar -->
+
 {% for group_row in groups | batch(3) %}
 <div class="container">
     <br>
@@ -12,17 +26,19 @@
                     <div class="mask"></div>
                 </a>
             </div>
-            <a class="btn-floating btn-action"><i class="fa fa-chevron-right"></i></a>
+
+            <a class="btn-floating btn-action" id="{{ group.id }}" onclick="group_modal_show(this)"><i class="fa fa-chevron-right"></i></a>
             <div class="card-body">
                 <h4 class="card-title"> {{ group.name }}</h4>
                 <hr>
                 <p class="card-text">{{ group.description }}</p>
             </div>
-            <div class="card-data">
+            <div class="card-data flex-center">
                 <ul>
-                    <li><i class="fa fa-clock-o"></i> 05/10/2015</li>
-                    <li><a href="#"><i class="fa fa-comments-o"></i>12</a></li>
-                    <li><a href="#"><i class="fa fa-users"> </i>21</a></li>
+                    <li><a href="#"><i class="fa fa-users"></i>{{ group.members|length }}</a></li>
+                    {% if current_user in group.admins %}
+                    <li><a data-toggle="modal" data-target="#editGroupForm" id="{{ group.id }}" onclick="set_group('{{ group.id }}', '{{ group.name }}', '{{ group.description }}')"> edit </a></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -30,7 +46,7 @@
     </div>
 </div>{% endfor %}
 </div>
-<a class="btn-floating btn-lg btn-unique" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm"><i class="fa fa-plus"></i></a>
+<a class="btn-floating btn-lg pkColor" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm"><i class="fa fa-plus"></i></a>
 <!--Modal: Contact form-->
 <div class="modal fade" id="createGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
     <div class="modal-dialog cascading-modal" role="document">
@@ -38,7 +54,7 @@
         <div class="modal-content">
 
             <!--Header-->
-            <div class="modal-header light-blue darken-3 white-text">
+            <div class="modal-header darken-3 white-text" style="background-color: #45526E">
                 <h4 class="title"><i class="fa fa-pencil"></i>Create Group</h4>
                 <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -63,43 +79,114 @@
                     </div>
 
                     <div class="text-center mt-1-half">
-                        <button id="groupCreateButton" type="submit" class="btn btn-info mdb-2" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button>
+                        <button id="groupCreateButton" type="submit" name="submit" value="create" class="btn btn-mdb mdb-2" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button>
                     </div>
-
-                    <!-- <div class="text-center mt-1-half"> -->
-                    <!-- <button class="btn btn-info mb-2"> Create <i class="fa fa-send ml-1"></i></button> -->
-                    <!-- </div> -->
-
-                    <!-- <div class="text-center mt-1-half"> -->
-                    <!-- <button id="meetingCreateButton" type="submit" class="btn btn-info mdb-2" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button> -->
-                    <!-- </div> -->
-
-                    <!-- <div class="md-form form-sm"> -->
-                    <!-- <textarea type="text" id="form8" class="md-textarea mb-0"></textarea> -->
-                    <!-- <label for="form8">Description</label> -->
-                    <!-- </div> -->
-
-
                 </div>
             </form>
         </div>
         <!--/.Content-->
     </div>
 </div>
-<!--Modal: Contact form-->
+
+<div class="modal fade right" id="editGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
+    <div class="modal-dialog modal-full-height modal-right" role="document">
+        <!--Content-->
+        <div class="modal-content">
+
+            <!--Header-->
+            <div class="modal-header darken-3 white-text" style="background-color: #45526E">
+                <h4 class="title"><i class="fa fa-pencil"></i>Edit Group</h4>
+                <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+            </div>
+
+            <!--Body-->
+            <form>
+                <div class="modal-body mb-0">
+
+                    <div class="md-form form-sm">
+                        <input type="text" name="group_id" id="group_id" value="{{ request.form.group_id }}" class="form-control" readonly>
+                    </div>
+
+                    <div class="md-form form-sm">
+                        <input type="text" id="update_name" name="name" value="{{ request.form.name }}" class="form-control">
+                    </div>
+
+                    <div class="md-form form-sm">
+                        <input type="text" id="add_emails" name="add_emails" value="{{ request.form.add_emails }}" class="form-control">
+                        <label for="add_emails"> New User Emails </label>
+                    </div>
+
+                    <div class="md-form form-sm">
+                        <input type="text" id="add_admin_emails" name="add_admin_emails" value="{{ request.form.add_admin_emails }}" class="form-control">
+                        <label for="add_admin_emails"> New Admin Emails </label>
+                    </div>
+
+                    <div class="md-form form-sm">
+                        <input type="text" id="del_emails" name="del_emails" value="{{ request.form.del_emails }}" class="form-control">
+                        <label for="del_emails"> User's to remove </label>
+                    </div>
+
+                    <div class="md-form form-sm">
+                        <input type="text" id="update_description" name="description" value="{{ request.form.description }}" class="form-control">
+                        <label for="update_description"> New Description </label>
+                    </div>
+
+                    <div class="text-center mt-1-half">
+                        <button id="groupEditButton" type="submit" name="submit" value="update" class="btn btn-mdb mdb-2" formmethod="post"> Update <i class="fa fa-send ml-1"></i></button>
+                        <button id="groupDeleteButton" type="submit" name="submit" value="delete" class="btn btn-danger mdb-2" formmethod="delete"> Delete Group <i class="fa fa-send ml-1"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
+<div class="modal fade right" id="adminAccess" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-full-height modal-right" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title w-100" id="myModalLabel">Group Settings</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %} {% block js_import %}
-<script type="text/javascript" src="/static/js/quillio.js"></script>
 <script>
-    $('.chips-placeholder#form20').material_chip({
-        placeholder: 'Add Members',
-        secondaryPlaceholder: '+Member Emails',
-    });
-    $('.chips-placeholder#form21').material_chip({
-        placeholder: 'Add Admins',
-        secondaryPlaceholder: '+Admin Emails',
-    });
+    function group_modal_show(el) {
+        id = $(el).attr("id")
+        url = '/groups/is/admin/' + id
+
+        $.get(url, function (data) {
+            if (data['is_admin']) {
+                alert('User is admin for this group')
+            } else {
+                alert('User does not have the permissions to edit')
+            }
+        })
+    }
+
+    function set_group(id, name, description) {
+        document.getElementById('group_id').value = id
+        document.getElementById('update_name').value = name
+        document.getElementById('update_description').value = description
+    }
+
 </script>
 <script>
     $(".button-collapse").sideNav();
+
 </script>
 {% endblock %}

@@ -5,8 +5,10 @@ from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
 from flask_security import current_user, login_required
 
+
 from app.modules.auth.model import User
-from app.modules.meeting.model import Meeting, MeetingForm
+from app.modules.meeting.model import Meeting, MeetingCreateForm, \
+    MeetingSearchForm, MeetingUpdateForm
 
 from app.setup import db
 
@@ -16,18 +18,81 @@ meeting = Blueprint('meeting', __name__)
 @meeting.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    form = MeetingForm(request.form)
+    usr = current_user._get_current_object()
+    create_form = MeetingCreateForm(request.form)
     if request.method == 'GET':
-        usr = current_user._get_current_object()
         res = []
         for meet in usr.meetings:
             res.append({'name': meet.name})
-        return render_template('meeting.html', meetings=res, form=form)
+        return render_template('meeting.html', meetings=usr.meetings, form=create_form)
 
-    if form.validate():
+    # user requests a search
+    if request.form['submit'] == 'search':
+        search_form = MeetingSearchForm(request.form)
+        if search_form.validate():
+            usr = current_user._get_current_object()
+            criterium = search_form.criteria.data.split(" ")
+            meetings = usr.meetings
+            for c in criterium:
+                meetings = list(filter(lambda x: c.lower() in x.name.lower(), meetings))
+
+            return render_template('meeting.html', meetings=meetings, form=create_form)
+    
+    if request.form['submit'] == 'update':
+        update_form = MeetingUpdateForm(request.form)
+        if update_form.validate():
+            query = Meeting.objects(id__exact=request.form.get('meeting_id'))
+            if len(query) != 0:
+                meeting = query[0]
+
+                # update name
+                meeting.name = request.form.get('name')
+                flash('Successfully updated meeting!')
+
+                del_user_emails = request.form.get('del_emails')                
+                new_user_emails = request.form.get('add_emails')
+
+                members = meeting.members
+
+                # delete
+
+                if len(del_user_emails) != 0:
+                    del_list = del_user_emails.split(" ")
+                    del_users = User.objects(email__in=del_list)
+
+                    for u in del_users:
+                        if meeting in u.meetings:
+                            u.meetings.remove(meeting)
+                            u.save() 
+                
+                    members = list(filter(lambda x: x not in del_users, members))
+                
+                if len(new_user_emails) != 0:
+                    new_list = new_user_emails.split(" ")
+                    new_users = User.objects(email__in=new_list)
+
+                    for u in new_users:
+                        if u not in members:
+                            members.append(u)
+
+                            if meeting not in u.meetings:
+                                u.meetings.append(meeting)
+                                u.save()
+                
+                meeting.members = members
+                meeting.save()
+                return redirect(url_for('meeting.home'))
+            else:
+                flash('Could not find Meeting')
+                return redirect(url_for('meeting.home'))
+        flash('Invalid Input')
+        return redirect(url_for('meeting.home'))
+
+
+    if create_form.validate():
         try:
             # generate list of users that will be in the meeting
-            emails = form.emails.data.split(" ")
+            emails = create_form.emails.data.split(" ")
             emails.append(current_user.email)
 
             # grab the list of valid users
@@ -37,8 +102,8 @@ def home():
             # validate that all the members exist
             if len(emails) == len(query):
                 # add the meeting to each user's meetings list
-                m = Meeting(name=form.name.data,
-                            members=query, active=True).save()
+                m = Meeting(name=create_form.name.data,
+                            members=query, owner=current_user._get_current_object(), active=True).save()
                 for u in query:
                     u.meetings.append(m)
                     u.save()
@@ -79,11 +144,12 @@ def get_meeting_by_id(meeting_id):
 @meeting.route('/search/<string:date_from>/to/<string:date_to>')
 @login_required
 def search_date(date_from, date_to):
-    start_time = datetime.strptime(date_from,'%b.%d.%Y')
+    start_time = datetime.strptime(date_from, '%b.%d.%Y')
     end_time = datetime.strptime(date_to, '%b.%d.%Y')
     end_time += timedelta(days=1)
     meetings = current_user.meetings
-    filtered = list(filter(lambda x: x.created_at >= start_time and x.created_at <= end_time, meetings))
+    filtered = list(filter(lambda x: x.created_at >=
+                           start_time and x.created_at <= end_time, meetings))
     return jsonify({'results': filtered})
 
 
@@ -93,7 +159,6 @@ def search(meeting_title):
     meetings = current_user.meetings
     filtered = list(filter(lambda x: x.name == meeting_title, meetings))
     return jsonify({'results': filtered})
-
 
 
 @meeting.route('/all', methods=['GET'])
