@@ -1,12 +1,10 @@
-import json
-import string
-import time
+import json, string, time
 
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
 from flask_security import current_user, login_required
-from fuzzywuzzy import fuzz
+
 
 from app.modules.auth.model import User
 from app.modules.meeting.model import Meeting, MeetingCreateForm, \
