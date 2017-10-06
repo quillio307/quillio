@@ -72,10 +72,8 @@ def home():
                     # remove group from user
                     for u in del_users:
                         if group in u.groups:
-                            flash('removed {0} from {1}'.format(group.name, u.name))
                             u.groups.remove(group)
                             u.save()
-
                     members = list(filter(lambda x: x not in del_users, members))
                 
                 # add the users
