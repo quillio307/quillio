@@ -20,8 +20,12 @@ class Group(db.Document):
         return False
 
 
-class GroupForm(Form):
+class GroupCreateForm(Form):
     name = StringField('Meeting Name', [validators.Length(min=3, max=100),
                                         validators.DataRequired()])
     emails = StringField('Emails', [validators.DataRequired()])
     admin_emails = StringField('Admin Emails')
+
+
+class GroupSearchForm(Form):
+    criteria = StringField('Criteria')

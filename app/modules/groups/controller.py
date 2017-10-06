@@ -6,7 +6,7 @@ from flask import Blueprint, abort, request, render_template, flash, redirect, \
 from flask_security import Security, login_required
 
 from app.modules.auth.model import User
-from app.modules.groups.model import Group, GroupForm
+from app.modules.groups.model import Group, GroupCreateForm, GroupSearchForm
 from flask_login import current_user
 from app.setup import login_manager, db
 
@@ -16,24 +16,35 @@ groups = Blueprint('groups', __name__)
 @groups.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    form = GroupForm(request.form)
+    create_form = GroupCreateForm(request.form)
     if request.method == 'GET':
         usr = current_user._get_current_object()
         res = []
         for group in usr.groups:
             res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
-        return render_template('groups.html', groups=res, form=form)
+        return render_template('groups.html', groups=res, form=create_form)
 
-    if form.validate():
+    if request.form['submit'] == 'search':
+        search_form = GroupSearchForm(request.form)
+        if search_form.validate():
+            usr = current_user._get_current_object()
+            criterium = search_form.criteria.data.split(" ")
+            groups = usr.groups
+            for c in criterium:
+                groups = list(filter(lambda x: c.lower() in x.name.lower(), groups))
+
+            return render_template('groups.html', groups=groups, form=create_form)
+
+    if create_form.validate():
         try:
-            emails = form.emails.data.split(" ")
+            emails = create_form.emails.data.split(" ")
             emails.append(current_user.email)
 
             query = User.objects(email__in=emails)
             query_emails = [u.email for u in query]
 
             if len(emails) == len(query):
-                g = Group(name=form.name.data,
+                g = Group(name=create_form.name.data,
                           members=query, admins=[]).save()
 
                 for u in query:
