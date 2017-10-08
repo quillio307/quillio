@@ -1,23 +1,13 @@
+from app.modules.auth.model import User, SignupForm, LoginForm, \
+    user_datastore
+from app.modules.meeting.controller import meeting
+
 from flask import Blueprint, render_template, flash, request, redirect, url_for
 from flask_security import login_user, logout_user, login_required
-from passlib.hash import bcrypt
-
-from app.modules.auth.model import SignupForm, LoginForm
-from app.modules.auth.model import User
-from app.modules.auth.model import user_datastore
-from app.modules.meeting.controller import meeting
-from app.setup import login_manager
+from flask_security.utils import hash_password, verify_password
 
 
 auth = Blueprint('auth', __name__)
-
-@login_manager.user_loader
-def user_loader(user_id):
-    """ Reloads the user object from the user ID stored in the session. """
-    user = user_datastore.find_user(id=user_id)
-    if user is not None:
-        return user
-    return None
 
 
 @auth.route('/signup', methods=['GET', 'POST'])
@@ -28,17 +18,10 @@ def signup():
     if form.validate():
         try:
             # add user to the database
-            pwd_hash = bcrypt.encrypt(form.password.data)
             user = user_datastore.create_user(
                 email=form.email.data,
                 name=form.name.data,
-                password=pwd_hash)
-
-            # set the user to have unregistered and default permissions
-            unreg = user_datastore.find_or_create_role('unregistered')
-            default = user_datastore.find_or_create_role('default')
-            user_datastore.add_role_to_user(user, unreg)
-            user_datastore.add_role_to_user(user, default)
+                password=hash_password(form.password.data))
 
             login_user(user)
             return redirect(request.args.get('next') or url_for('meeting.home'))
@@ -57,7 +40,7 @@ def login():
     if form.validate():
         user = user_datastore.find_user(email=form.email.data)
         if user is not None:
-            if bcrypt.verify(form.password.data, user.password):
+            if verify_password(form.password.data, user.password):
                 login_user(user)
                 flash('Logged in successfully, {}'.format(user.name))
                 return redirect(request.args.get('next') or url_for('meeting.home'))

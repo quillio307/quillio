@@ -1,22 +1,20 @@
-from flask_security import MongoEngineUserDatastore, UserMixin, RoleMixin
-from wtforms import Form, validators
-from wtforms import StringField, PasswordField
+from app import app, db
 
-from app.setup import db
+from flask_security import Security, MongoEngineUserDatastore, \
+    UserMixin, RoleMixin
+from wtforms import Form, StringField, PasswordField, validators
 
 
 class Role(db.Document, RoleMixin):
-    """ Definition for a Role Document needed by Flask Security """
     name = db.StringField(max_length=80, unique=True)
     description = db.StringField(max_length=255)
 
 
 class User(db.Document, UserMixin):
-    """ Definition for a User """
     email = db.EmailField(required=True, unique=True,
                           min_length=3, max_length=35)
     name = db.StringField(required=True, min_length=4, max_length=20)
-    password = db.StringField(required=True, min_length=5, max_length=100)
+    password = db.StringField(required=True, min_length=5, max_length=1000)
     active = db.BooleanField(default=True)
     authenticated = db.BooleanField(required=False, default=False)
     roles = db.ListField(db.ReferenceField(Role), default=[])
@@ -43,13 +41,16 @@ class User(db.Document, UserMixin):
         return str(User.objects(email__exact=self['email'])[0].id)
 
 
+# Flask-Security Setup
 user_datastore = MongoEngineUserDatastore(db, User, Role)
+security = Security(app, user_datastore)
 
 
 class SignupForm(Form):
     email = StringField('Email', [validators.Length(min=6, max=35)])
     name = StringField('Name', [validators.Length(min=4, max=25)])
-    password = PasswordField('Password', [validators.DataRequired()])
+    password = PasswordField('Password', [validators.DataRequired(),
+                                          validators.Length(min=5, max=35)])
 
 
 class LoginForm(Form):

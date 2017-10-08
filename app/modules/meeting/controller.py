@@ -1,16 +1,16 @@
-import json, string, time
-
+import json
+import string
+import time
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, flash, request, redirect, \
-    url_for, jsonify
-from flask_security import current_user, login_required
-
 
 from app.modules.auth.model import User
 from app.modules.meeting.model import Meeting, MeetingCreateForm, \
     MeetingSearchForm, MeetingUpdateForm
 
-from app.setup import db
+from flask import Blueprint, render_template, flash, request, redirect, \
+    url_for, jsonify
+from flask_security import current_user, login_required
+
 
 meeting = Blueprint('meeting', __name__)
 
@@ -24,7 +24,7 @@ def home():
         res = []
         for meet in usr.meetings:
             res.append({'name': meet.name})
-        return render_template('meeting.html', meetings=usr.meetings, form=create_form)
+        return render_template('meeting/dashboard.html', meetings=usr.meetings, form=create_form)
 
     # user requests a search
     if request.form['submit'] == 'search':
@@ -37,16 +37,18 @@ def home():
 
             # search by name
             for c in criterium:
-                meetings = list(filter(lambda x: c.lower() in x.name.lower(), meetings))
-            
+                meetings = list(filter(lambda x: c.lower()
+                                       in x.name.lower(), meetings))
+
             # search by users
             for u in users:
                 uq = User.objects(email__iexact=u[1:])
                 if len(uq) != 0:
-                    meetings = list(filter(lambda x: uq[0] in x.members, meetings))
+                    meetings = list(
+                        filter(lambda x: uq[0] in x.members, meetings))
 
-            return render_template('meeting.html', meetings=meetings, form=create_form)
-    
+            return render_template('meeting/dashboard.html', meetings=meetings, form=create_form)
+
     if request.form['submit'] == 'update':
         update_form = MeetingUpdateForm(request.form)
         if update_form.validate():
@@ -58,7 +60,7 @@ def home():
                 meeting.name = request.form.get('name')
                 flash('Successfully updated meeting!')
 
-                del_user_emails = request.form.get('del_emails')                
+                del_user_emails = request.form.get('del_emails')
                 new_user_emails = request.form.get('add_emails')
 
                 members = meeting.members
@@ -72,10 +74,11 @@ def home():
                     for u in del_users:
                         if meeting in u.meetings:
                             u.meetings.remove(meeting)
-                            u.save() 
-                
-                    members = list(filter(lambda x: x not in del_users, members))
-                
+                            u.save()
+
+                    members = list(
+                        filter(lambda x: x not in del_users, members))
+
                 if len(new_user_emails) != 0:
                     new_list = new_user_emails.split(" ")
                     new_users = User.objects(email__in=new_list)
@@ -87,7 +90,7 @@ def home():
                             if meeting not in u.meetings:
                                 u.meetings.append(meeting)
                                 u.save()
-                
+
                 meeting.members = members
                 meeting.save()
                 return redirect(url_for('meeting.home'))
@@ -96,7 +99,6 @@ def home():
                 return redirect(url_for('meeting.home'))
         flash('Invalid Input')
         return redirect(url_for('meeting.home'))
-
 
     if create_form.validate():
         try:
@@ -129,6 +131,7 @@ def home():
             return redirect(url_for('meeting.home'))
     flash('Invalid input.  Please try again!')
     return redirect(url_for('meeting.home'))
+
 
 @meeting.route('/active/<string:meeting_id>', methods=['GET'])
 @login_required

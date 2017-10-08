@@ -1,8 +1,9 @@
+from app import db
+
+from app.modules.auth.model import User
+
 from wtforms import Form, validators
 from wtforms import StringField
-
-from app.setup import db
-from app.modules.auth.model import User
 
 
 class Group(db.Document):
