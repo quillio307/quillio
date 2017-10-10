@@ -1,11 +1,11 @@
+from app import db
 from datetime import datetime as dt
-from flask_security import MongoEngineUserDatastore
-from wtforms import Form, validators
-from wtforms import StringField
 
-from app.setup import db
 from app.modules.auth.model import User
-from app.modules.note.model import Note
+
+from flask_security import MongoEngineUserDatastore
+from wtforms import Form, validators, StringField
+
 
 
 class Meeting(db.Document):
