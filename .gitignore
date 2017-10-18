@@ -103,7 +103,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 *.pyc
+
+# ADDITIONS
 .idea/*
 **.swp
-.vscode/*Pipfile.lock
 **/.vscode
+**/Pipfile.lock

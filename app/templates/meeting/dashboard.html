@@ -1,23 +1,19 @@
 {% extends"helpers/dashboard.html" %} {% block title %} Quillio Meetings {% endblock %} {% block main %}
 
-
-<h3 class="text-center">Meetings</h3>
+<h3 class="text-center"> Meetings </h3>
 
 <!-- Search Bar -->
 <div class="container flex-center text-center">
     <div class="col"></div>
     <div class="col-sm-6">
-        <input class="form-control w-100" id="search-input" type="text" placeholder="Search">
-        <button type="search" class="btn pkButton" name="search-submit" value="search" onclick="meetingSearch()"> Search </button>
-        <!-- <form> -->
-            <!-- <input class="form-control w-100" name="criteria" type="text" placeholder="Search" value="{{ request.form.criteria }}"> -->
-            <!-- <button type="submit" class="btn pkButton" name="submit" value="search" formmethod="post"> Search </button> -->
-        <!-- </form> -->
+        <input type="text" class="form-control w-100" id="searchInput" placeholder="Search">
+        <button type="search" class="btn pkButton" id="searchSubmit" onclick="meetingSearch()"> Search </button>
     </div>
     <div class="col"></div>
 </div>
-<!-- Search Bar -->
+<!-- \Search Bar -->
 
+<!-- Meeting Cards  -->
 {% for meeting_row in meetings | batch(3) %}
 <div class="container">
     <br>
@@ -30,19 +26,28 @@
                     <div class="mask"></div>
                 </a>
             </div>
-            <a href="/{{ current_user.id }}/{{ meeting.id }}" class="btn-floating btn-action"><i class="fa fa-chevron-right"></i></a>
+            <!-- <a href="/{{ current_user.id }}/{{ meeting.id }}" class="btn-floating btn-action"><i class="fa fa-chevron-right"></i></a> -->
             <!-- <a class="btn-floating btn-action" id="{{ meeting.id }}" onclick="meeting_modal_show(this)"><i class="fa fa-chevron-right"></i></a> -->
             <div class="card-body">
                 <h4 class="card-title"> {{ meeting.name }}</h4>
                 <hr>
-                <p class="card-text">{{ meeting.description }}</p>
+                <p class="card-text"> {{ meeting.description }} </p>
             </div>
             <div class="card-data flex-center">
                 <ul>
-                    <li><i class="fa fa-clock-o"></i> {{ meeting.created_atString }}</li>
-                    <li><a href="#"><i class="fa fa-users"> </i>{{ meeting.members|length }}</a></li>
+                    <li>
+                        <i class="fa fa-clock-o"></i> {{ meeting.created_at_str }}</li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-users"> </i>{{ meeting.members|length }}</a>
+                    </li>
+                    <!-- Add Edit Meeting Option if Current user is the owner of the Meeting -->
                     {% if current_user.id == meeting.owner.id %}
-                    <li><a data-toggle="modal" data-target="#editMeetingForm" id="{{ meeting.id }}" onclick="set_meeting('{{ meeting.id }}', '{{ meeting.name }}')"> edit </a></li>
+                    <li>
+                        <a data-toggle="modal" data-target="#editMeetingForm" id="{{ meeting.id }}" onclick="setMeeting('{{ meeting.id }}', '{{ meeting.name }}')">
+                            Edit
+                        </a>
+                    </li>
                     {% endif %}
                 </ul>
             </div>
@@ -50,21 +55,28 @@
         {% endfor %}
     </div>
 </div>{% endfor %}
-</div>
-<a class="btn-floating btn-lg pkButton" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm"><i class="fa fa-plus"></i></a>
-<!--Modal: Contact form-->
+<!-- \Meeting Cards -->
+
+<!-- Create Meeting Button -->
+<a class="btn-floating btn-lg pkButton" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm">
+    <i class="fa fa-plus"></i>
+</a>
+<!-- \Create Meeting Button -->
+
+<!-- Create Meeting Modal -->
 <div class="modal fade" id="createMeetingForm" tabindex="-1" role="dialog" aria-labelledby="createMeetingForm" aria-hidden="true">
     <div class="modal-dialog cascading-modal" role="document">
-        <!--Content-->
         <div class="modal-content">
-            <!--Header-->
             <div class="modal-header darken-3 white-text" style="background-color: #45526E">
-                <h4 class=" title"><i class="fa fa-pencil"></i>Create Meeting</h4>
+                <h4 class=" title">
+                    <i class="fa fa-pencil"></i>
+                    Create Meeting
+                </h4>
                 <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <!--Body-->
+
             <form>
                 <div class="modal-body mb-0">
                     <div class="md-form form-sm">
@@ -78,70 +90,79 @@
                     </div>
 
                     <div class="text-center mt-1-half">
-                        <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="create" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button>
+                        <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="create" onclick="resetPage()" formmethod="post">
+                            Create
+                            <i class="fa fa-send ml-1"></i>
+                        </button>
                     </div>
                 </div>
             </form>
         </div>
-        <!--/.Content-->
     </div>
 </div>
+<!-- \Create Meeting Modal -->
 
+<!-- Update Meeting Modal -->
 <div class="modal fade right" id="editMeetingForm" tabindex="-1" role="dialog" aria-labelledby="createMeetingForm" aria-hidden="true">
     <div class="modal-dialog modal-full-height modal-right" role="document">
-        <!--Content-->
         <div class="modal-content">
-
-            <!--Header-->
             <div class="modal-header darken-3 white-text" style="background-color: #45526E">
-                <h4 class="title">Edit Meeting&emsp;<i class="fa fa-pencil"></i></h4>
+                <h4 class="title">
+                    Edit Meeting&emsp;
+                    <i class="fa fa-pencil"></i>
+                </h4>
                 <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
 
-            <!--Body-->
             <form>
                 <div class="modal-body mb-0">
 
                     <div class="md-form form-sm">
-                        <input type="text" name="meeting_id" id="meeting_id" value="{{ request.form.meeting_id }}" class="form-control" readonly>
+                        <input type="text" class="form-control" id="updateMeetingId" name="meeting_id" value="{{ request.form.meeting_id }}"  readonly>
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" id="update_name" name="name" value="{{ request.form.name }}" class="form-control">
+                        <input type="text" class="form-control" id="updateName" name="name" value="{{ request.form.name }}" >
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" id="add_emails" name="add_emails" value="{{ request.form.add_emails }}" class="form-control">
-                        <label for="add_emails"> New User Emails </label>
+                        <input type="text" class="form-control" id="updateEmailsToAdd" name="emails_to_add" value="{{ request.form.emails_to_add }}" >
+                        <label for="add_emails"> Users to Add </label>
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" id="del_emails" name="del_emails" value="{{ request.form.del_emails }}" class="form-control">
-                        <label for="del_emails"> User's to remove </label>
+                        <input type="text" class="form-control" id="updateEmailsToRemove" name="emails_to_remove" value="{{ request.form.emails_to_remove }}">
+                        <label for="del_emails"> Users to Remove </label>
                     </div>
 
                     <div class="text-center mt-1-half">
-                        <button id="meetingEditButton" type="submit" name="submit" value="update" class="btn btn-mdb mdb-2" formmethod="post"> Update <i class="fa fa-send ml-1"></i></button>
-                        <button id="meetingDeleteButton" type="submit" name="submit" value="delete" class="btn btn-danger mdb-2" formmethod="delete"> Delete Meeting <i class="fa fa-trash-o ml-1"></i></button>
+                        <button id="meetingEditButton" type="submit" name="submit" value="update" class="btn btn-mdb mdb-2" formmethod="post">
+                            Update
+                            <i class="fa fa-send ml-1"></i>
+                        </button>
+                        <button id="meetingDeleteButton" type="submit" name="submit" value="delete" class="btn btn-danger mdb-2" formmethod="delete">
+                            Delete
+                            <i class="fa fa-trash-o ml-1"></i>
+                        </button>
                     </div>
                 </div>
             </form>
         </div>
-        <!--/.Content-->
     </div>
 </div>
-<!--Modal: Contact form-->
-<!--Modal: meeting info-->
+<!-- \Update Meeting Modal -->
+
+<!-- Meeting Info Modal  -->
 <div class="modal fade right" id="meetingInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-full-height modal-right" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title w-100" id="myModalLabel">Meeting Information</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
             </div>
@@ -152,26 +173,38 @@
         </div>
     </div>
 </div>
+<!-- \Meeting Info Modal -->
+
 {% endblock %} {% block js_import %}
-<script>
+<script type="text/javascript">
+    /**
+     * Resets the current url
+     */
+    function resetPage() {
+        window.location.href = "/meetings/"
+    }
+
     /**
      * Searches and displays the meetings that match the given criteria
      */
     function meetingSearch() {
-        url = '/meetings/search=' + document.getElementById('search-input').value
-        $.get(url)
+        search = document.getElementById('searchInput').value
+
+        if (search) {
+            window.location.href = "/meetings/search=" + search
+        } else {
+            alert('No search value given.')
+            window.location.href = "/meetings/"
+        }
     }
 
-    function meeting_modal_show(el) {
-
+    /**
+     * Initializes the Edit Meeting Form for the meeting that was clicked
+     */
+    function setMeeting(id, name) {
+        document.getElementById('updateMeetingId').value = id
+        document.getElementById('updateName').value = name
     }
 
-    function set_meeting(id, name) {
-        document.getElementById('meeting_id').value = id
-        document.getElementById('update_name').value = name
-    }
-</script>
-<script>
     $(".button-collapse").sideNav();
-</script>
-{% endblock %}
+</script> {% endblock %}

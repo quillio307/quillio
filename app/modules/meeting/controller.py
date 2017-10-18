@@ -1,11 +1,12 @@
 import json
+import requests
 import string
 import time
 from datetime import datetime, timedelta
 
 from app.modules.auth.model import User
 from app.modules.meeting.model import Meeting, MeetingCreateForm, \
-    MeetingSearchForm, MeetingUpdateForm
+    MeetingUpdateForm
 
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
@@ -15,136 +16,170 @@ from flask_security import current_user, login_required
 meeting = Blueprint('meeting', __name__)
 
 
+def filter_form(form):
+    """ Router for CRUD Forms that were Recieved on the Meeting Dashboard """
+
+    if form['submit'] == 'create':
+        return create_meeting(form)
+    elif form['submit'] == 'update':
+        return update_meeting(form)
+
+    flash('Could not Fulfill Request. Please Try Again.')
+    return redirect(url_forl('meeting.home'))
+
+
 @meeting.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    usr = current_user._get_current_object()
-    create_form = MeetingCreateForm(request.form)
-    if request.method == 'GET':
-        res = []
-        for meet in usr.meetings:
-            res.append({'name': meet.name})
-        return render_template('meeting/dashboard.html', meetings=usr.meetings, form=create_form)
+    """ Displays all of the current users meetings on the meeting dashboard """
+    if request.method == 'POST':
+        return filter_form(request.form)
 
-    # user requests a search
-    if request.form['submit'] == 'search':
-        search_form = MeetingSearchForm(request.form)
-        if search_form.validate():
-            criterium = search_form.criteria.data.split(" ")
-            users = list(filter(lambda x: "@" in x, criterium))
-            criterium = list(filter(lambda x: "@" not in x, criterium))
-            meetings = usr.meetings
+    user = current_user._get_current_object()
+    return render_template('meeting/dashboard.html', meetings=user.meetings)
 
-            # search by name
-            for c in criterium:
-                meetings = list(filter(lambda x: c.lower()
-                                       in x.name.lower(), meetings))
 
-            # search by users
-            for u in users:
-                uq = User.objects(email__iexact=u[1:])
-                if len(uq) != 0:
-                    meetings = list(
-                        filter(lambda x: uq[0] in x.members, meetings))
+@meeting.route('/create', methods=['POST'])
+@login_required
+def create_meeting(form=None):
+    """ Creates a new meeting. """
 
-            return render_template('meeting/dashboard.html', meetings=meetings, form=create_form)
+    if form is not None:
+        create_form = MeetingCreateForm(form)
+        if create_form.validate():
+            try:
+                user = current_user._get_current_object()
 
-    if request.form['submit'] == 'update':
-        update_form = MeetingUpdateForm(request.form)
+                # generate the list of users that will be in the meeting
+                emails = create_form.emails.data.split(" ")
+                emails.append(user.email)
+
+                # generate the list of valid emails
+                query = User.objects(email__in=emails)
+                valid_emails = [u.email for u in query]
+
+                if len(emails) == len(emails):
+                    # validate and create the meeting
+                    m = Meeting(name=create_form.name.data, members=query, owner=user, active=True).save()
+
+                    # insert the meeting in each user's list of meetings
+                    for u in query:
+                        u.meetings.append(m)
+                        u.save()
+                    
+                    flash('New Meeting has been Created with Member(s): {}'.format(valid_emails))
+                    return redirect(request.args.get('next') or url_for('meeting.home'))
+                else:
+                    # determine the invalid emails
+                    invalid_emails = list(set(emails) - set(valid_emails))
+
+                    flash('Could not Create Meeting. We Were Unable to Find User(s): {}'.format(invalid_emails))
+                    return (request.args.get('next') or url_for('meeting.home'))
+            except Exception as e:
+                flash('An Error has occurred, Please Try Again. {}'.format(e))
+                return redirect(request.args.get('next') or url_for('meeting.home'))
+        else:
+            # failed to validate form
+            flash('Could not Create New Meeting, Please Try Again.')
+            return redirect(request.args.get('next') or url_for('meeting.home'))
+    
+    flash('Invalid Request to Create New Meeting.')
+    return redirect(request.args.get('next') or url_for('meeting.home'))
+
+
+@meeting.route('/update', methods=['PUT'])
+@login_required
+def update_meeting(form=None):
+    """ Updates an Existing Meeting """
+
+    if form is not None:
+        update_form = MeetingUpdateForm(form)
         if update_form.validate():
-            query = Meeting.objects(id__exact=request.form.get('meeting_id'))
-            if len(query) != 0:
-                meeting = query[0]
+            try:
+                # extract the form data
+                name = update_form.name.data
+                emails_to_add_str = update_form.emails_to_add.data
+                emails_to_remove_str = update_form.emails_to_remove.data
 
-                # update name
-                meeting.name = request.form.get('name')
-                flash('Successfully updated meeting!')
+                # search for the meeting
+                query = Meeting.objects(id__exact=update_form.meeting_id.data)
 
-                del_user_emails = request.form.get('del_emails')
-                new_user_emails = request.form.get('add_emails')
+                if len(query) > 0:
+                    meeting = query[0]
+                    members = meeting.members
 
-                members = meeting.members
+                    # remove the undesired members
+                    if len(emails_to_remove_str) != 0:
+                        emails_to_remove = emails_to_remove_str.split(" ")
+                        members_to_remove = User.objects(email__in=emails_to_remove)
 
-                # delete
+                        # remove the meeting from each members list of meetings
+                        for member in members_to_remove:
+                            if meeting in member.meetings:
+                                member.meetings.remove(meeting)
+                                member.save()
 
-                if len(del_user_emails) != 0:
-                    del_list = del_user_emails.split(" ")
-                    del_users = User.objects(email__in=del_list)
+                        # remove the members from the list    
+                        members = list(filter(
+                            lambda x: x not in members_to_remove, members))
+                    
+                    # add the new members
+                    if len(emails_to_add_str) != 0:
+                        emails_to_add = emails_to_add_str.split(" ")
+                        members_to_add = User.objects(email__in=emails_to_add)
 
-                    for u in del_users:
-                        if meeting in u.meetings:
-                            u.meetings.remove(meeting)
-                            u.save()
+                        for member in members_to_add:
+                            # add to list if not already a member
+                            if member not in members:
+                                members.append(member)
+                            
+                            # add meeting to the member's list of meetings
+                            if meeting not in member.meetings:
+                                member.meetings.append(meeting)
+                                member.save()
+                                
+                    # save the changes
+                    meeting.name = name
+                    meeting.members = members
+                    meeting.save()
 
-                    members = list(
-                        filter(lambda x: x not in del_users, members))
-
-                if len(new_user_emails) != 0:
-                    new_list = new_user_emails.split(" ")
-                    new_users = User.objects(email__in=new_list)
-
-                    for u in new_users:
-                        if u not in members:
-                            members.append(u)
-
-                            if meeting not in u.meetings:
-                                u.meetings.append(meeting)
-                                u.save()
-
-                meeting.members = members
-                meeting.save()
-                return redirect(url_for('meeting.home'))
-            else:
-                flash('Could not find Meeting')
-                return redirect(url_for('meeting.home'))
-        flash('Invalid Input')
-        return redirect(url_for('meeting.home'))
-
-    if create_form.validate():
-        try:
-            # generate list of users that will be in the meeting
-            emails = create_form.emails.data.split(" ")
-            emails.append(current_user.email)
-
-            # grab the list of valid users
-            query = User.objects(email__in=emails)
-            query_emails = [u.email for u in query]
-
-            # validate that all the members exist
-            if len(emails) == len(query):
-                # add the meeting to each user's meetings list
-                m = Meeting(name=create_form.name.data,
-                            members=query, owner=current_user._get_current_object(), active=True).save()
-                for u in query:
-                    u.meetings.append(m)
-                    u.save()
-                flash('New meeting created with member(s): {}'
-                      .format(query_emails))
-                return redirect(url_for('meeting.home'))
-            # show the invalid users
-            else:
-                invalid = list(set(emails) - set(query_emails))
-                flash('Could not find user(s): {}'.format(invalid))
-                return redirect(url_for('meeting.home'))
-        except Exception as e:
-            flash('A problem has occurred, please try again! {}'.format(e))
-            return redirect(url_for('meeting.home'))
-    flash('Invalid input.  Please try again!')
-    return redirect(url_for('meeting.home'))
+                    flash('Meeting has been Successfully Updated.')
+                    return redirect(request.args.get('next') or url_for('meeting.home'))
+                else:
+                    flash('Unable to Update Meeting at this Time.')
+                    return redirect(request.args.get('next') or url_for('meeting.home'))
+            except Exception as e:
+                flash('An Error has Occurred, Please Try Again. {}'.format(e))
+                return redirect(request.args.get('next') or url_for('meeting.home'))
+        else:
+            # failed to validate form
+            flash('Could not Update Meeting, Please Try Again.')
+            return redirect(request.args.get('next') or url_for('meeting.home'))
+    flash('Invalid Request to Update a Meeting.')
+    return redirect(request.args.get('next') or url_for('meeting.home'))
 
 
-@meeting.route('/search=<string:query>', methods=['GET'])
+@meeting.route('/search=<string:query>', methods=['GET', 'POST'])
 def search_meetings(query):
+    """ Displays the Meetings to the User's Dashboard that match the given criteria """
+    if request.method == 'POST':
+        return filter_form(request.form) 
+
     meetings = current_user._get_current_object().meetings
     search = query.split(" ")
 
     # get the list of users to search for
     users = list(filter(lambda x: "@" in x, search))
 
-    # get the regular search criteria
+    # get the other search criteria
     search = list(filter(lambda x: "@" not in x, search))
 
-    # filter the meetings to only containt meetings with desired members
+    # search is too expensive
+    if len(search) > 20:
+        flash('Could not fulfill search request.')
+        return redirect(request.args.get('next') or url_for('meeting.home'))
+
+    # filter the meetings to only contain meetings with desired members
     for u in users:
         user_query = User.objects(email__iexact=u[1:])
         if (len(user_query) != 0):
@@ -156,9 +191,11 @@ def search_meetings(query):
         meetings = list(filter(
             lambda x: c.lower() in x.name.lower(), meetings))
 
-    create_form = MeetingCreateForm(request.form)
-    return render_template('meeting/dashboard.html', meetings=meetings,
-                           form=create_form)
+    # reset the page and only show the desired meetings
+    return render_template('meeting/dashboard.html', meetings=meetings)
+
+
+# CODE FOR REFERENCE
 
 
 @meeting.route('/active/<string:meeting_id>', methods=['GET'])
@@ -172,7 +209,7 @@ def get_active_meeting(meeting_id):
             if current_user not in query[0].members:
                 flash('You are not a member of that meeting.')
                 return redirect(url_for('meeting.meetings_page'))
-            return jsonify({'Meeting': query})
+            return json.dumps({'Meeting': query})
         else:
             flash('Meeting Not found')
             return redirect(url_for('meeting.meetings_page'))
