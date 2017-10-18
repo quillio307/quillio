@@ -133,6 +133,34 @@ def home():
     return redirect(url_for('meeting.home'))
 
 
+@meeting.route('/search=<string:query>', methods=['GET'])
+def search_meetings(query):
+    meetings = current_user._get_current_object().meetings
+    search = query.split(" ")
+
+    # get the list of users to search for
+    users = list(filter(lambda x: "@" in x, search))
+
+    # get the regular search criteria
+    search = list(filter(lambda x: "@" not in x, search))
+
+    # filter the meetings to only containt meetings with desired members
+    for u in users:
+        user_query = User.objects(email__iexact=u[1:])
+        if (len(user_query) != 0):
+            meetings = list(filter(
+                lambda x: user_query[0] in x.members, meetings))
+
+    # filter the meetings to only contain meetings with the desired text
+    for c in search:
+        meetings = list(filter(
+            lambda x: c.lower() in x.name.lower(), meetings))
+
+    create_form = MeetingCreateForm(request.form)
+    return render_template('meeting/dashboard.html', meetings=meetings,
+                           form=create_form)
+
+
 @meeting.route('/active/<string:meeting_id>', methods=['GET'])
 @login_required
 def get_active_meeting(meeting_id):

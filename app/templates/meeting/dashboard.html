@@ -7,10 +7,12 @@
 <div class="container flex-center text-center">
     <div class="col"></div>
     <div class="col-sm-6">
-        <form>
-            <input class="form-control w-100" name="criteria" type="text" placeholder="Search" value="{{ request.form.criteria }}">
-            <button type="submit" class="btn pkButton" name="submit" value="search" formmethod="post"> Search </button>
-        </form>
+        <input class="form-control w-100" id="search-input" type="text" placeholder="Search">
+        <button type="search" class="btn pkButton" name="search-submit" value="search" onclick="meetingSearch()"> Search </button>
+        <!-- <form> -->
+            <!-- <input class="form-control w-100" name="criteria" type="text" placeholder="Search" value="{{ request.form.criteria }}"> -->
+            <!-- <button type="submit" class="btn pkButton" name="submit" value="search" formmethod="post"> Search </button> -->
+        <!-- </form> -->
     </div>
     <div class="col"></div>
 </div>
@@ -28,7 +30,7 @@
                     <div class="mask"></div>
                 </a>
             </div>
-            <a href="http://localhost:6000/{{ current_user.id }}/{{ meeting.id }}" class="btn-floating btn-action"><i class="fa fa-chevron-right"></i></a>
+            <a href="/{{ current_user.id }}/{{ meeting.id }}" class="btn-floating btn-action"><i class="fa fa-chevron-right"></i></a>
             <!-- <a class="btn-floating btn-action" id="{{ meeting.id }}" onclick="meeting_modal_show(this)"><i class="fa fa-chevron-right"></i></a> -->
             <div class="card-body">
                 <h4 class="card-title"> {{ meeting.name }}</h4>
@@ -152,6 +154,14 @@
 </div>
 {% endblock %} {% block js_import %}
 <script>
+    /**
+     * Searches and displays the meetings that match the given criteria
+     */
+    function meetingSearch() {
+        url = '/meetings/search=' + document.getElementById('search-input').value
+        $.get(url)
+    }
+
     function meeting_modal_show(el) {
 
     }
