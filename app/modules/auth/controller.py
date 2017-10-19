@@ -5,7 +5,7 @@ from app.modules.meeting.controller import meeting
 from flask import Blueprint, render_template, flash, request, redirect, url_for
 from flask_security import login_user, logout_user, login_required
 from flask_security.utils import hash_password, verify_password
-
+from app import mail
 
 auth = Blueprint('auth', __name__)
 
@@ -22,7 +22,13 @@ def signup():
                 email=form.email.data,
                 name=form.name.data,
                 password=hash_password(form.password.data))
-				# log the user in on signup --> will likely be changed with account activation option 
+				# log the user in on signup --> will likely be changed with account activation option
+            mail.send_email(
+                from_email='quillio.admin@quillio.com', 
+                to_email=form.email.data, 
+                subject='Welcome to Quillio', 
+                text='Welcome to Quillio! Thanks for creating an account.'
+            ) 
             login_user(user)
             return redirect(request.args.get('next') or url_for('meeting.home'))
         except Exception as e:

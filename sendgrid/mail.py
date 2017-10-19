@@ -6,23 +6,23 @@ class Mail(object):
     """Creates the response body for v3/mail/send"""
     def __init__(
             self, from_email=None, subject=None, to_email=None, content=None):
-        self._from_email = None
-        self._subject = None
-        self._template_id = None
-        self._send_at = None
-        self._batch_id = None
-        self._asm = None
-        self._ip_pool_name = None
-        self._mail_settings = None
-        self._tracking_settings = None
-        self._reply_to = None
-        self._personalizations = None
-        self._contents = None
-        self._attachments = None
-        self._sections = None
-        self._headers = None
-        self._categories = None
-        self._custom_args = None
+        self.from_email = None
+        self.subject = None
+        self.template_id = None
+        self.send_at = None
+        self.batch_id = None
+        self.asm = None
+        self.ip_pool_name = None
+        self.mail_settings = None
+        self.tracking_settings = None
+        self.reply_to = None
+        self.personalizations = None
+        self.contents = None
+        self.attachments = None
+        self.sections = None
+        self.headers = None
+        self.categories = None
+        self.custom_args = None
 
         # Minimum required to send an email
         if from_email and subject and to_email and content:

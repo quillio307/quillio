@@ -6,7 +6,7 @@ from flask_sendgrid import SendGrid
 app = Flask(__name__)
 app.config.from_object('config')
 app.config['SENDGRID_API_KEY'] = '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'
-app.config['SENDGIRD_DEFAULT_FROM'] = 'quillio.admin@quillio.com'
+app.config['SENDGRID_DEFAULT_FROM'] = "quillio.admin@quillio.com"
 
 mail = SendGrid(app) 
 
