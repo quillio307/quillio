@@ -1,8 +1,7 @@
 import string
 
 from app.modules.auth.model import User
-from app.modules.group.model import Group, GroupCreateForm, GroupSearchForm, \
-    GroupUpdateForm
+from app.modules.group.model import Group, GroupCreateForm, GroupUpdateForm
 
 from flask import Blueprint, request, render_template, flash, redirect, \
     url_for, jsonify
@@ -12,134 +11,210 @@ from flask_security import Security, login_required, current_user
 group = Blueprint('group', __name__)
 
 
+def filter_form(form):
+    """ Router for CRUD Forms that were Recieved on the Group Dashboard """
+
+    if form['submit'] == 'create':
+        return create_group(form)
+    elif form['submit'] == 'update':
+        return update_group(form)
+
+    flash('Could not Fulfill Request. Please Try Again.')
+    return redirect(url_for('meeting.home'))
+
+
 @group.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    usr = current_user._get_current_object()
-    create_form = GroupCreateForm(request.form)
-    if request.method == 'GET':
-        res = []
-        for group in usr.groups:
-            res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
-        return render_template('group/dashboard.html', groups=usr.groups, form=create_form)
+    """ Displays All of the Current User's Groups on the Group Dashboard """
+    if request.method == 'POST':
+        return filter_form(request.form)
 
-    # user requests a search
-    if request.form['submit'] == 'search':
-        search_form = GroupSearchForm(request.form)
-        if search_form.validate():
-            criterium = search_form.criteria.data.split(" ")
-            users = list(filter(lambda x: "@" in x, criterium))
-            criterium = list(filter(lambda x: "@" not in x, criterium))
-            groups = usr.groups
+    user = current_user._get_current_object()
+    return render_template('group/dashboard.html', groups=user.groups)
 
-            # search by name 
-            for c in criterium:
-                groups = list(filter(lambda x: c.lower() in x.name.lower(), groups))
 
-            # search by user
-            for u in users:
-                uq = User.objects(email__iexact=u[1:])
-                if len(uq) != 0:
-                    groups = list(filter(lambda x: uq[0] in x.members, groups))
+@group.route('/create', methods=['POST'])
+@login_required
+def create_group(form=None):
+    """ Creates a new Group. """
 
-            return render_template('groups/dashboard.html', groups=groups, form=create_form)
+    if form is not None:
+        create_form = GroupCreateForm(form)
+        if create_form.validate():
+            try:
+                user = current_user._get_current_object()
 
-    # user requests an update
-    if request.form['submit'] == 'update':
-        update_form = GroupUpdateForm(request.form)
-        if update_form.validate():
-            query = Group.objects(id__exact=request.form.get('group_id'))
-            if len(query) != 0:
-                group = query[0]
+                # generate the list of requested member emails
+                emails = create_form.emails.data.split(" ")
+                emails.append(user.email)
 
-                # update name and description
-                group.name = request.form.get('name')
-                group.description = request.form.get('description')
+                # generate the list of valid emails
+                query = User.objects(email__in=emails)
+                valid_emails = [u.email for u in query]
 
-                del_user_emails = request.form.get('del_emails')
-                new_user_emails = request.form.get('add_emails')
-                new_admin_emails = request.form.get('add_admin_emails')
+                # validate and create the new group
+                if len(emails) == len(valid_emails):
+                    g = Group(name=create_form.name.data, members=query, admins=[user]).save()
 
-                # delete the users
-                members = group.members
+                    # add the group to each member's list of groups
+                    for u in query():
+                        u.groups.append(g)
+                        u.save()
 
-                if len(del_user_emails) != 0:
-                    del_list = del_user_emails.split(" ")
-                    del_users = User.objects(email__in=del_list)
-                    # remove group from user
-                    for u in del_users:
-                        if group in u.groups:
-                            u.groups.remove(group)
-                            u.save()
-                    members = list(filter(lambda x: x not in del_users, members))
-                
-                # add the users
-                if len(new_user_emails) != 0:
-                    new_list = new_user_emails.split(" ")
-                    new_users = User.objects(email__in=new_list)
-                    for u in new_users:
-                        if u not in members:
-                            members.append(u)
-                            # add group to user
-                            if group not in u.groups:
-                                u.groups.append(group)
-                                u.save()
-                
-                admins = group.admins
-
-                # add the admins
-                if len(new_admin_emails) != 0:
-                    new_admin_list = new_admin_emails.split(" ")
-                    new_admins = User.objects(email__in=new_admin_list)
-
-                    for a in new_admins:
-                        if a not in admins:
-                            admins.append(a)
-                        if a not in members:
-                            members.append(a)
-                        if group not in a.groups:
-                            a.groups.append(group)
-
-                group.members = members
-                group.admins = admins
-                group.save()
-                flash('successfully updated group!')
-                return redirect(url_for('group.home'))
-            flash('could not find the group')
-            return redirect(url_for('group.home')) 
+                    flash('New Group Created with Member(s): {}'.format(str(valid_emails)))
+                    return redirect(request.args.get('next') or url_for('group.home'))
+                else:
+                    # determine the invalid emails
+                    invalid_emails = list(set(emails) - set(valid_emails))
+                    flash('Could not Create New Group. Unable to Find User(s): {}'.format(invalid_emails))
+            except Exception as e:
+                flash('An Error has Occured, Please Try Again. {}'.format(str(e)))
         else:
-            flash('Invalid Input, Please try again!')
-            return redirect(url_for('group.home'))
+            # failed to validate form
+            flash('Could not Create New Group, Please Try Again.')
+        return redirect(request.args.get('next') or url_for('group.home'))
 
-    # user requests a new group
-    if create_form.validate():
-        try:
-            emails = create_form.emails.data.split(" ")
-            emails.append(current_user.email)
-
-            query = User.objects(email__in=emails)
-            query_emails = [u.email for u in query]
-
-            if len(emails) == len(query):
-                g = Group(name=create_form.name.data,
-                          members=query, admins=[current_user._get_current_object()]).save()
-
-                for u in query:
-                    u.groups.append(g)
-                    u.save()
-                flash('New Group created with member(s): {}'
-                      .format(query_emails))
-                return redirect(url_for('group.home'))
-            else:
-                invalid = list(set(emails) - set(query_emails))
-                flash('Could not find user(s): {}'.format(invalid))
-                return redirect(url_for('group.home'))
-        except Exception as e:
-            flash('A problem has occurred, please try again! {}'.format(e))
-            return redirect(url_for('group.home'))
-
-    flash('Invalid input.  Please try again!')
+    flash('Invalid Request to Create New Group.')
     return redirect(url_for('group.home'))
+
+
+@group.route('/update', methods=['POST'])
+@login_required
+def update_group(form=None):
+    """ Updates an Existing Group """
+
+    if form is not None:
+        update_form = GroupUpdateForm(form)
+        if update_form.validate():
+            try:
+                # extract the form data
+                name = update_form.name.data
+                description = update_form.description.data
+                emails_to_add_str = update_form.emails_to_add.data
+                admin_emails_to_add_str = update_form.admin_emails_to_add.data
+                emails_to_remove_str = update_form.emails_to_remove.data
+
+                # search for the group
+                query = Group.objects(id__exact=update_form.group_id.data)
+
+                if len(query) > 0:
+                    group = query[0]
+                    members = group.members
+                    admins = group.admins
+
+                    # remove the undesired members
+                    if len(emails_to_remove_str) != 0:
+                        emails_to_remove = emails_to_remove_str.split(" ")
+                        members_to_remove = User.objects(email__in=emails_to_remove)
+
+                        # remove the group from each members list of groups
+                        for member in members_to_remove:
+                            if group in member.groups:
+                                member.groups.remove(group)
+                                member.save()
+                        
+                        # remove the members from the list
+                        members = list(filter(
+                            lambda x: x not in members_to_remove, members))
+                        
+                    # add the new members
+                    if len(emails_to_add_str) != 0:
+                        emails_to_add = emails_to_add_str.split(" ")
+                        members_to_add = User.object(email__in=emails_to_add)
+
+                        for member in members_to_add:
+                            # add member to the group's list of members
+                            if member not in members:
+                                members.append(member) 
+
+                            # add group to the member's list of groups
+                            if group not in member.groups:
+                                member.groups.append(group)
+                                member.save()
+
+                    # add the new admins
+                    if len(admin_emails_to_add_str) != 0:
+                        admin_emails_to_add = admin_emails_to_add_str.split(" ")
+                        admins_to_add = User.objects(email__in=admin_emails_to_add)
+
+                        for admin in admins_to_add:
+                            # add admin to the group's list of admins
+                            if admin not in admins:
+                                admins.append(admin)
+                            
+                            # add admin to the group's list of members
+                            if admin not in members:
+                                members.append(admin)
+
+                            # add group to the admin's list of groups
+                            if group not in admin.groups:
+                                admin.groups.append(group)
+                                admin.save()
+                    
+                    # update the description
+                    if len(description) != 0:
+                        group.description = description
+
+                    # save the changes
+                    group.name = name
+                    group.members = members
+                    group.admins = admins
+                    group.save()
+
+                    flash('Group has been Successfully Updated')
+                    return redirect(request.args.get('next') or url_for('group.home'))
+                else:
+                    flash('Unable to Update Group at this Time.')
+            except Exception as e:
+                flash('Unable to Update Group at this Time.  Please Try Again. {}'.format(str(e)))
+        else:
+            # failed to validate form
+            flash('Could not Update Group, Please Try Again.')
+        return redirect(request.args.get('next') or url_for('group.home'))
+
+    flash('Invalid Request to Update Group.')
+    return redirect(url_for('group.home'))
+
+
+@group.route('/search=<string:query>', methods=['GET', 'POST'])
+@login_required
+def search_groups(query):
+    """ Displays the Groups that Match the Given Query on the User's Group Dashboard """
+    
+    if request.method == 'POST':
+        return filter_form(request.form)
+
+    groups = current_user._get_current_object().groups
+    search = query.split(" ")
+
+    # get the list of users to search for
+    users = list(filter(lambda x: "@" in x, search))
+
+    # get the other search criteria
+    search = list(filter(lambda x: "@" not in x, search))
+
+    # search is too expensive
+    if len(search) > 20:
+        flash('Could not Fulfill Search Request.')
+        return redirect(request.args.get('next') or url_for('group.home'))
+
+    # filter the groups by user
+    for u in users:
+        user_query = User.objects(email__iexact=u[1:])
+        if len(user_query) != 0:
+            groups = list(filter(
+                lambda x: user_query[0] in x.members, groups))
+    
+    # filter the meetings by name
+    for c in search:
+        groups = list(filter(
+            lambda x: c.lower() in x.name.lower(), groups))
+    
+    # reset the page and only show the matched groups
+    return render_template('group/dashboard.html', groups=groups)
+
+
 
 
 @group.route('/is/admin/<string:group_id>')
@@ -156,21 +231,23 @@ def get_group_admins(group_id):
     return jsonify({'status': 400}) 
 
 
-@group.route('/get/<string:group_id>')
+@group.route('/info/<string:group_id>')
 @login_required
 def get_group_by_id(group_id):
+    # validate the id given
     if len(group_id) == 24 and all(c in string.hexdigits for c in group_id):
         query = Group.objects(id__exact=group_id)
         if len(query) > 0:
+            
+            # check that the current user is in the group
             if current_user not in query[0].members:
                 flash('You are not a member of that group.')
-                return redirect(url_for('group.home'))
-            return jsonify({'Group': query})
+                return redirect(request.args.get('next') or url_for('group.home'))
+            return jsonify(query)
         else:
-            flash('Group not found')
-            return redirect(url_for('group.home'))
-    flash('Invalid Group Id.')
-    return redirect(url_for('group.home'))
+            return redirect(request.args.get('next') or url_for('group.home'))
+    flash('Invalid Group ID')
+    return redirect(request.args.get('next') or url_for('group.home'))
 
 
 # AMMO CODE

@@ -26,8 +26,11 @@
                     <div class="mask"></div>
                 </a>
             </div>
-            <!-- <a href="/{{ current_user.id }}/{{ meeting.id }}" class="btn-floating btn-action"><i class="fa fa-chevron-right"></i></a> -->
-            <!-- <a class="btn-floating btn-action" id="{{ meeting.id }}" onclick="meeting_modal_show(this)"><i class="fa fa-chevron-right"></i></a> -->
+
+            <a class="btn-floating btn-action">
+                <i class="fa fa-chevron-right"></i>
+            </a>
+
             <div class="card-body">
                 <h4 class="card-title"> {{ meeting.name }}</h4>
                 <hr>
@@ -90,7 +93,8 @@
                     </div>
 
                     <div class="text-center mt-1-half">
-                        <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="create" onclick="resetPage()" formmethod="post">
+                        <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="create"
+                            formmethod="post">
                             Create
                             <i class="fa fa-send ml-1"></i>
                         </button>
@@ -120,15 +124,15 @@
                 <div class="modal-body mb-0">
 
                     <div class="md-form form-sm">
-                        <input type="text" class="form-control" id="updateMeetingId" name="meeting_id" value="{{ request.form.meeting_id }}"  readonly>
+                        <input type="text" class="form-control" id="updateMeetingId" name="meeting_id" value="{{ request.form.meeting_id }}" readonly>
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" class="form-control" id="updateName" name="name" value="{{ request.form.name }}" >
+                        <input type="text" class="form-control" id="updateName" name="name" value="{{ request.form.name }}">
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" class="form-control" id="updateEmailsToAdd" name="emails_to_add" value="{{ request.form.emails_to_add }}" >
+                        <input type="text" class="form-control" id="updateEmailsToAdd" name="emails_to_add" value="{{ request.form.emails_to_add }}">
                         <label for="add_emails"> Users to Add </label>
                     </div>
 
@@ -178,13 +182,6 @@
 {% endblock %} {% block js_import %}
 <script type="text/javascript">
     /**
-     * Resets the current url
-     */
-    function resetPage() {
-        window.location.href = "/meetings/"
-    }
-
-    /**
      * Searches and displays the meetings that match the given criteria
      */
     function meetingSearch() {
@@ -193,7 +190,6 @@
         if (search) {
             window.location.href = "/meetings/search=" + search
         } else {
-            alert('No search value given.')
             window.location.href = "/meetings/"
         }
     }

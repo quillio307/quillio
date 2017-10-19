@@ -1,15 +1,19 @@
 {% extends"helpers/dashboard.html" %} {% block title %} Quillio Groups {% endblock %} {% block main %}
-<h3 class="text-center">Groups</h3>
+
+<h3 class="text-center"> Groups </h3>
+
+<!-- Search Bar -->
 <div class="container flex-center text-center">
     <div class="col"></div>
     <div class="col-sm-6">
-        <form>
-            <input class="form-control w-100" name="criteria" type="text" placeholder="Search" value="{{ request.form.criteria }}">
-            <button type="submit" class="btn pkButton" name="submit" value="search" formmethod="post"> Search </button>
-        </form>
+        <input type="text" class="form-control w-100" id="searchInput" placeholder="Search">
+        <button type="search" class="btn pkButton" id="searchSubmit" onclick="groupSearch()"> Search </button>
     </div>
     <div class="col"></div>
 </div>
+<!-- \Search Bar -->
+
+<!-- Group Cards -->
 {% for group_row in groups | batch(3) %}
 <div class="container">
     <br>
@@ -23,17 +27,30 @@
                 </a>
             </div>
 
-            <a class="btn-floating btn-action" id="{{ group.id }}" onclick="group_modal_show(this)"><i class="fa fa-chevron-right"></i></a>
+            <a class="btn-floating btn-action" onclick="getGroupInfo('{{ group.id }}')">
+                <i class="fa fa-chevron-right"></i>
+            </a>
+
             <div class="card-body">
                 <h4 class="card-title"> {{ group.name }}</h4>
                 <hr>
-                <p class="card-text">{{ group.description }}</p>
+                <p class="card-text"> {{ group.description }} </p>
             </div>
+
             <div class="card-data flex-center">
                 <ul>
-                    <li><a href="#"><i class="fa fa-users"></i>{{ group.members|length }}</a></li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-users"></i> {{ group.members|length }}
+                        </a>
+                    </li>
+                    <!-- Add Edit Meeting Option if Current user is an Admin in the Group -->
                     {% if current_user in group.admins %}
-                    <li><a data-toggle="modal" data-target="#editGroupForm" id="{{ group.id }}" onclick="set_group('{{ group.id }}', '{{ group.name }}', '{{ group.description }}')"> edit </a></li>
+                    <li>
+                        <a data-toggle="modal" data-target="#editGroupForm" id="{{ group.id }}" onclick="setGroup('{{ group.id }}', '{{ group.name }}', '{{ group.description }}')">
+                            Edit
+                        </a>
+                    </li>
                     {% endif %}
                 </ul>
             </div>
@@ -41,117 +58,145 @@
         {% endfor %}
     </div>
 </div>{% endfor %}
-</div>
-<a class="btn-floating btn-lg pkButton" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm"><i class="fa fa-plus"></i></a>
+<!-- \Group Cards -->
+
+<!-- Create Group Button -->
+<a class="btn-floating btn-lg pkButton" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm">
+    <i class="fa fa-plus"></i>
+</a>
+<!-- \Create Group Button -->
+
+<!-- Group Create Modal -->
 <div class="modal fade" id="createGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
     <div class="modal-dialog cascading-modal" role="document">
         <div class="modal-content">
             <div class="modal-header darken-3 white-text" style="background-color: #45526E">
-                <h4 class="title"><i class="fa fa-pencil"></i>Create Group</h4>
+                <h4 class="title">
+                    <i class="fa fa-pencil"></i>Create Group</h4>
                 <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <form>
                 <div class="modal-body mb-0">
                     <div class="md-form form-sm">
-                        <input type="text" id="name" name="name" value="{{ request.form.name }}" class="form-control" required>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ request.form.name }}" required>
                         <label for="name"> Group Name </label>
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" id="emails" name="emails" value="{{ request.form.emails }}" class="form-control" required>
+                        <input type="text" class="form-control" id="emails" name="emails" value="{{ request.form.emails }}" required>
                         <label for="emails"> Member Emails </label>
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" id="description" name="description" value="{{ request.form.description }}" class="form-control">
+                        <input type="text" class="form-control" id="description" name="description" value="{{ request.form.description }}">
                         <label for="description"> Description </label>
                     </div>
 
                     <div class="text-center mt-1-half">
-                        <button id="groupCreateButton" type="submit" name="submit" value="create" class="btn btn-mdb mdb-2" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button>
+                        <button id="groupCreateButton" type="submit" name="submit" value="create" class="btn btn-mdb mdb-2" formmethod="post">
+                            Create
+                            <i class="fa fa-send ml-1"></i>
+                        </button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
+<!-- \Group Create Modal -->
 
+<!-- Update Group Modal -->
 <div class="modal fade right" id="editGroupForm" tabindex="-1" role="dialog" aria-labelledby="createGroupForm" aria-hidden="true">
     <div class="modal-dialog modal-full-height modal-right" role="document">
-        <!--Content-->
         <div class="modal-content">
             <div class="modal-header darken-3 white-text" style="background-color: #45526E">
-                <h4 class="title">Edit Group&emsp;<i class="fa fa-pencil"></i></h4>
+                <h4 class="title">Edit Group&emsp;
+                    <i class="fa fa-pencil"></i>
+                </h4>
                 <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <form>
                 <div class="modal-body mb-0">
 
                     <div class="md-form form-sm">
-                        <input type="text" name="group_id" id="group_id" value="{{ request.form.group_id }}" class="form-control" readonly>
+                        <input type="text" class="form-control" id="updateGroupId" name="group_id" value="{{ request.form.group_id }}" readonly>
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" id="update_name" name="name" value="{{ request.form.name }}" class="form-control">
+                        <input type="text" class="form-control" id="updateName" name="name" value="{{ request.form.name }}">
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" id="add_emails" name="add_emails" value="{{ request.form.add_emails }}" class="form-control">
-                        <label for="add_emails"> New User Emails </label>
+                        <input type="text" class="form-control" id="updateEmailsToAdd" name="emails_to_add" value="{{ request.form.emails_to_add }}">
+                        <label for="updateEmailsToAdd"> Users to Add </label>
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" id="add_admin_emails" name="add_admin_emails" value="{{ request.form.add_admin_emails }}" class="form-control">
-                        <label for="add_admin_emails"> New Admin Emails </label>
+                        <input type="text" class="form-control" id="updateAdminEmailsToAdd" name="admin_emails_to_add" value="{{ request.form.add_admin_emails_to_add }}">
+                        <label for="updateAdminEmailsToAdd"> Admins to Add </label>
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" id="del_emails" name="del_emails" value="{{ request.form.del_emails }}" class="form-control">
-                        <label for="del_emails"> User's to remove </label>
+                        <input type="text" class="form-control" id="updateEmailsToRemove" name="emails_to_remove" value="{{ request.form.emails_to_remove }}">
+                        <label for="updateEmailsToRemove"> Users to remove </label>
                     </div>
 
                     <div class="md-form form-sm">
-                        <input type="text" id="update_description" name="description" value="{{ request.form.description }}" class="form-control">
-                        <label for="update_description"> New Description </label>
+                        <input type="text" id="updateDescription" name="description" value="{{ request.form.description }}" class="form-control">
+                        <label for="updateDescription"> Update the Description </label>
                     </div>
 
                     <div class="text-center mt-1-half">
-                        <button id="groupEditButton" type="submit" name="submit" value="update" class="btn btn-mdb mdb-2" formmethod="post"> Update <i class="fa fa-send ml-1"></i></button>
-                        <button id="groupDeleteButton" type="submit" name="submit" value="delete" class="btn btn-danger mdb-2" formmethod="delete"> Delete Group <i class="fa fa-trash-o ml-1"></i></button>
+                        <button id="groupEditButton" type="submit" name="submit" value="update" class="btn btn-mdb mdb-2" formmethod="post">
+                            Update
+                            <i class="fa fa-send ml-1"></i>
+                        </button>
+                        <button id="groupDeleteButton" type="submit" name="submit" value="delete" class="btn btn-danger mdb-2" formmethod="delete">
+                            Delete Group
+                            <i class="fa fa-trash-o ml-1"></i>
+                        </button>
                     </div>
                 </div>
             </form>
         </div>
-        <!--/.Content-->
     </div>
 </div>
+<!-- \Update Group Modal -->
 
 {% endblock %} {% block js_import %}
 <script>
-    function group_modal_show(el) {
-        id = $(el).attr("id")
-        url = '/groups/is/admin/' + id
+    /**
+     * Searches and displays the groups that match the given criteria
+     */
+    function groupSearch() {
+        search = document.getElementById('searchInput').value
 
-        $.get(url, function(data) {
-            if (data['is_admin']) {
-                alert('User is admin for this group')
-            } else {
-                alert('User does not have the permissions to edit')
-            }
-        })
+        if (search) {
+            window.location.href = "/groups/search=" + search
+        } else {
+            window.location.href = "/groups"
+        }
     }
 
-    function set_group(id, name, description) {
-        document.getElementById('group_id').value = id
-        document.getElementById('update_name').value = name
-        document.getElementById('update_description').value = description
+    /**
+     * Displays the information for a specific group
+     */
+    function getGroupInfo(id) {
+        window.location.href = "/groups/info/" + id
     }
-</script>
-<script>
+
+    /**
+     * Initializes the Edit Group Form for the group that was clicked
+     */
+    function setGroup(id, name, description) {
+        document.getElementById('updateGroupId').value = id
+        document.getElementById('updateName').value = name
+        document.getElementById('updateDescription').value = description
+    }
+
     $(".button-collapse").sideNav();
-</script>
-{% endblock %}
+</script> {% endblock %}
