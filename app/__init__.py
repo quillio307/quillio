@@ -1,9 +1,14 @@
 from flask import Flask, render_template, redirect, url_for
 from flask_mongoengine import MongoEngine
+from flask_sendgrid import SendGrid
 
 # Initialize the app
 app = Flask(__name__)
 app.config.from_object('config')
+app.config['SENDGRID_API_KEY'] = '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'
+app.config['SENDGIRD_DEFAULT_FROM'] = 'quillio.admin@quillio.com'
+
+mail = SendGrid(app) 
 
 # Define the database
 db = MongoEngine(app)
@@ -23,3 +28,26 @@ from app.modules.meeting.controller import meeting
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(group, url_prefix='/groups')
 app.register_blueprint(meeting, url_prefix='/meetings')
+
+
+
+# How to use send grid notes
+#
+#	send email to multiple users
+#  mail.send_email(
+#      from_email='someone@yourdomain.com',
+#      to_email=[{'email': 'test1@example.com'}, {'email': 'test2@example.com'}],
+#      subject='Subject'
+#      text='Body',
+#  )
+#
+#
+#	send single recipient
+#	mail.send_email(
+#		from_email='someone@quillio.com',
+#		to_email = Email('test@example.com'),
+#		subject = 'Subject', 
+#		text='Body'
+#  )
+
+
