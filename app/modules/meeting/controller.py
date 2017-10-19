@@ -31,7 +31,7 @@ def filter_form(form):
 @meeting.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    """ Displays all of the current users meetings on the meeting dashboard """
+    """ Displays All of the Current Users Meetings on the Meeting Dashboard """
     if request.method == 'POST':
         return filter_form(request.form)
 
@@ -42,7 +42,7 @@ def home():
 @meeting.route('/create', methods=['POST'])
 @login_required
 def create_meeting(form=None):
-    """ Creates a new meeting. """
+    """ Creates a new Meeting. """
 
     if form is not None:
         create_form = MeetingCreateForm(form)
@@ -72,19 +72,16 @@ def create_meeting(form=None):
                 else:
                     # determine the invalid emails
                     invalid_emails = list(set(emails) - set(valid_emails))
-
                     flash('Could not Create Meeting. We Were Unable to Find User(s): {}'.format(invalid_emails))
-                    return (request.args.get('next') or url_for('meeting.home'))
             except Exception as e:
                 flash('An Error has occurred, Please Try Again. {}'.format(e))
-                return redirect(request.args.get('next') or url_for('meeting.home'))
         else:
             # failed to validate form
             flash('Could not Create New Meeting, Please Try Again.')
-            return redirect(request.args.get('next') or url_for('meeting.home'))
+        return redirect(request.args.get('next') or url_for('meeting.home'))
     
     flash('Invalid Request to Create New Meeting.')
-    return redirect(request.args.get('next') or url_for('meeting.home'))
+    return redirect(url_for('meeting.home'))
 
 
 @meeting.route('/update', methods=['PUT'])
@@ -129,7 +126,7 @@ def update_meeting(form=None):
                         members_to_add = User.objects(email__in=emails_to_add)
 
                         for member in members_to_add:
-                            # add to list if not already a member
+                            # add member to the meeting's list of members
                             if member not in members:
                                 members.append(member)
                             
@@ -160,6 +157,7 @@ def update_meeting(form=None):
 
 
 @meeting.route('/search=<string:query>', methods=['GET', 'POST'])
+@login_required
 def search_meetings(query):
     """ Displays the Meetings to the User's Dashboard that match the given criteria """
     if request.method == 'POST':
