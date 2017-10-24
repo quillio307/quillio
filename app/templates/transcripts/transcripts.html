@@ -1,0 +1,16 @@
+{% extends"helpers/dashboard.html" %} {% block title %} Quillio Groups {% endblock %} {% block main %}
+
+<h3 class="text-center"> Meeting Transcript </h3>
+
+<div id="summernote">Hello Summernote</div>
+
+{% endblock %} {% block js_import %}
+<script>
+    //$(document).ready(function() {
+    $('#summernote').summernote();
+    //});
+</script>
+<script>
+    $(".button-collapse").sideNav();
+</script>
+{% endblock %}
