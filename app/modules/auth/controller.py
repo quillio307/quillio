@@ -28,7 +28,7 @@ def signup():
                 to_email=form.email.data, 
                 subject='Welcome to Quillio', 
                 text='Welcome to Quillio! Thanks for creating an account.'
-            ) 
+            )
             login_user(user)
             return redirect(request.args.get('next') or url_for('meeting.home'))
         except Exception as e:
