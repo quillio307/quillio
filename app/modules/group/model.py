@@ -1,8 +1,9 @@
+from app import db
+
+from app.modules.auth.model import User
+
 from wtforms import Form, validators
 from wtforms import StringField
-
-from app.setup import db
-from app.modules.auth.model import User
 
 
 class Group(db.Document):
@@ -32,7 +33,7 @@ class GroupSearchForm(Form):
 class GroupUpdateForm(Form):
     group_id = StringField('Group ID')
     name = StringField('Name')
-    add_emails = StringField('Add Users')
-    add_admin_emails = StringField('Add Admins')
-    del_emails = StringField('Remove Users')
+    emails_to_add = StringField('Users to Add')
+    admin_emails_to_add = StringField('Admins to Add')
+    emails_to_remove = StringField('Users to Remove')
     description = StringField('Description')

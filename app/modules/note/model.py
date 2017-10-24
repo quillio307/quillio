@@ -1,8 +1,7 @@
-from flask_security import MongoEngineUserDatastore
-from wtforms import Form, validators
-from wtforms import StringField, PasswordField
+from app import db
 
-from app.setup import db
+from flask_security import MongoEngineUserDatastore
+from wtforms import Form, validators, StringField, PasswordField
 
 
 class Note(db.Document):
