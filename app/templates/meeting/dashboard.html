@@ -188,7 +188,7 @@
         search = document.getElementById('searchInput').value
 
         if (search) {
-            window.location.href = "/meetings/search=" + search
+            window.location.href = "/meetings/search=" + escape(search)
         } else {
             window.location.href = "/meetings/"
         }

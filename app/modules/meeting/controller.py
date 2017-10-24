@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from app.modules.auth.model import User
 from app.modules.meeting.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm
+from app.modules.tag.model import Tag
 
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
@@ -66,7 +67,7 @@ def create_meeting(form=None):
                     for u in query:
                         u.meetings.append(m)
                         u.save()
-                    
+
                     flash('New Meeting has been Created with Member(s): {}'.format(valid_emails))
                     return redirect(request.args.get('next') or url_for('meeting.home'))
                 else:
@@ -79,7 +80,7 @@ def create_meeting(form=None):
             # failed to validate form
             flash('Could not Create New Meeting, Please Try Again.')
         return redirect(request.args.get('next') or url_for('meeting.home'))
-    
+
     flash('Invalid Request to Create New Meeting.')
     return redirect(url_for('meeting.home'))
 
@@ -119,7 +120,7 @@ def update_meeting(form=None):
                         # remove the members from the list    
                         members = list(filter(
                             lambda x: x not in members_to_remove, members))
-                    
+
                     # add the new members
                     if len(emails_to_add_str) != 0:
                         emails_to_add = emails_to_add_str.split(" ")
@@ -129,12 +130,12 @@ def update_meeting(form=None):
                             # add member to the meeting's list of members
                             if member not in members:
                                 members.append(member)
-                            
+
                             # add meeting to the member's list of meetings
                             if meeting not in member.meetings:
                                 member.meetings.append(meeting)
                                 member.save()
-                                
+
                     # save the changes
                     meeting.name = name
                     meeting.members = members
@@ -161,21 +162,31 @@ def update_meeting(form=None):
 def search_meetings(query):
     """ Displays the Meetings to the User's Dashboard that match the given criteria """
     if request.method == 'POST':
-        return filter_form(request.form) 
+        return filter_form(request.form)
 
     meetings = current_user._get_current_object().meetings
     search = query.split(" ")
-
-    # get the list of users to search for
-    users = list(filter(lambda x: "@" in x, search))
-
-    # get the other search criteria
-    search = list(filter(lambda x: "@" not in x, search))
 
     # search is too expensive
     if len(search) > 20:
         flash('Could not fulfill search request.')
         return redirect(request.args.get('next') or url_for('meeting.home'))
+
+    # get the list of users to search for
+    users = list(filter(lambda x: "@" in x, search))
+
+    #get the list of tags to search for
+    tags = list(filter(lambda x: "#" in x, search))
+
+    # get the other search criteria
+    search = list(set(search) - set(users) - set(tags))
+    # search = list(filter(lambda x: "@" not in x, search))
+
+    # filter the meetings to only contain meetings with desired tags
+    for t in tags:
+        tag_query = Tag.objects(string__iexact=t[1:])
+        if(len(tag_query) != 0):
+            meetings = list(filter(lambda x: tag_query[0] in x.tags, meetings))
 
     # filter the meetings to only contain meetings with desired members
     for u in users:
