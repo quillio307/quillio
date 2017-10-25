@@ -12,4 +12,12 @@ gunicorn = "*"
 "flask-login" = "*"
 "flask-wtf" = "*"
 "flask-mongoengine" = "*"
+<<<<<<< HEAD
 "flask-security" = "*"
+"flask-bcrypt" = "*"
+passlib = "*"
+bcrypt = "*"
+"flask-testing" = "*"
+=======
+"flask-security" = "*"
+>>>>>>> ef9a686cff503143cda9f7907a8b888743b82dcb
