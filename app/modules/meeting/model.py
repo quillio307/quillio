@@ -30,3 +30,7 @@ class MeetingUpdateForm(Form):
                                 validators.DataRequired()])
     emails_to_add = StringField('Users to Add')
     emails_to_remove = StringField('Users to Remove')
+
+
+class MeetingDeleteForm(Form):
+    meeting_id = StringField('Meeting ID', [validators.Required()])

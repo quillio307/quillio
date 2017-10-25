@@ -26,10 +26,6 @@ class GroupCreateForm(Form):
     emails = StringField('Emails', [validators.DataRequired()])
 
 
-class GroupSearchForm(Form):
-    criteria = StringField('Criteria')
-
-
 class GroupUpdateForm(Form):
     group_id = StringField('Group ID')
     name = StringField('Name')
@@ -37,3 +33,12 @@ class GroupUpdateForm(Form):
     admin_emails_to_add = StringField('Admins to Add')
     emails_to_remove = StringField('Users to Remove')
     description = StringField('Description')
+    criteria = StringField('Criteria')
+
+
+class GroupDeleteForm(Form):
+    group_id = StringField('Group ID', [validators.DataRequired()])
+
+
+class GroupSearchForm(Form):
+    criteria = StringField('Criteria')
