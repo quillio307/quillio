@@ -238,12 +238,17 @@ def delete_group(form=None):
 @login_required
 def search_groups(query):
     """ Displays the Groups that match the query on the Group Dashboard """
-    
+
     if request.method == 'POST':
         return filter_form(request.form)
 
     groups = current_user._get_current_object().groups
     search = query.split(" ")
+
+    # search is too expensive
+    if len(search) > 20:
+        flash('error Could not Fulfill Search Request.')
+        return redirect(request.args.get('next') or url_for('group.home'))
 
     # get the list of users to search for
     users = list(filter(lambda x: "@" in x, search))
@@ -251,22 +256,17 @@ def search_groups(query):
     # get the other search criteria
     search = list(filter(lambda x: "@" not in x, search))
 
-    # search is too expensive
-    if len(search) > 20:
-        flash('error Could not Fulfill Search Request.')
-        return redirect(request.args.get('next') or url_for('group.home'))
-
     # filter the groups by user
     for u in users:
-        user_query = User.objects(email__iexact=u[1:])
-        if len(user_query) != 0:
-            groups = list(filter(
-                lambda x: user_query[0] in x.members, groups))
+        try:
+            user = User.objects.get(email=u[1:])
+            groups = list(filter(lambda x: user in x.members, groups))
+        except Exception as e:
+            return render_template('group/dashboard.html', groups=[])
             
     # filter the meetings by name
     for c in search:
-        groups = list(filter(
-            lambda x: c.lower() in x.name.lower(), groups))
+        groups = list(filter(lambda x: c.lower() in x.name.lower(), groups))
         
     # reset the page and only show the matched groups
     return render_template('group/dashboard.html', groups=groups)

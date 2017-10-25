@@ -178,7 +178,8 @@
         search = document.getElementById('searchInput').value
 
         if (search) {
-            window.location.href = "/groups/search=" + search
+            console.log('Search: ', search)
+            window.location.href = "/groups/search=" + escape(search)
         } else {
             window.location.href = "/groups"
         }
