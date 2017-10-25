@@ -1,10 +1,8 @@
 import string
 
 from app.modules.auth.model import User
-
 from app.modules.group.model import Group, GroupCreateForm, GroupUpdateForm, \
     GroupDeleteForm
-
 
 from flask import Blueprint, request, render_template, flash, redirect, \
     url_for, jsonify
@@ -25,7 +23,7 @@ def filter_form(form):
     elif form['submit'] == 'delete':
         return delete_group(form)
 
-    flash('Could not Fulfill Request. Please Try Again.')
+    flash('error Could not Fulfill Request. Please Try Again.')
     return redirect(url_for('meeting.home'))
 
 
@@ -70,24 +68,24 @@ def create_group(form=None):
                         u.groups.append(g)
                         u.save()
 
-                    flash('New Group Created with Member(s): {}'.format(
+                    flash('success New Group Created with Member(s): {}'.format(
                         str(valid_emails)))
                     return redirect(request.args.get('next') or
                                     url_for('group.home'))
                 else:
                     # determine the invalid emails
                     invalid_emails = list(set(emails) - set(valid_emails))
-                    flash('Could not Create New Group. Unable to Find User(s):'
+                    flash('error Could not Create New Group. Unable to Find User(s):'
                           '{}'.format(invalid_emails))
             except Exception as e:
-                flash('An Error has Occured, Please Try Again. '
+                flash('error An Error has Occured, Please Try Again. '
                       '{}'.format(str(e)))
         else:
             # failed to validate form
-            flash('Could not Create New Group, Please Try Again.')
+            flash('error Could not Create New Group, Please Try Again.')
         return redirect(request.args.get('next') or url_for('group.home'))
 
-    flash('Invalid Request to Create New Group.')
+    flash('error Invalid Request to Create New Group.')
     return redirect(url_for('group.home'))
 
 
@@ -173,18 +171,18 @@ def update_group(form=None):
                 group.admins = admins
                 group.save()
 
-                flash('Group has been Successfully Updated')
+                flash('success Group has been Successfully Updated')
                 return redirect(request.args.get('next') or
                                 url_for('group.home'))
             except Exception as e:
-                flash('Unable to Update Group at this Time.  Please Try Again.'
+                flash('error Unable to Update Group at this Time.  Please Try Again.'
                       '{}'.format(str(e)))
         else:
             # failed to validate form
-            flash('Could not Update Group, Please Try Again.')
+            flash('error Could not Update Group, Please Try Again.')
         return redirect(request.args.get('next') or url_for('group.home'))
 
-    flash('Invalid Request to Update Group.')
+    flash('error Invalid Request to Update Group.')
     return redirect(url_for('group.home'))
 
 
@@ -205,7 +203,7 @@ def delete_group(form=None):
 
                 # validate that the user is an admin for the group
                 if user not in admins:
-                    flash('You do not have permission to delete this group.')
+                    flash('error You do not have permission to delete this group.')
                     return redirect(request.args.get('next') or
                                     url_for('group.home'))
 
@@ -223,15 +221,15 @@ def delete_group(form=None):
 
                 group.delete()
 
-                flash('Group Successfully Deleted')
+                flash('success Group Successfully Deleted')
                 return redirect(request.args.get('next') or
                                 url_for('group.home'))
             except Exception as e:
-                flash('An Error has Occured, Please Try Again.'
+                flash('error An Error has Occured, Please Try Again.'
                       '{}'.format(str(e)))
         else:
             # failed to validate form
-            flash('Could not Delete Group, Please Try Again.')
+            flash('error Could not Delete Group, Please Try Again.')
         return redirect(request.args.get('next') or url_for('group.home'))
 
 
@@ -254,7 +252,7 @@ def search_groups(query):
 
     # search is too expensive
     if len(search) > 20:
-        flash('Could not Fulfill Search Request.')
+        flash('error Could not Fulfill Search Request.')
         return redirect(request.args.get('next') or url_for('group.home'))
 
     # filter the groups by user
@@ -284,7 +282,7 @@ def get_group_admins(group_id):
                 return jsonify({'is_admin': True, 'status': 200})
             return jsonify({'is_admin': False, 'status': 200})
         except Exception as e:
-            flash('An Error Occured. {}'.format(str(e)))
+            flash('error An Error Occured. {}'.format(str(e)))
     return jsonify({'status': 400})
 
 
@@ -298,14 +296,14 @@ def get_group_by_id(group_id):
             group = Group.objects.get(id=group_id)
 
             if user not in group.members and current_user not in group.admins:
-                flash('You do not have Permission to View this Group.')
+                flash('error You do not have Permission to View this Group.')
                 return redirect(request.args.get('next') or
                                 url_for('group.home'))
 
             return jsonify(group)
         except Exception as e:
-            flash('An Error Occured. {}'.format(str(e)))
+            flash('error An Error Occured. {}'.format(str(e)))
             return redirect(request.args.get('next') or url_for('group.home'))
-    flash('Invalid Group ID')
+    flash('error Invalid Group ID')
     return redirect(request.args.get('next') or url_for('group.home'))
   

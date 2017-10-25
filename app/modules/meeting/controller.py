@@ -27,7 +27,7 @@ def filter_form(form):
     elif form['submit'] == 'delete':
         return delete_meeting(form)
 
-    flash('Could not Fulfill Request. Please Try Again.')
+    flash('error Could not Fulfill Request. Please Try Again.')
     return redirect(url_forl('meeting.home'))
 
 
@@ -71,22 +71,21 @@ def create_meeting(form=None):
                         u.meetings.append(m)
                         u.save()
 
-                    flash('New Meeting has been Created with Member(s): {}'.format(
-                        valid_emails))
+                    flash('success New Meeting has been Created with Member(s): {}'.format(", ".join(valid_emails)))
                     return redirect(request.args.get('next') or url_for('meeting.home'))
                 else:
                     # determine the invalid emails
                     invalid_emails = list(set(emails) - set(valid_emails))
-                    flash('Could not Create Meeting. We Were Unable to Find User(s): {}'.format(
+                    flash('error Could not Create Meeting. We Were Unable to Find User(s): {}'.format(
                         invalid_emails))
             except Exception as e:
-                flash('An Error has occurred, Please Try Again. {}'.format(e))
+                flash('error An Error has occurred, Please Try Again. {}'.format(e))
         else:
             # failed to validate form
-            flash('Could not Create New Meeting, Please Try Again.')
+            flash('error Could not Create New Meeting, Please Try Again.')
         return redirect(request.args.get('next') or url_for('meeting.home'))
 
-    flash('Invalid Request to Create New Meeting.')
+    flash('error Invalid Request to Create New Meeting.')
     return redirect(url_for('meeting.home'))
 
 
@@ -145,16 +144,16 @@ def update_meeting(form=None):
                 meeting.members = members
                 meeting.save()
 
-                flash('Meeting has been Successfully Updated.')
+                flash('success Meeting has been Successfully Updated.')
                 return redirect(request.args.get('next') or url_for('meeting.home'))
-              except Exception as e:
-                flash('An Error has Occurred, Please Try Again. {}'.format(e))
+            except Exception as e:
+                flash('error An Error has Occurred, Please Try Again. {}'.format(e))
                 return redirect(request.args.get('next') or url_for('meeting.home'))
         else:
             # failed to validate form
-            flash('Could not Update Meeting, Please Try Again.')
+            flash('error Could not Update Meeting, Please Try Again.')
             return redirect(request.args.get('next') or url_for('meeting.home'))
-    flash('Invalid Request to Update a Meeting.')
+    flash('error Invalid Request to Update a Meeting.')
     return redirect(request.args.get('next') or url_for('meeting.home'))
 
 
@@ -175,7 +174,7 @@ def delete_meeting(form=None):
 
                 # user is not the owner of the group and cannot delete
                 if user != owner:
-                    flash('You do not have Permission to Delete this Meeting.')
+                    flash('error You do not have Permission to Delete this Meeting.')
                     return redirect(request.args.get('next') or url_for('meeting.home'))
 
                 # remove the meeting from each member's list of meetings
@@ -193,14 +192,14 @@ def delete_meeting(form=None):
 
                 meeting.delete()
 
-                flash('Meeting Successfully Deleted.')
+                flash('success Meeting Successfully Deleted.')
                 return redirect(request.args.get('next') or url_for('meeting.home'))
             except Exception as e:
-                flash('An Error has Occured, Please Try Again.'
+                flash('error An Error has Occured, Please Try Again.'
                       '{}'.format(str(e)))
         else:
             # failed to validate form
-            flash('Could not Delete Meeting, Please Try Again.')
+            flash('error Could not Delete Meeting, Please Try Again.')
     return redirect(request.args.get('next') or url_for('meeting.home'))
 
 
@@ -217,31 +216,34 @@ def search_meetings(query):
 
     # search is too expensive
     if len(search) > 20:
-        flash('Could not fulfill search request.')
+        flash('error Could not fulfill search request.')
         return redirect(request.args.get('next') or url_for('meeting.home'))
 
     # get the list of users to search for
     users = list(filter(lambda x: "@" in x, search))
 
-    #get the list of tags to search for
+    # get the list of tags to search for
     tags = list(filter(lambda x: "#" in x, search))
 
     # get the other search criteria
     search = list(set(search) - set(users) - set(tags))
-    # search = list(filter(lambda x: "@" not in x, search))
 
     # filter the meetings to only contain meetings with desired tags
     for t in tags:
-        tag_query = Tag.objects(string__iexact=t[1:])
-        if(len(tag_query) != 0):
-            meetings = list(filter(lambda x: tag_query[0] in x.tags, meetings))
+        try:
+            tag = Tag.objects.get(string=t[1:])
+            meetings = list(filter(lambda x: tag in x.tags, meetings))
+        except Exception as e:
+            return render_template('meeting.home', meetings=[])
 
     # filter the meetings to only contain meetings with desired members
     for u in users:
-        user_query = User.objects(email__iexact=u[1:])
-        if (len(user_query) != 0):
+        try:
+            user = User.objects.get(email=u[1:])
             meetings = list(filter(
-                lambda x: user_query[0] in x.members, meetings))
+                lambda x: user in x.members, meetings))
+        except Exception as e:
+            return render_template('meeting.home', meetings=[])
 
     # filter the meetings to only contain meetings with the desired text
     for c in search:
@@ -260,11 +262,11 @@ def get_active_meeting(meeting_id):
             meeting = Meeting.objects.get(id=meeting_id)
 
             if current_user not in meeting.members:
-                flash('You are not a member of that meeting.')
+                flash('error You are not a member of that meeting.')
                 return redirect(url_for('meeting.meetings_page'))
             return jsonify(meeting)
         except Exception as e:
-            flash('An Error Occured. {}'.format(str(e)))
+            flash('error An Error Occured. {}'.format(str(e)))
             return redirect(request.args.get('next') or url_for('meeting.home'))
-    flash('Invalid Meeting Id.')
+    flash('error Invalid Meeting Id.')
     return redirect(request.args.get('next') or url_for('meeting.meetings_page'))
