@@ -23,12 +23,13 @@ def signup():
                 name=form.name.data,
                 password=hash_password(form.password.data))
 				# log the user in on signup --> will likely be changed with account activation option
-            mail.send_email(
-                from_email='quillio.admin@quillio.com', 
-                to_email=form.email.data, 
-                subject='Welcome to Quillio', 
-                text='Welcome to Quillio! Thanks for creating an account.'
-            )
+            #the following email 
+            #mail.send_email(
+            #    from_email='quillio.admin@quillio.com', 
+            #    to_email=form.email.data, 
+            #    subject='Welcome to Quillio', 
+            #    text='Welcome to Quillio! Thanks for creating an account.'
+            #)
             login_user(user)
             return redirect(request.args.get('next') or url_for('meeting.home'))
         except Exception as e:
