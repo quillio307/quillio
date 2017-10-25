@@ -4,9 +4,10 @@ import string
 import time
 from datetime import datetime, timedelta
 
-from app.modules.auth.model import User
 from app.modules.meeting.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm, MeetingDeleteForm
+from app.modules.auth.model import User
+from app.modules.tag.model import Tag
 
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
@@ -146,7 +147,7 @@ def update_meeting(form=None):
 
                 flash('Meeting has been Successfully Updated.')
                 return redirect(request.args.get('next') or url_for('meeting.home'))
-            except Exception as e:
+              except Exception as e:
                 flash('An Error has Occurred, Please Try Again. {}'.format(e))
                 return redirect(request.args.get('next') or url_for('meeting.home'))
         else:
@@ -214,16 +215,26 @@ def search_meetings(query):
     meetings = current_user._get_current_object().meetings
     search = query.split(" ")
 
-    # get the list of users to search for
-    users = list(filter(lambda x: "@" in x, search))
-
-    # get the other search criteria
-    search = list(filter(lambda x: "@" not in x, search))
-
     # search is too expensive
     if len(search) > 20:
         flash('Could not fulfill search request.')
         return redirect(request.args.get('next') or url_for('meeting.home'))
+
+    # get the list of users to search for
+    users = list(filter(lambda x: "@" in x, search))
+
+    #get the list of tags to search for
+    tags = list(filter(lambda x: "#" in x, search))
+
+    # get the other search criteria
+    search = list(set(search) - set(users) - set(tags))
+    # search = list(filter(lambda x: "@" not in x, search))
+
+    # filter the meetings to only contain meetings with desired tags
+    for t in tags:
+        tag_query = Tag.objects(string__iexact=t[1:])
+        if(len(tag_query) != 0):
+            meetings = list(filter(lambda x: tag_query[0] in x.tags, meetings))
 
     # filter the meetings to only contain meetings with desired members
     for u in users:

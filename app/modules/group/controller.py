@@ -1,8 +1,10 @@
 import string
 
 from app.modules.auth.model import User
+
 from app.modules.group.model import Group, GroupCreateForm, GroupUpdateForm, \
     GroupDeleteForm
+
 
 from flask import Blueprint, request, render_template, flash, redirect, \
     url_for, jsonify
@@ -19,6 +21,7 @@ def filter_form(form):
         return create_group(form)
     elif form['submit'] == 'update':
         return update_group(form)
+
     elif form['submit'] == 'delete':
         return delete_group(form)
 
@@ -58,6 +61,7 @@ def create_group(form=None):
 
                 # validate and create the new group
                 if len(emails) == len(valid_emails):
+
                     g = Group(name=create_form.name.data, members=query,
                               admins=[user]).save()
 
@@ -103,11 +107,8 @@ def update_group(form=None):
                 admin_emails_to_add_str = update_form.admin_emails_to_add.data
                 emails_to_remove_str = update_form.emails_to_remove.data
 
-                # search for the group
-                # query = Group.objects(id__exact=update_form.group_id.data)
                 group = Group.objects.get(id=update_form.group_id.data)
 
-                # group = query[0]
                 members = group.members
                 admins = group.admins
 
@@ -262,16 +263,16 @@ def search_groups(query):
         if len(user_query) != 0:
             groups = list(filter(
                 lambda x: user_query[0] in x.members, groups))
-
+            
     # filter the meetings by name
     for c in search:
         groups = list(filter(
             lambda x: c.lower() in x.name.lower(), groups))
-
+        
     # reset the page and only show the matched groups
     return render_template('group/dashboard.html', groups=groups)
 
-
+  
 @group.route('/is/admin/<string:group_id>')
 @login_required
 def get_group_admins(group_id):
@@ -307,60 +308,4 @@ def get_group_by_id(group_id):
             return redirect(request.args.get('next') or url_for('group.home'))
     flash('Invalid Group ID')
     return redirect(request.args.get('next') or url_for('group.home'))
-
-
-# AMMO CODE
-
-# @group.route('/all', methods=['GET'])
-# @login_required
-# def all_groups():
-#     usr = current_user._get_current_object()
-#     res = []
-#     for group in usr.groups:
-#         res.append({'name': group.name, 'admin': group.user_is_admin(usr)})
-#     return json.dumps(res)
-
-
-#@group.route('/create', methods=['POST'])
-#@login_required
-# def create_group():
-#    usr = current_user._get_current_object()
-#    req = request.get_json(silent=True)
-#
-#    if not('name' in req and 'members' in req and 'admins' in req):
-#        abort(400)
-#
-#    members = []
-#
-#    for email in req['members']:
-#        query = User.objects(email=email)
-#        if len(query) == 0:
-#            req['members'].remove(email)
-#        else:
-#            members.append(query[0])
-#
-#    if usr.email not in req['members']:
-#        members.append(usr)
-#
-#    if len(members) <= 1:
-#        abort(400)
-#
-#    admins = []
-#
-#    for admin_email in req['admins']:
-#        for mem in members:
-#            if mem.email == admin_email:
-#                admins.append(mem)
-#
-#    if usr.email not in req['admins']:
-#        admins.append(usr)
-#
-#    grp = Group(name=req['name'], members=members, admins=admins)
-#    grp.save()
-#
-#    for member in members:
-#        member.groups.append(grp)
-#        member.save()
-#
-#    res = {'message': "Success"}
-#    return json.dumps(res)
+  
