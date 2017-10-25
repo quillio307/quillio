@@ -29,7 +29,7 @@ def signup():
                 to_email=form.email.data, 
                 subject='Welcome to Quillio', 
                 template_id='43482b8d-1fb1-45cb-85d3-1451c8614703',
-                text='Heyyyyyy'
+					 html=get_html()
             )
             login_user(user)
             return redirect(request.args.get('next') or url_for('meeting.home'))
@@ -63,3 +63,8 @@ def logout():
     logout_user()
     flash('logged out')
     return redirect(url_for('auth.login'))
+
+
+#the following method generates the html template for the email notification
+def get_html():
+	return '<nav style="height:50px" class="navbar navbar-expand-lg pkColor"></nav><h2 align="center">Account Activation</h2>'
