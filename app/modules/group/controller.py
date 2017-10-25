@@ -4,6 +4,7 @@ from app.modules.auth.model import User
 from app.modules.group.model import Group, GroupCreateForm, GroupUpdateForm, \
     GroupDeleteForm
 
+
 from flask import Blueprint, request, render_template, flash, redirect, \
     url_for, jsonify
 from flask_security import Security, login_required, current_user
@@ -237,7 +238,7 @@ def delete_group(form=None):
 @login_required
 def search_groups(query):
     """ Displays the Groups that match the query on the Group Dashboard """
-
+    
     if request.method == 'POST':
         return filter_form(request.form)
 
@@ -270,7 +271,7 @@ def search_groups(query):
     # reset the page and only show the matched groups
     return render_template('group/dashboard.html', groups=groups)
 
-  
+
 @group.route('/is/admin/<string:group_id>')
 @login_required
 def get_group_admins(group_id):
