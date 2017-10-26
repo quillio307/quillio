@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from app.modules.meeting.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm, MeetingDeleteForm
 from app.modules.auth.model import User
-from app.modules.tag.model import Tag
 
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
@@ -231,8 +230,8 @@ def search_meetings(query):
     # filter the meetings to only contain meetings with desired tags
     for t in tags:
         try:
-            tag = Tag.objects.get(string=t[1:])
-            meetings = list(filter(lambda x: tag in x.tags, meetings))
+            t = t.lower()
+            meetings = list(filter(lambda x: t in x.tags, meetings))
         except Exception as e:
             return render_template('meeting.home', meetings=[])
 
