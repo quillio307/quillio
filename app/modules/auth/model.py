@@ -15,6 +15,7 @@ class User(db.Document, UserMixin):
                           min_length=3, max_length=35)
     name = db.StringField(required=True, min_length=4, max_length=20)
     password = db.StringField(required=True, min_length=5, max_length=1000)
+    password_reset_hash = db.StringField(required=False)
     active = db.BooleanField(default=False)
     activation_hash = db.StringField(required=True)
     authenticated = db.BooleanField(required=False, default=False)
@@ -57,3 +58,6 @@ class SignupForm(Form):
 class LoginForm(Form):
     email = StringField('Email', [validators.Length(min=4, max=25)])
     password = PasswordField('Password', [validators.DataRequired()])
+
+class PasswordReset(Form):
+    email = StringField('Email', [validators.Length(min=4)])
