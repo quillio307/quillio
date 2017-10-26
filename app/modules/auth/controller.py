@@ -36,8 +36,7 @@ def signup():
                 template_id='43482b8d-1fb1-45cb-85d3-1451c8614703',
 				html=get_html(form.name.data, activation_token, form.email.data)
             )
-            login_user(user)
-            return redirect(request.args.get('next') or url_for('meeting.home'))
+            return render_template('auth/activation_request.html')
         except Exception as e:
             flash('A Problem has Occured, Please Try Again! {}'.format(e))
             return redirect(url_for('auth.signup'))
@@ -54,7 +53,7 @@ def login():
 			#user login -> find email in db, check hash to verify password
         user = user_datastore.find_user(email=form.email.data)
         if user is not None:
-            if verify_password(form.password.data, user.password):
+            if verify_password(form.password.data, user.password) and user.active:
                 login_user(user)
                 flash('Logged in successfully, {}'.format(user.name))
                 return redirect(request.args.get('next') or url_for('meeting.home'))
@@ -75,6 +74,7 @@ def activate_account(activation_hash, email_param):
     user = user_datastore.find_user(email=email_param)
     if user is not None:
         if verify_password(activation_hash, user.activation_hash):
+            user.acitve = True
             login_user(user)
             flash("success Successfully activated account!")
             return redirect(url_for('meeting.home'))
