@@ -69,7 +69,7 @@ def logout():
     flash('logged out')
     return redirect(url_for('auth.login'))
 
-@auth.route('/activate_account/<activation_hash>/<email_param>', methods=['POST'])
+@auth.route('/activate_account/<activation_hash>/<email_param>', methods=['GET','POST'])
 def activate_account(activation_hash, email_param):
     #method is used to activate a user's account following the email notification they receive upon signup
     user = user_datastore.find_user(email=email_param)
@@ -85,7 +85,7 @@ def activate_account(activation_hash, email_param):
 def get_html(name, token, email_data):
     header='<nav style="height:50px" class="navbar navbar-expand-lg pkColor"></nav><h2 align="center">Account Activation</h2>'
     body='<p>Dear '+name+',</p><br><p>Welcome to Quillio! To activate your account, please follow the following link:</p>'
-    link='<a href='+url_for('auth.activate_account', activation_hash=token, email_param=email_data)+'>Activate account</a></br>'
+    link='<a href=http://0.0.0.0:5000'+url_for('auth.activate_account', activation_hash=token, email_param=email_data)+'>Activate account</a></br>'
     close='<p>Thanks!</p><br><p>The Quillio Team</p>'
     to_ret=(header+body+link+close)
     return to_ret
