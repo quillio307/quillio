@@ -16,6 +16,7 @@ class User(db.Document, UserMixin):
     name = db.StringField(required=True, min_length=4, max_length=20)
     password = db.StringField(required=True, min_length=5, max_length=1000)
     active = db.BooleanField(default=True)
+    activation_hash = db.StringField(required=True)
     authenticated = db.BooleanField(required=False, default=False)
     roles = db.ListField(db.ReferenceField(Role), default=[])
     groups = db.ListField(db.ReferenceField('Group'), default=[])
