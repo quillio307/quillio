@@ -93,6 +93,10 @@ def reset_password(reset_hash, email_param):
     flash("error Invalid password reset link provided. Please sign in.")
     return redirect(url_for('auth.login'))
 
+@auth.route('/reset_form/<email_param>', methods=['GET','POST'])
+def reset_form(email_param):
+    if method.request == 'GET'
+
 @auth.route('/logout')
 @login_required
 def logout():
