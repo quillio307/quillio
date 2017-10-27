@@ -95,7 +95,16 @@ def reset_password(reset_hash, email_param):
 
 @auth.route('/reset_form/<email_param>', methods=['GET','POST'])
 def reset_form(email_param):
-    if method.request == 'GET'
+    if method.request == 'GET':
+        return render_template('auth/password_reset.html')
+    if form.validate():
+        user = user_datastore.find_user(email=email_param)
+        if user is not None:
+            user.password = hash_password(form.password.data)
+            flash("success Password successfully reset!")
+            return redirect(url_for('auth.login'))
+    flash("error Invalid Password Entered! Please try again.")
+    return redirect(url_for('auth.reset_form', email_param=email_param))
 
 @auth.route('/logout')
 @login_required
