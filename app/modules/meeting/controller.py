@@ -28,9 +28,9 @@ def filter_form(form):
     return redirect(url_forl('meeting.home'))
 
 
-# @meeting.route('/edit/', methods=['GET', 'POST'])
-# def edit_meeting():
-#     return render_template('transcripts/transcripts.html')
+@meeting.route('/edit/', methods=['GET', 'POST'])
+def edit_meeting():
+    return render_template('transcripts/transcripts.html')
 
 
 @meeting.route('/', methods=['GET', 'POST'])
