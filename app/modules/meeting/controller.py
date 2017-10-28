@@ -1,5 +1,5 @@
 import json
-import requests
+from flask import request
 import string
 import time
 from datetime import datetime, timedelta

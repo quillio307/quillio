@@ -1,9 +1,12 @@
 from flask import Flask, render_template, redirect, url_for
 from flask_mongoengine import MongoEngine
+from flask_socketio import SocketIO
 
 # Initialize the app
 app = Flask(__name__)
 app.config.from_object('config')
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app, logger=True)
 
 # Define the database
 db = MongoEngine(app)
