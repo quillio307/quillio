@@ -14,9 +14,11 @@ from flask_security import current_user, login_required
 
 meeting = Blueprint('meeting', __name__)
 
-@meeting.route('/meeting/<meeting_id>')
+
+@meeting.route('/<meeting_id>')
 @login_required
 def meeting_page(meeting_id):
+    print("Receieved join request for: " + meeting_id)
     meeting = Meeting.objects.with_id(meeting_id)
     if meeting is None:
         abort(404)
@@ -27,7 +29,7 @@ def meeting_page(meeting_id):
 
 @socketio.on('join', namespace='/meeting')
 def on_join(data):
-    user = User.objects.with_id(data['user_id'])
+    #user = User.objects.with_id(data['user_id'])
     meeting = Meeting.objects.with_id(data['room_id'])
     if meeting.active is False:
         meeting.active = True

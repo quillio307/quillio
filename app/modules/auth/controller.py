@@ -44,7 +44,7 @@ def login():
             if verify_password(form.password.data, user.password):
                 login_user(user)
                 flash('Logged in successfully, {}'.format(user.name))
-                return redirect(request.args.get('next') or url_for('meeting.home'))
+                return redirect(request.args.get('next') or url_for('meetings.home'))
     flash('Invalid Email or Password')
     return redirect(url_for('auth.login'))
 

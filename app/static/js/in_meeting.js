@@ -5,7 +5,7 @@ $(document).ready(function(){
 
     var user = args[args.length-2];
     var room = args[args.length-1];
-
+    console.log("Room joined: " +room);
     var mic_toggle = false;
     $("#mic").click(function () {
 
@@ -21,7 +21,7 @@ $(document).ready(function(){
     $("#end").click(function () {
         socket.emit('end', {room: room, user: user})
     });
-    socket = io.connect('http://localhost:5000/meetings');
+    socket = io.connect('http://localhost:5000/meeting');
 
     socket.on('receivemsg', function(msg) {
         console.log(msg);
