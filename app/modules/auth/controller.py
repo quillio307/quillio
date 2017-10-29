@@ -26,9 +26,9 @@ def signup():
             login_user(user)
             return redirect(request.args.get('next') or url_for('meeting.home'))
         except Exception as e:
-            flash('A Problem has Occured, Please Try Again! {}'.format(e))
+            flash('error A Problem has Occured, Please Try Again! {}'.format(e))
             return redirect(url_for('auth.signup'))
-    flash('Invalid Email or Password')
+    flash('error Invalid Email or Password')
     return redirect(url_for('auth.signup'))
 
 
@@ -43,9 +43,9 @@ def login():
         if user is not None:
             if verify_password(form.password.data, user.password):
                 login_user(user)
-                flash('Logged in successfully, {}'.format(user.name))
+                flash('success Logged in Successfully, {}'.format(user.name))
                 return redirect(request.args.get('next') or url_for('meeting.home'))
-    flash('Invalid Email or Password')
+    flash('error Invalid Email or Password')
     return redirect(url_for('auth.login'))
 
 
@@ -53,5 +53,5 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('logged out')
+    flash('success Successfully Logged Out')
     return redirect(url_for('auth.login'))
