@@ -25,7 +25,7 @@ def filter_form(form):
         return update_meeting(form)
 
     flash('Could not Fulfill Request. Please Try Again.')
-    return redirect(url_forl('meeting.home'))
+    return redirect(url_for('meeting.home'))
 
 
 @meetings.route('/', methods=['GET', 'POST'])

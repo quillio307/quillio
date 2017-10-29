@@ -28,6 +28,7 @@ def meeting_page(meeting_id):
 
 
 @socketio.on('join', namespace='/meeting')
+@login_required
 def on_join(data):
     #user = User.objects.with_id(data['user_id'])
     meeting = Meeting.objects.with_id(data['room_id'])
@@ -39,22 +40,26 @@ def on_join(data):
 
 
 @socketio.on('start', namespace='/meeting')
+@login_required
 def start_meeting(data):
     emit('startMeeting', room=data['room'])
 
 
 @socketio.on('end', namespace='/meeting')
+@login_required
 def start_meeting(data):
     emit('endMeeting', room=data['room'])
 
 
 @socketio.on('silenceAll', namespace='/meeting')
+@login_required
 def silence_all(data):
     emit('silence', {}, room=data['room'], include_self=False)
     emit('receivemsg', {'data': data['user'] + " is talking."}, room=data['room'])
 
 
 @socketio.on('leave', namespace='/meeting')
+@login_required
 def on_leave(data):
     username = data['username']
     room = data['room']
@@ -63,6 +68,7 @@ def on_leave(data):
 
 
 @socketio.on('sendmsg', namespace='/meeting')
+@login_required
 def test_message(message):
     username = message['username']
     room = message['room']
@@ -70,10 +76,12 @@ def test_message(message):
 
 
 @socketio.on('connect', namespace='/meeting')
+@login_required
 def test_connect():
     emit('my response', {'data': 'Connected'})
 
 
 @socketio.on('disconnect', namespace='/meeting')
+@login_required
 def test_disconnect():
     print('Client disconnected')

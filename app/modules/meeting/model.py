@@ -16,6 +16,12 @@ class Meeting(db.Document):
     created_at_str = db.StringField(default=dt.now().strftime('%m-%d-%Y'))
     meta = {'strict': False}
 
+    def is_in_meeting(self, user):
+        """ Determines if a User is allowed in this meeting """
+        if user in self.members:
+            return True
+        return False
+
 
 class MeetingCreateForm(Form):
     name = StringField('Meeting Name', [validators.Length(min=3, max=100),
