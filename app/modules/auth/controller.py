@@ -1,9 +1,9 @@
 from app.modules.auth.model import User, SignupForm, LoginForm, \
     user_datastore
 
-
+import json
 from flask import Blueprint, render_template, flash, request, redirect, url_for
-from flask_security import login_user, logout_user, login_required
+from flask_security import login_user, logout_user, login_required, current_user
 from flask_security.utils import hash_password, verify_password
 
 
@@ -55,3 +55,9 @@ def logout():
     logout_user()
     flash('logged out')
     return redirect(url_for('auth.login'))
+
+@auth.route('/getUser')
+@login_required
+def get_user():
+    usr = current_user._get_current_object()
+    return json.dumps({'name': usr.name, 'email': usr.email, 'id': str(usr.id)})

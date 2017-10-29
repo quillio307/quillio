@@ -30,13 +30,13 @@ def meeting_page(meeting_id):
 @socketio.on('join', namespace='/meeting')
 @login_required
 def on_join(data):
-    #user = User.objects.with_id(data['user_id'])
+    user = current_user
     meeting = Meeting.objects.with_id(data['room_id'])
     if meeting.active is False:
         meeting.active = True
         meeting.save()
     join_room(data['room_id'])
-    emit('receivemsg', {'data': data['user_id'] + ' has joined the meeting.'}, room=data['room_id'])
+    emit('receivemsg', {'data': user.email + ' has joined the meeting.'}, room=data['room_id'])
 
 
 @socketio.on('start', namespace='/meeting')

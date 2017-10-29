@@ -1,5 +1,11 @@
 var socket;
 $(document).ready(function(){
+    $.ajax({
+      url: '/auth/getUser',
+      success: function(data){
+          console.log(data);
+      }
+    });
     var url =window.location.href;
     var args =url.split('/');
 
