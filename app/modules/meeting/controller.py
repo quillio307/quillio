@@ -13,7 +13,7 @@ from flask import Blueprint, render_template, flash, request, redirect, \
 from flask_security import current_user, login_required
 
 
-meeting = Blueprint('meeting', __name__)
+meetings = Blueprint('meetings', __name__)
 
 
 def filter_form(form):
@@ -28,7 +28,7 @@ def filter_form(form):
     return redirect(url_forl('meeting.home'))
 
 
-@meeting.route('/', methods=['GET', 'POST'])
+@meetings.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
     """ Displays All of the Current Users Meetings on the Meeting Dashboard """
@@ -39,7 +39,7 @@ def home():
     return render_template('meeting/dashboard.html', meetings=user.meetings)
 
 
-@meeting.route('/create', methods=['POST'])
+@meetings.route('/create', methods=['POST'])
 @login_required
 def create_meeting(form=None):
     """ Creates a new Meeting. """
@@ -84,7 +84,7 @@ def create_meeting(form=None):
     return redirect(url_for('meeting.home'))
 
 
-@meeting.route('/update', methods=['PUT'])
+@meetings.route('/update', methods=['PUT'])
 @login_required
 def update_meeting(form=None):
     """ Updates an Existing Meeting """
@@ -156,7 +156,7 @@ def update_meeting(form=None):
     return redirect(request.args.get('next') or url_for('meeting.home'))
 
 
-@meeting.route('/search=<string:query>', methods=['GET', 'POST'])
+@meetings.route('/search=<string:query>', methods=['GET', 'POST'])
 @login_required
 def search_meetings(query):
     """ Displays the Meetings to the User's Dashboard that match the given criteria """
@@ -196,7 +196,7 @@ def search_meetings(query):
 # CODE FOR REFERENCE
 
 
-@meeting.route('/active/<string:meeting_id>', methods=['GET'])
+@meetings.route('/active/<string:meeting_id>', methods=['GET'])
 @login_required
 def get_active_meeting(meeting_id):
     # validate meeting id

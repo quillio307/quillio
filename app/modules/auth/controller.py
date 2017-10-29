@@ -1,6 +1,6 @@
 from app.modules.auth.model import User, SignupForm, LoginForm, \
     user_datastore
-from app.modules.meeting.controller import meeting
+
 
 from flask import Blueprint, render_template, flash, request, redirect, url_for
 from flask_security import login_user, logout_user, login_required

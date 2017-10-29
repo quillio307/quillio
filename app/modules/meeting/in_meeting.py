@@ -12,19 +12,17 @@ from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
 from flask_security import current_user, login_required
 
-
 meeting = Blueprint('meeting', __name__)
 
-
-@meeting.route('/meeting/<room_id>')
+@meeting.route('/meeting/<meeting_id>')
 @login_required
-def meeting_page(room_id):
-    user = User.objects.with_id(user_id)
-    meeting = Meeting.objects.with_id(room_id)
-    if user is None or meeting is None:
+def meeting_page(meeting_id):
+    meeting = Meeting.objects.with_id(meeting_id)
+    if meeting is None:
         abort(404)
+        return
 
-    return render_template('in_meeting.html', meeting={'title': meeting.name})
+    return render_template('meeting/in_meeting.html', meeting={'title': meeting.name})
 
 
 @socketio.on('join', namespace='/meeting')
