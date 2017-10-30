@@ -22,7 +22,6 @@ def signup():
                 email=form.email.data,
                 name=form.name.data,
                 password=hash_password(form.password.data))
-				# log the user in on signup --> will likely be changed with account activation option 
             login_user(user)
             return redirect(request.args.get('next') or url_for('meeting.home'))
         except Exception as e:
@@ -38,7 +37,6 @@ def login():
     if request.method == 'GET':
         return render_template('auth/login.html', form=form)
     if form.validate():
-			#user login -> find email in db, check hash to verify password
         user = user_datastore.find_user(email=form.email.data)
         if user is not None:
             if verify_password(form.password.data, user.password):
