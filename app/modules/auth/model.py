@@ -24,9 +24,9 @@ class User(db.Document, UserMixin):
     groups = db.ListField(db.ReferenceField('Group'), default=[])
     meetings = db.ListField(db.ReferenceField('Meeting'), default=[])
 
-    # registration fields
-    password_reset_hash = db.StringField(required=False)
+    # authentication fields
     activation_hash = db.StringField(required=True)
+    password_reset_hash = db.StringField()
 
     # security fields
     active = db.BooleanField(default=False)
@@ -47,29 +47,34 @@ class User(db.Document, UserMixin):
         return False
 
     def get_id(self):
-        """ Fetches the unicode id for the Usera """
-        # return str(User.objects(email__exact=self['email'])[0].id)
+        """ Fetches the unicode id for the User """
         return str(User.objects.get(email=self['email']).id)
+
+
+class SignupForm(Form):
+    email = StringField('Email', [validators.DataRequired(),
+                                  validators.Length(min=6, max=35)])
+    name = StringField('Name', [validators.DataRequired(),
+                                validators.Length(min=4, max=25)])
+    password = PasswordField('Password', [validators.DataRequired(),
+                                          validators.Length(min=5, max=35)])
+
+
+class LoginForm(Form):
+    email = StringField('Email', [validators.DataRequired(),
+                                  validators.Length(min=4, max=25)])
+    password = PasswordField('Password', [validators.DataRequired(),
+                                          validators.Length(min=5, max=35)])
+
+
+class PasswordReset(Form):
+    email = StringField('Email', [validators.DataRequired(),
+                                  validators.Length(min=4)])
 
 
 # Flask-Security Setup
 user_datastore = MongoEngineUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
-# Email Confirmation Setup
+# Authentication Setup
 mail = SendGrid(app)
-
-
-class SignupForm(Form):
-    email = StringField('Email', [validators.Length(min=6, max=35)])
-    name = StringField('Name', [validators.Length(min=4, max=25)])
-    password = PasswordField('Password', [validators.DataRequired(),
-                                          validators.Length(min=5, max=35)])
-
-
-class LoginForm(Form):
-    email = StringField('Email', [validators.Length(min=4, max=25)])
-    password = PasswordField('Password', [validators.DataRequired()])
-
-class PasswordReset(Form):
-    email = StringField('Email', [validators.Length(min=4)])
