@@ -5,6 +5,14 @@ from flask_mongoengine import MongoEngine
 app = Flask(__name__)
 app.config.from_object('config')
 
+
+# Jenna's Code
+# app.config['SENDGRID_API_KEY'] = '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'
+# app.config['SENDGRID_DEFAULT_FROM'] = "quillio.admin@quillio.com"
+
+# mail = SendGrid(app) 
+
+
 # Define the database
 db = MongoEngine(app)
 
