@@ -1,3 +1,4 @@
+import os
 import secrets
 
 from app import app
@@ -14,6 +15,7 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/signup', methods=['GET', 'POST'])
 def signup():
+    """ Signs the Current User In """
     form = SignupForm(request.form)
     if request.method == 'GET':
         return render_template('auth/signup.html', form=form)
@@ -236,7 +238,7 @@ def password_html(name, token, email):
         url_for('auth.reset_password', reset_token=token,
                 email=email) + '> Reset Password </a><br>'
     close = '<p>Thanks!</p><br><p>The Quillio Team</p>'
-    return str(header + body + body2 + link + close)
+    return header + body + body2 + link + close
 
 
 def invite_html(user_email, email):
@@ -248,4 +250,4 @@ def invite_html(user_email, email):
     link = '<a href=http://localhost:5000' + \
         url_for('auth.signup') + '> Create an Account </a><br>'
     close = '<p>Thanks!</p><br><p>The Quillio Team</p>'
-    return str(header + body + link + close)
+    return header + body + link + close
