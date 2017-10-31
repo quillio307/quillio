@@ -9,7 +9,6 @@ from flask_security import login_user, logout_user, login_required, \
     current_user
 from flask_security.utils import hash_password, verify_password
 
-
 auth = Blueprint('auth', __name__)
 
 
@@ -24,6 +23,15 @@ def signup():
             # generate activation token
             activation_token = secrets.token_urlsafe(32)
 
+            # send registration email
+            mail.send_email(
+                from_email=app.config['SENDGRID_DEFAULT_FROM'],
+                to_email=form.email.data,
+                subject='Welcome to Quillio',
+                html=activate_html(form.name.data, activation_token,
+                                   form.email.data)
+            )
+
             # add user to the database
             user_datastore.create_user(
                 email=form.email.data,
@@ -32,15 +40,6 @@ def signup():
                 activation_hash=hash_password(activation_token),
                 active=True,
                 authenticated=False
-            )
-
-            # send registration email
-            mail.send_email(
-                from_email=app.config['SENDGRID_DEFAULT_FROM'],
-                to_email=form.email.data,
-                subject='Welcome to Quillio',
-                html=activate_html(form.name.data, activation_token,
-                                   form.email.data)
             )
 
             return render_template('auth/activation_request.html')

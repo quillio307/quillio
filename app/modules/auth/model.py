@@ -2,9 +2,9 @@ from app import app, db
 
 from flask_security import Security, MongoEngineUserDatastore, \
     UserMixin, RoleMixin
-from flask_sendgrid import SendGrid
 from wtforms import Form, StringField, PasswordField, validators
 
+from flask_sendgrid import SendGrid
 
 class Role(db.Document, RoleMixin):
     name = db.StringField(max_length=80, unique=True)
