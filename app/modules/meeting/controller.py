@@ -30,9 +30,22 @@ def filter_form(form):
     return redirect(url_forl('meeting.home'))
 
 
-@meeting.route('/edit/', methods=['GET', 'POST'])
-def edit_meeting():
-    return render_template('transcripts/transcripts.html')
+@meeting.route('/edit/<id>', methods=['GET', 'POST'])
+@login_required
+def edit_meeting(id):
+    if len(id) == 24 and all(c in string.hexdigits for c in id):
+        try:
+            meeting = Meeting.objects.get(id=id)
+
+            if current_user not in meeting.members:
+                flash('error You are not a member of that meeting.')
+                return redirect(url_for('meeting.meetings_page'))
+            return render_template('transcripts/transcripts.html', meeting=meeting)
+        except Exception as e:
+            flash('error An Error Occured. {}'.format(str(e)))
+            return redirect(request.args.get('next') or url_for('meeting.home'))
+    flash('error Invalid Meeting Id.')
+    return redirect(request.args.get('next') or url_for('meeting.home'))
 
 
 @meeting.route('/', methods=['GET', 'POST'])
