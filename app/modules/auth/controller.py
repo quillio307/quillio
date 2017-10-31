@@ -5,7 +5,8 @@ from app.modules.auth.model import User, SignupForm, LoginForm, mail, \
     user_datastore, PasswordResetRequestForm, PasswordResetForm
 
 from flask import Blueprint, render_template, flash, request, redirect, url_for
-from flask_security import login_user, logout_user, login_required
+from flask_security import login_user, logout_user, login_required, \
+    current_user
 from flask_security.utils import hash_password, verify_password
 
 
@@ -41,10 +42,12 @@ def signup():
                 html=activate_html(form.name.data, activation_token,
                                    form.email.data)
             )
+
             return render_template('auth/activation_request.html')
         except Exception as e:
             flash('error An Error has Occured, Please Try Again! {}'.format(e))
             return redirect(url_for('auth.signup'))
+
     flash('error Invalid Email or Password')
     return redirect(url_for('auth.signup'))
 
@@ -181,6 +184,26 @@ def reset_form(email):
     return redirect(url_for('auth.login'))
 
 
+@auth.route('/invite/<email>', methods=['GET'])
+@login_required
+def invite_user(email):
+    try:
+        user = current_user._get_current_object()
+
+        mail.send_email(
+            from_email=app.config['SENDGRID_DEFAULT_FROM'],
+            to_email=email,
+            subject='Come Join Quillio',
+            html=invite_html(user.email, email)
+        )
+
+        flash('success Invitation Sent.')
+    except Exception as e:
+        flash('error Could not Create Invitation. {}'.format(e))
+
+    return redirect(request.args.get('next') or url_for('meeting.home'))
+
+
 @auth.route('/logout')
 @login_required
 def logout():
@@ -195,8 +218,11 @@ def activate_html(name, token, email):
     """ Generates the Account Authentication Email Template """
 
     header = '<nav style="height:50px" class="navbar navbar-expand-lg pkColor"></nav><h2 align="center"> Account Activation </h2>'
-    body = '<p>Dear ' + name + ',</p><br><p> Welcome to Quillio! To activate your account, please follow the following link: </p>'
-    link = '<a href=http://localhost:5000' + url_for('auth.activate_account', activation_token=token, email=email) + '> Activate account </a></br>'
+    body = '<p>Dear ' + name + \
+        ',</p><br><p> Welcome to Quillio! To activate your account, please follow the following link: </p>'
+    link = '<a href=http://localhost:5000' + \
+        url_for('auth.activate_account', activation_token=token,
+                email=email) + '> Activate account </a></br>'
     close = '<p> Thanks! </p><br><p> The Quillio Team </p>'
     return str(header + body + link + close)
 
@@ -207,6 +233,20 @@ def password_html(name, token, email):
     header = '<nav style="height:50px" class="navbar navbar-expand-lg pkColor"></nav><h2 align="center">Account Activation</h2>'
     body = '<p>Dear ' + name + ',</p><br><p>We received your request for password reset. If you did not request to reset your password, please disregard this email and do not share it with anyone.<p>'
     body2 = '<p>Follow this link to reset your password: </p><br>'
-    link = '<a href=http://localhost:5000' + url_for('auth.reset_password', reset_token=token, email=email) + '> Reset Password </a><br>'
+    link = '<a href=http://localhost:5000' + \
+        url_for('auth.reset_password', reset_token=token,
+                email=email) + '> Reset Password </a><br>'
     close = '<p>Thanks!</p><br><p>The Quillio Team</p>'
     return str(header + body + body2 + link + close)
+
+
+def invite_html(user_email, email):
+    """ Generates the Invitation Email Template """
+
+    header = '<nav style="height:50px" class="navbar navbar-expand-lg pkColor"></nav><h2 align="center">Account Activation</h2>'
+    body = '<p> Dear ' + email + ',</p><br><p>' + user_email + \
+        'has invited you to join us at Quillio. </p><br><p> Come see what we can do for you!</p><br>'
+    link = '<a href=http://localhost:5000' + \
+        url_for('auth.signup') + '> Create an Account </a><br>'
+    close = '<p>Thanks!</p><br><p>The Quillio Team</p>'
+    return str(header + body + link + close)
