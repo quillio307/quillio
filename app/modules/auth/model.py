@@ -67,9 +67,14 @@ class LoginForm(Form):
                                           validators.Length(min=5, max=35)])
 
 
-class PasswordReset(Form):
+class PasswordResetRequestForm(Form):
     email = StringField('Email', [validators.DataRequired(),
                                   validators.Length(min=4)])
+
+
+class PasswordResetForm(Form):
+    password = PasswordField('Password', [validators.DataRequired(),
+                                          validators.Length(min=5, max=35)])
 
 
 # Flask-Security Setup
