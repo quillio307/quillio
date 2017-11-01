@@ -43,7 +43,7 @@
                     the light of the westering moon. He wondered where Frodo was, and if he was already in Mordor, or if he was dead; and he did not know that Frodo from far away looked on that same moon as it set beyond Gondor ere the coming of the day.</p>
             </div>
         </div>
-        <a class="btn-floating btn-lg quillioButton" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm">
+        <a class="btn-floating btn-lg quillioButton" style="position: fixed; right:350px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm">
             <i class="fa fa-edit"></i>
         </a>
     </div>
@@ -127,8 +127,6 @@
         </div>
     </div>
 
-
-
     {% endblock %} {% block js_import %}
     <script src="https://cdn.quilljs.com/1.3.3/quill.js"></script>
     <script>
@@ -145,6 +143,7 @@
             placeholder: 'Compose an epic...',
             theme: 'snow'
         });
+        quill.setText('SUH DUDES');
     </script>
     <script>
         $(".button-collapse").sideNav();
