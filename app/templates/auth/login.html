@@ -1,11 +1,5 @@
-{% set login_signup = "loginorsignup" %}{% extends "helpers/layout.html" %} 
-
-{% block title %} Quillio Login {% endblock %}
-
-{% block bodyheader %}{{ super() }}{% endblock %}
-
-{% block navbar %}
-<nav style="height:50px" class="navbar navbar-expand-lg pkColor"></nav>
+{% set login_signup = "loginorsignup" %}{% extends "helpers/layout.html" %} {% block title %} Quillio Login {% endblock %} {% block bodyheader %}{{ super() }}{% endblock %} {% block navbar %}
+<nav style="height:50px" class="navbar navbar-expand-lg quillioColor"></nav>
 {% endblock %}{% block content %}
 <div style="max-width:800px; margin:0 auto" class="container">
     <form>
@@ -24,13 +18,11 @@
                 <label for="password"> Enter your password </label>
             </div>
             <ul>
-                <button type="submit" style="width:120px" class="btn pkButton" formmethod="post"> Login </button>
-                <a style="width:120px" href="/auth/signup" class="btn pkButton"> Sign Up </a>
+                <button type="submit" style="width:120px" class="btn quillioButton" formmethod="post"> Login </button>
+                <a style="width:120px" href="/auth/signup" class="btn quillioButton">Sign Up</a>
             </ul>
-
             <a href="/auth/forgot_password" style="text-align:center;"> Forgot your password? Reset Here! </a>
         </div>
     </form>
 </div>
-{% endblock %} 
-{% block jsaddition %}{{ super() }}{% endblock %}
+{% endblock %} {% block jsaddition %}{{ super() }}{% endblock %}

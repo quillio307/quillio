@@ -1,11 +1,5 @@
-{% set login_signup = "loginorsignup" %}{% extends "helpers/layout.html" %}
-
-{% block title %} Quillio Signup {% endblock %} 
-
-{% block bodyheader %}{{ super() }}{% endblock %}
-
-{% block navbar %}
-<nav style="height:50px" class="navbar navbar-expand-lg pkColor"></nav>
+{% set login_signup = "loginorsignup" %}{% extends "helpers/layout.html" %} {% block title %} Quillio Signup {% endblock %} {% block bodyheader %}{{ super() }}{% endblock %} {% block navbar %}
+<nav style="height:50px" class="navbar navbar-expand-lg quillioColor"></nav>
 {% endblock %}{% block content %}
 <div style="max-width:800px; margin:0 auto" class="container">
     <form>
@@ -27,11 +21,10 @@
                 <label for="password"> Password </label>
             </div>
             <div class="md-form">
-                <button type="submit" class="btn pkButton" formmethod="post"> Create Account </button>
+                <button type="submit" class="btn quillioButton" formmethod="post">Create Account</button>
             </div>
             <a href="/auth/login"> Already have an account? Log In Here! </a>
         </div>
     </form>
 </div>
-{% endblock %} 
-{% block jsaddition %}{{ super() }}{% endblock %}
+{% endblock %} {% block jsaddition %}{{ super() }}{% endblock %}

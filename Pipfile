@@ -14,5 +14,8 @@ gunicorn = "*"
 "flask-mongoengine" = "*"
 "flask-security" = "*"
 "flask-testing" = "*"
+<<<<<<< HEAD
+=======
 "flask-sendgrid" = "*"
 sendgrid = "==3.6.5"
+>>>>>>> 65800b66555d7c07450fbd514939f386589f2a5e
