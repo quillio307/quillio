@@ -109,3 +109,6 @@ venv.bak/
 **.swp
 **/.vscode
 **/Pipfile.lock
+
+# Sensitive information
+config.py
