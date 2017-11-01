@@ -161,7 +161,7 @@
     <div class="modal-dialog modal-full-height modal-right" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title w-100" id="myModalLabel">Meeting Information</h4>
+                <h4 class="modal-title w-100" id="myModalLabel"> Meeting Information </h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -169,8 +169,8 @@
             <div class="modal-body">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"> Close </button>
+                <button type="button" class="btn btn-primary"> Save </button>
             </div>
         </div>
     </div>
@@ -179,6 +179,18 @@
 
 {% endblock %} {% block js_import %}
 <script type="text/javascript">
+    function inviteUser() {
+        email = document.getElementById('inviteEmail').value
+
+        if (email) {
+            console.log('Sent invite to ' + email)
+            window.location.href = '/auth/invite/' + email
+        } else {
+            console.log('Sent invite to nobody')
+            window.location.href = '/meetings/home'
+        }
+    }
+
     /**
      * Searches and displays the meetings that match the given criteria
      */
@@ -201,4 +213,5 @@
     }
 
     $(".button-collapse").sideNav();
-</script> {% endblock %}
+</script>
+{% endblock %}
