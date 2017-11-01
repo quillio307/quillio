@@ -1,7 +1,7 @@
 let socket;
+let speechsocket;
 var user;
 $(document).ready(function(){
-
     $.ajax({
       url: '/auth/getUser',
       success: function(data){
@@ -11,7 +11,34 @@ $(document).ready(function(){
     });
 });
 
+function convertFloat32ToInt16(buffer) {
+  l = buffer.length;
+  buf = new Int16Array(l);
+  while (l--) {
+    buf[l] = Math.min(1, buffer[l])*0x7FFF;
+  }
+  return buf.buffer;
+}
+
 function init() {
+    var context = new AudioContext();
+//     // Create WebSocket connection.
+    const speechsocket = new WebSocket(`ws://quillio-ws-st.herokuapp.com/?sampRate=${context.sampleRate}`);
+
+    speechsocket.addEventListener('message', function (event) {
+        let msg = JSON.parse(event.data);
+        if(msg[0] && msg[0].alternatives[0]){
+            let alt = msg[0].alternatives[0];
+            console.log(msg[0].isFinal);
+            if(msg[0].isFinal === true){
+                $('#tempChunk').html('');
+                $('ul#msgboard').append('<li>' + user.name + ': ' + alt.transcript +'</li>');
+            }else{
+                console.log(alt.transcript);
+                $('#tempChunk').html(alt.transcript);
+            }
+        }
+    });
 
     var url =window.location.href;
     var args =url.split('/');
@@ -52,31 +79,26 @@ function init() {
         mediaStream.getAudioTracks()[0].enabled = false;
     });
 
-    var mediaRecorder;
-    var mediaStream;
     var handleSuccess = function(stream) {
-        mediaStream = stream;
-        const options = {mimeType: 'audio/webm'};
-        mediaRecorder= new MediaRecorder(stream, options);
-        const recordedChunks = [];
-        mediaRecorder.addEventListener('dataavailable', function(e) {
-          if (e.data.size > 0) {
-              //if(mic_toggle){
-                  recordedChunks.push(e.data);
-              //}else{
-                  //recordedChunks.push(e.data.size)
-              //}
+
+        var source = context.createMediaStreamSource(stream);
+        var processor = context.createScriptProcessor(1024, 1, 1);
+
+        source.connect(processor);
+        processor.connect(context.destination);
+        console.log(context.sampleRate);
+        processor.onaudioprocess = function(e) {
+          // Do something with the data, i.e Convert this to WAV
+          if(speechsocket.readyState == 1){
+            speechsocket.send(convertFloat32ToInt16(e.inputBuffer.getChannelData(0)));
           }
-        });
 
-        mediaRecorder.addEventListener('stop', function() {
-            saveData(new Blob(recordedChunks), "meeting_audio"+new Date()+".wav");
-        });
+        };
+  };
 
-    };
-    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
       .then(handleSuccess);
-      
+
 
     socket.on('startMeeting', function () {
         msglog("Meeting Started");
