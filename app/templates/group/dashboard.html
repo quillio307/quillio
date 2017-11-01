@@ -155,7 +155,9 @@
                             Update
                             <i class="fa fa-send ml-1"></i>
                         </button>
-                        <button id="groupDeleteButton" type="submit" name="submit" value="delete" class="btn btn-danger mdb-2" formmethod="delete">
+
+                        <button id="groupDeleteButton" type="submit" name="submit" value="delete" class="btn btn-danger mdb-2" formmethod="post">
+
                             Delete Group
                             <i class="fa fa-trash-o ml-1"></i>
                         </button>
@@ -176,7 +178,8 @@
         search = document.getElementById('searchInput').value
 
         if (search) {
-            window.location.href = "/groups/search=" + search
+            console.log('Search: ', search)
+            window.location.href = "/groups/search=" + escape(search)
         } else {
             window.location.href = "/groups"
         }
