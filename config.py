@@ -28,4 +28,4 @@ SECURITY_POST_LOGOUT_VIEW = '/'
 
 # Mail Configuration
 SENDGRID_API_KEY = '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'
-SENDGRID_DEFAULT_FROM = "NotReply@quillio.com"
+SENDGRID_DEFAULT_FROM = "noreply@quillio.com"

@@ -16,6 +16,7 @@ auth = Blueprint('auth', __name__)
 @auth.route('/signup', methods=['GET', 'POST'])
 def signup():
     """ Signs the Current User In """
+
     form = SignupForm(request.form)
     if request.method == 'GET':
         return render_template('auth/signup.html', form=form)
@@ -246,7 +247,7 @@ def invite_html(user_email, email):
 
     header = '<nav style="height:50px" class="navbar navbar-expand-lg pkColor"></nav><h2 align="center">Account Activation</h2>'
     body = '<p> Dear ' + email + ',</p><br><p>' + user_email + \
-        'has invited you to join us at Quillio. </p><br><p> Come see what we can do for you!</p><br>'
+        ' has invited you to join us at Quillio. </p><br><p> Come see what we can do for you!</p><br>'
     link = '<a href=http://localhost:5000' + \
         url_for('auth.signup') + '> Create an Account </a><br>'
     close = '<p>Thanks!</p><br><p>The Quillio Team</p>'

@@ -171,6 +171,19 @@
 
 {% endblock %} {% block js_import %}
 <script>
+
+    function inviteUser() {
+        email = document.getElementById('inviteEmail').value
+
+        if (email) {
+            console.log('Sent invite to ' + email)
+            window.location.href = '/auth/invite/' + email
+        } else {
+            console.log('Sent invite to nobody')
+            window.location.href = '/meetings/home'
+        }
+    }
+
     /**
      * Searches and displays the groups that match the given criteria
      */
