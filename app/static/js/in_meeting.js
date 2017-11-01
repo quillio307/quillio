@@ -1,15 +1,21 @@
-var socket;
+let socket;
+var user;
 $(document).ready(function(){
+
     $.ajax({
       url: '/auth/getUser',
       success: function(data){
-          console.log(data);
+          user = JSON.parse(data);
+          init();
       }
     });
+});
+
+function init() {
+
     var url =window.location.href;
     var args =url.split('/');
 
-    var user = args[args.length-2];
     var room = args[args.length-1];
     console.log("Room joined: " +room);
     var mic_toggle = false;
@@ -17,15 +23,15 @@ $(document).ready(function(){
 
         $("#mic").attr('style', '');
         mic_toggle = true;
-        socket.emit('silenceAll', {room: room, user: user});
+        socket.emit('silenceAll', {room: room, user: user.name});
         mediaStream.getAudioTracks()[0].enabled = true;
     });
 
     $("#start").click(function () {
-        socket.emit('start', {room: room, user: user})
+        socket.emit('start', {room: room, user: user.name})
     });
     $("#end").click(function () {
-        socket.emit('end', {room: room, user: user})
+        socket.emit('end', {room: room, user: user.name})
     });
     socket = io.connect('http://localhost:5000/meeting');
 
@@ -70,6 +76,7 @@ $(document).ready(function(){
     };
     navigator.mediaDevices.getUserMedia({ audio: true, video: false })
       .then(handleSuccess);
+      
 
     socket.on('startMeeting', function () {
         msglog("Meeting Started");
@@ -95,4 +102,4 @@ $(document).ready(function(){
             window.URL.revokeObjectURL(url);
         };
     }());
-});
+}

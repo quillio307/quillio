@@ -36,7 +36,7 @@ def on_join(data):
         meeting.active = True
         meeting.save()
     join_room(data['room_id'])
-    emit('receivemsg', {'data': user.email + ' has joined the meeting.'}, room=data['room_id'])
+    emit('receivemsg', {'data': user.name + ' has joined the meeting.'}, room=data['room_id'])
 
 
 @socketio.on('start', namespace='/meeting')
@@ -63,7 +63,7 @@ def silence_all(data):
 def on_leave(data):
     username = data['username']
     room = data['room']
-    emit('receivemsg', {'data':username + ' has left the room.'})
+    emit('receivemsg', {'data': username + ' has left the room.'})
     leave_room(room)
 
 
@@ -72,7 +72,7 @@ def on_leave(data):
 def test_message(message):
     username = message['username']
     room = message['room']
-    emit('receivemsg', {'data': username+ ": " + message['data']}, room=room)
+    emit('receivemsg', {'data': username + ": " + message['data']}, room=room)
 
 
 @socketio.on('connect', namespace='/meeting')
