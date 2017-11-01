@@ -7,7 +7,7 @@
     <div class="col"></div>
     <div class="col-sm-6">
         <input type="text" class="form-control w-100" id="searchInput" placeholder="Search">
-        <button type="search" class="btn pkButton" id="searchSubmit" onclick="groupSearch()"> Search </button>
+        <button type="search" class="btn quillioButton" id="searchSubmit" onclick="groupSearch()"> Search </button>
     </div>
     <div class="col"></div>
 </div>
@@ -61,7 +61,7 @@
 <!-- \Group Cards -->
 
 <!-- Create Group Button -->
-<a class="btn-floating btn-lg pkButton" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm">
+<a class="btn-floating btn-lg quillioButton" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createGroupForm">
     <i class="fa fa-plus"></i>
 </a>
 <!-- \Create Group Button -->
@@ -72,7 +72,7 @@
         <div class="modal-content">
             <div class="modal-header darken-3 white-text" style="background-color: #45526E">
                 <h4 class="title">
-                    <i class="fa fa-pencil"></i>Create Group</h4>
+                    <i class="fa fa-pencil"></i> Create Group </h4>
                 <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -155,7 +155,9 @@
                             Update
                             <i class="fa fa-send ml-1"></i>
                         </button>
-                        <button id="groupDeleteButton" type="submit" name="submit" value="delete" class="btn btn-danger mdb-2" formmethod="delete">
+
+                        <button id="groupDeleteButton" type="submit" name="submit" value="delete" class="btn btn-danger mdb-2" formmethod="post">
+
                             Delete Group
                             <i class="fa fa-trash-o ml-1"></i>
                         </button>
@@ -169,6 +171,19 @@
 
 {% endblock %} {% block js_import %}
 <script>
+
+    function inviteUser() {
+        email = document.getElementById('inviteEmail').value
+
+        if (email) {
+            console.log('Sent invite to ' + email)
+            window.location.href = '/auth/invite/' + email
+        } else {
+            console.log('Sent invite to nobody')
+            window.location.href = '/meetings/home'
+        }
+    }
+
     /**
      * Searches and displays the groups that match the given criteria
      */
@@ -176,7 +191,8 @@
         search = document.getElementById('searchInput').value
 
         if (search) {
-            window.location.href = "/groups/search=" + search
+            console.log('Search: ', search)
+            window.location.href = "/groups/search=" + escape(search)
         } else {
             window.location.href = "/groups"
         }
