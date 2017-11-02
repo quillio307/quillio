@@ -13,7 +13,6 @@ from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
 from flask_security import current_user, login_required
 
-
 meetings = Blueprint('meetings', __name__)
 
 
