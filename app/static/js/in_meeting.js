@@ -1,7 +1,7 @@
 var socket;
 $(document).ready(function(){
 
-    $('#createMeetingModal').modal('show')
+    $('#insertKeywordsModal').modal('show')
 
     var url =window.location.href;
     var args =url.split('/');

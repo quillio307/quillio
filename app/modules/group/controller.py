@@ -25,7 +25,7 @@ def filter_form(form):
         return delete_group(form)
 
     flash('error Could not Fulfill Request. Please Try Again.')
-    return redirect(url_for('meeting.home'))
+    return redirect(url_for('meetings.home'))
 
 
 @group.route('/', methods=['GET', 'POST'])

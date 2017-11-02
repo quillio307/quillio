@@ -27,17 +27,11 @@ def filter_form(form):
     elif form['submit'] == 'delete':
         return delete_meeting(form)
 
-<<<<<<< HEAD
+
     flash('Could not Fulfill Request. Please Try Again.')
     return redirect(url_for('meeting.home'))
-=======
-    flash('error Could not Fulfill Request. Please Try Again.')
-    return redirect(url_forl('meeting.home'))
->>>>>>> 72b1364719044081134a7cde4f4651e806b1d349
 
-
-<<<<<<< HEAD
-@meeting.route('/edit/<id>', methods=['GET', 'POST'])
+@meetings.route('/edit/<id>', methods=['GET', 'POST'])
 @login_required
 def edit_meeting(id):
     if len(id) == 24 and all(c in string.hexdigits for c in id):
@@ -46,19 +40,16 @@ def edit_meeting(id):
 
             if current_user not in meeting.members:
                 flash('error You are not a member of that meeting.')
-                return redirect(url_for('meeting.meetings_page'))
+                return redirect(url_for('meetings.meetings_page'))
             return render_template('transcripts/transcripts.html', meeting=meeting)
         except Exception as e:
             flash('error An Error Occured. {}'.format(str(e)))
-            return redirect(request.args.get('next') or url_for('meeting.home'))
+            return redirect(request.args.get('next') or url_for('meetings.home'))
     flash('error Invalid Meeting Id.')
-    return redirect(request.args.get('next') or url_for('meeting.home'))
+    return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
-@meeting.route('/', methods=['GET', 'POST'])
-=======
 @meetings.route('/', methods=['GET', 'POST'])
->>>>>>> AJ-meeting-modal
 @login_required
 def home():
     """ Displays All of the Current Users Meetings on the Meeting Dashboard """
@@ -99,7 +90,7 @@ def create_meeting(form=None):
                         u.save()
 
                     flash('success New Meeting has been Created with Member(s): {}'.format(", ".join(valid_emails)))
-                    return redirect(request.args.get('next') or url_for('meeting.home'))
+                    return redirect(request.args.get('next') or url_for('meetings.home'))
                 else:
                     # determine the invalid emails
                     invalid_emails = list(set(emails) - set(valid_emails))
@@ -110,10 +101,10 @@ def create_meeting(form=None):
         else:
             # failed to validate form
             flash('error Could not Create New Meeting, Please Try Again.')
-        return redirect(request.args.get('next') or url_for('meeting.home'))
+        return redirect(request.args.get('next') or url_for('meetings.home'))
 
     flash('error Invalid Request to Create New Meeting.')
-    return redirect(url_for('meeting.home'))
+    return redirect(url_for('meetings.home'))
 
 
 @meetings.route('/update', methods=['PUT'])
@@ -172,19 +163,19 @@ def update_meeting(form=None):
                 meeting.save()
 
                 flash('success Meeting has been Successfully Updated.')
-                return redirect(request.args.get('next') or url_for('meeting.home'))
+                return redirect(request.args.get('next') or url_for('meetings.home'))
             except Exception as e:
                 flash('error An Error has Occurred, Please Try Again. {}'.format(e))
-                return redirect(request.args.get('next') or url_for('meeting.home'))
+                return redirect(request.args.get('next') or url_for('meetings.home'))
         else:
             # failed to validate form
             flash('error Could not Update Meeting, Please Try Again.')
-            return redirect(request.args.get('next') or url_for('meeting.home'))
+            return redirect(request.args.get('next') or url_for('meetings.home'))
     flash('error Invalid Request to Update a Meeting.')
-    return redirect(request.args.get('next') or url_for('meeting.home'))
+    return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
-@meeting.route('/delete', methods=['POST'])
+@meetings.route('/delete', methods=['POST'])
 @login_required
 def delete_meeting(form=None):
     """ Deletes an Existing Group """
@@ -202,7 +193,7 @@ def delete_meeting(form=None):
                 # user is not the owner of the group and cannot delete
                 if user != owner:
                     flash('error You do not have Permission to Delete this Meeting.')
-                    return redirect(request.args.get('next') or url_for('meeting.home'))
+                    return redirect(request.args.get('next') or url_for('meetings.home'))
 
                 # remove the meeting from each member's list of meetings
                 for member in members:
@@ -220,14 +211,14 @@ def delete_meeting(form=None):
                 meeting.delete()
 
                 flash('success Meeting Successfully Deleted.')
-                return redirect(request.args.get('next') or url_for('meeting.home'))
+                return redirect(request.args.get('next') or url_for('meetings.home'))
             except Exception as e:
                 flash('error An Error has Occured, Please Try Again.'
                       '{}'.format(str(e)))
         else:
             # failed to validate form
             flash('error Could not Delete Meeting, Please Try Again.')
-    return redirect(request.args.get('next') or url_for('meeting.home'))
+    return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
 @meetings.route('/search=<string:query>', methods=['GET', 'POST'])
@@ -244,7 +235,7 @@ def search_meetings(query):
     # search is too expensive
     if len(search) > 20:
         flash('error Could not fulfill search request.')
-        return redirect(request.args.get('next') or url_for('meeting.home'))
+        return redirect(request.args.get('next') or url_for('meetings.home'))
 
     # get the list of users to search for
     users = list(filter(lambda x: "@" in x, search))
@@ -281,25 +272,29 @@ def search_meetings(query):
     return render_template('meeting/dashboard.html', meetings=meetings)
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> AJ-meeting-modal
 # CODE FOR REFERENCE
 
 
 @meetings.route('/active/<string:meeting_id>', methods=['GET'])
 @login_required
-def get_active_meeting(meeting_id):
+def meeting_info(meeting_id):
     if len(meeting_id) == 24 and all(c in string.hexdigits for c in meeting_id):
         try:
             meeting = Meeting.objects.get(id=meeting_id)
 
             if current_user not in meeting.members:
                 flash('error You are not a member of that meeting.')
-                return redirect(url_for('meeting.meetings_page'))
+                return redirect(url_for('meetings.meetings_page'))
             return jsonify(meeting)
         except Exception as e:
             flash('error An Error Occured. {}'.format(str(e)))
-            return redirect(request.args.get('next') or url_for('meeting.home'))
+            return redirect(request.args.get('next') or url_for('meetings.home'))
     flash('error Invalid Meeting Id.')
+<<<<<<< HEAD
     return redirect(request.args.get('next') or url_for('meeting.meetings_page'))
 
 
@@ -316,3 +311,6 @@ def get_tags(meeting_id):
             return r.get_ranked_phrases()
         except Exception as e:
             flash('error An Error has occurred, Please Try Again. {}'.format(e))
+=======
+    return redirect(request.args.get('next') or url_for('meetings.meetings_page'))
+>>>>>>> AJ-meeting-modal

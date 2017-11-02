@@ -4,8 +4,6 @@ import secrets
 from app import app
 from app.modules.auth.model import User, SignupForm, LoginForm, mail, \
     user_datastore, PasswordResetRequestForm, PasswordResetForm
-
-
 from flask import Blueprint, render_template, flash, request, redirect, url_for
 from flask_security import login_user, logout_user, login_required, \
     current_user
@@ -68,7 +66,7 @@ def activate_account(activation_token, email):
 
             login_user(user)
             flash("success Successfully Authenticated account!")
-            return redirect(url_for('meeting.home'))
+            return redirect(url_for('meetings.home'))
         else:
             flash('error Could not Validate Activation Token.')
             return redirect(url_for('auth.signup'))
@@ -92,11 +90,19 @@ def login():
         if user is not None:
             if verify_password(form.password.data, user.password):
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                login_user(user)
+                flash('Logged in successfully, {}'.format(user.name))
+                return redirect(request.args.get('next') or url_for('meetings.home'))
+    flash('Invalid Email or Password')
+
+>>>>>>> AJ-meeting-modal
                 if user.is_authenticated():
                     login_user(user)
 
                     flash('success Logged in Successfully, {}'.format(user.name))
-                    return redirect(request.args.get('next') or url_for('meeting.home'))
+                    return redirect(request.args.get('next') or url_for('meetings.home'))
                 else:
                     flash('error Please Authenticate Your Account.')
                     return redirect(url_for('auth.login'))
@@ -106,6 +112,7 @@ def login():
         else:
             flash('error Please Make Sure You Have Activated Your Account.')
     flash('error Invalid Email or Password.')
+>>>>>>> 6d4eca2428cafe020bb75f7b22ccd65464502f71
     return redirect(url_for('auth.login'))
 
 
@@ -159,6 +166,7 @@ def reset_password(reset_token, email):
 
     # Could not find user
     flash('error Unable to Process Reset Request, Please Try Again.')
+<<<<<<< HEAD
 =======
                 login_user(user)
 <<<<<<< HEAD
@@ -170,6 +178,8 @@ def reset_password(reset_token, email):
                 return redirect(request.args.get('next') or url_for('meeting.home'))
     flash('error Invalid Email or Password')
 >>>>>>> 72b1364719044081134a7cde4f4651e806b1d349
+>>>>>>> AJ-meeting-modal
+=======
 >>>>>>> AJ-meeting-modal
     return redirect(url_for('auth.login'))
 
@@ -217,7 +227,7 @@ def invite_user(email):
     except Exception as e:
         flash('error Could not Create Invitation. {}'.format(e))
 
-    return redirect(request.args.get('next') or url_for('meeting.home'))
+    return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
 @auth.route('/logout')
