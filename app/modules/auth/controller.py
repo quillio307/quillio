@@ -5,6 +5,7 @@ from app import app
 from app.modules.auth.model import User, SignupForm, LoginForm, mail, \
     user_datastore, PasswordResetRequestForm, PasswordResetForm
 
+
 from flask import Blueprint, render_template, flash, request, redirect, url_for
 from flask_security import login_user, logout_user, login_required, \
     current_user
@@ -90,6 +91,7 @@ def login():
 
         if user is not None:
             if verify_password(form.password.data, user.password):
+<<<<<<< HEAD
                 if user.is_authenticated():
                     login_user(user)
 
@@ -157,6 +159,18 @@ def reset_password(reset_token, email):
 
     # Could not find user
     flash('error Unable to Process Reset Request, Please Try Again.')
+=======
+                login_user(user)
+<<<<<<< HEAD
+                flash('Logged in successfully, {}'.format(user.name))
+                return redirect(request.args.get('next') or url_for('meetings.home'))
+    flash('Invalid Email or Password')
+=======
+                flash('success Logged in Successfully, {}'.format(user.name))
+                return redirect(request.args.get('next') or url_for('meeting.home'))
+    flash('error Invalid Email or Password')
+>>>>>>> 72b1364719044081134a7cde4f4651e806b1d349
+>>>>>>> AJ-meeting-modal
     return redirect(url_for('auth.login'))
 
 
