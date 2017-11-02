@@ -1,6 +1,4 @@
-{% extends"helpers/dashboard.html" %} {% block title %}Meeting In Progress{% endblock %}
-
-{% block main %}
+{% extends"helpers/dashboard.html" %} {% block title %}Meeting In Progress{% endblock %} {% block main %}
 <div class="jumbotron">
     <h1 class="h1-responsive">{{meeting.title}}</h1>
     <button type="button" class="btn btn-success" id="start">Start</button>
@@ -13,8 +11,6 @@
         <i class="fa fa-microphone fa-5x"></i>
     </a>
 </div>
-
-<a class="btn-floating btn-lg pkColor" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm"><i class="fa fa-plus"></i></a>
 
 <!--Modal: Contact form-->
 <div class="modal fade" id="createMeetingForm" tabindex="-1" role="dialog" aria-labelledby="createMeetingForm" aria-hidden="true">
@@ -51,9 +47,7 @@
     </div>
 </div>
 
-{% endblock %}
-
-{% block js_import %}
+{% endblock %} {% block js_import %}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 <script type="text/javascript" src="/static/js/in_meeting.js"></script>
 {% endblock %}
