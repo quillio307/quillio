@@ -112,16 +112,4 @@ function init() {
     var msglog = function(txt) {
         $('ul#msgboard').append('<li>'+ txt +'</li>');
     };
-    var saveData = (function () {
-        var a = document.createElement("a");
-        document.body.appendChild(a);
-        a.style = "display: none";
-        return function (data, fileName) {
-            var url = window.URL.createObjectURL(data);
-            a.href = url;
-            a.download = fileName;
-            a.click();
-            window.URL.revokeObjectURL(url);
-        };
-    }());
 }

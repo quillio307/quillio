@@ -55,12 +55,16 @@ def on_join(data):
 @socketio.on('start', namespace='/meeting')
 @authenticated_only
 def start_meeting(data):
+    meeting = Meeting.objects.with_id(data['room_id'])
+    meeting.status = 1
     emit('startMeeting', room=data['room'])
 
 
 @socketio.on('end', namespace='/meeting')
 @authenticated_only
 def start_meeting(data):
+    meeting = Meeting.objects.with_id(data['room_id'])
+    meeting.status = 2
     emit('endMeeting', room=data['room'])
 
 
@@ -74,10 +78,21 @@ def silence_all(data):
 @socketio.on('leave', namespace='/meeting')
 @authenticated_only
 def on_leave(data):
-    username = data['username']
     room = data['room']
-    emit('receivemsg', {'data': username + ' has left the room.'})
+    emit('receivemsg', {'data': current_user.name + ' has left the room.'})
     leave_room(room)
+
+
+@socketio.on('transcription', namespace='/meeting')
+@authenticated_only
+def transcription(data):
+    usr = current_user._get_current_object()
+    tscript = data['transcript']
+    meeting = Meeting.objects.with_id(data['room_id'])
+    if meeting.status is 1:
+        meeting.note.add_transcription(usr, tscript)
+        meeting.save()
+        emit('receivemsg', {'data': usr.name + ' - ' + tscript}, room=data['room_id'])
 
 
 @socketio.on('sendmsg', namespace='/meeting')
