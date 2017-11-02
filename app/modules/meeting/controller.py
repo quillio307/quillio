@@ -1,7 +1,7 @@
 import json
-from flask import request
 import string
 import time
+
 from datetime import datetime, timedelta
 
 from app.modules.meeting.model import Meeting, MeetingCreateForm, \
@@ -47,7 +47,6 @@ def edit_meeting(id):
             return redirect(request.args.get('next') or url_for('meetings.home'))
     flash('error Invalid Meeting Id.')
     return redirect(request.args.get('next') or url_for('meetings.home'))
-#>>>>>>> 6d4eca2428cafe020bb75f7b22ccd65464502f71
 
 
 @meetings.route('/', methods=['GET', 'POST'])

@@ -1,16 +1,18 @@
 import json
-from flask import Flask, render_template, abort, request, request
 import string
 import time
+
 from datetime import datetime, timedelta
-from flask_socketio import SocketIO, emit, join_room, leave_room, send, rooms
+
 from app import socketio
 from app.modules.auth.model import User
 from app.modules.meeting.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm
+
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
 from flask_security import current_user, login_required
+from flask_socketio import SocketIO, emit, join_room, leave_room, send, rooms
 
 
 meeting = Blueprint('meeting', __name__)
