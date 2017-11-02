@@ -5,7 +5,7 @@ import time
 from datetime import datetime, timedelta
 from rake_nltk import Rake
 
-from app.modules.meeting.model import Meeting, MeetingCreateForm, \
+from app.modules.meetings.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm, MeetingDeleteForm
 from app.modules.auth.model import User
 
@@ -251,7 +251,7 @@ def search_meetings(query):
             t = t.lower()
             meetings = list(filter(lambda x: t in x.tags, meetings))
         except Exception as e:
-            return render_template('meeting.home', meetings=[])
+            return render_template('meetings.home', meetings=[])
 
     # filter the meetings to only contain meetings with desired members
     for u in users:
@@ -260,7 +260,7 @@ def search_meetings(query):
             meetings = list(filter(
                 lambda x: user in x.members, meetings))
         except Exception as e:
-            return render_template('meeting.home', meetings=[])
+            return render_template('meetings.home', meetings=[])
 
     # filter the meetings to only contain meetings with the desired text
     for c in search:

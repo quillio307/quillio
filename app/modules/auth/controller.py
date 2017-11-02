@@ -35,7 +35,7 @@ def signup():
             to_email=form.email.data,
             subject='Welcome to Quillio',
             html=activate_html(form.name.data, activation_token,
-                                form.email.data)
+                               form.email.data)
         )
 
         # add user to the database
@@ -48,13 +48,12 @@ def signup():
             authenticated=False
         )
 
-        flash('info We have Sent You an Authentication Email.')
+        flash('Please Check Your Email For An Activation Request.')
         return redirect(url_for('auth.login'))
     except Exception as e:
         print(str(e))
         flash('error An Error has Occured, Please Try Again!')
         return redirect(url_for('auth.signup'))
-
 
 
 @auth.route('/activate/<activation_token>/<email>', methods=['GET'])
@@ -174,7 +173,6 @@ def reset_password(reset_token, email):
         return redirect(url_for('auth.login'))
 
     return redirect(url_for('auth.reset_form', email=email))
-
 
 
 @auth.route('/reset_form/<email>', methods=['GET', 'POST'])

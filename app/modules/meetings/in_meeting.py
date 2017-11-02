@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 from app import socketio
 from app.modules.auth.model import User
-from app.modules.meeting.model import Meeting, MeetingCreateForm, \
+from app.modules.meetings.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm, KeywordsForm
 
 from flask import Blueprint, render_template, flash, request, redirect, \

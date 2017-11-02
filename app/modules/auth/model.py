@@ -25,12 +25,12 @@ class User(db.Document, UserMixin):
     meetings = db.ListField(db.ReferenceField('Meeting'), default=[])
 
     # authentication fields
-    activation_hash = db.StringField(required=True)
+    activation_hash = db.StringField()
     password_reset_hash = db.StringField()
 
     # security fields
     active = db.BooleanField(default=False)
-    authenticated = db.BooleanField(required=False, default=False)
+    authenticated = db.BooleanField(default=False)
     roles = db.ListField(db.ReferenceField(Role), default=[])
 
     def is_authenticated(self):

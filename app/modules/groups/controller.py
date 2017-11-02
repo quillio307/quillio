@@ -1,7 +1,7 @@
 import string
 
 from app.modules.auth.model import User
-from app.modules.group.model import Group, GroupCreateForm, GroupUpdateForm, \
+from app.modules.groups.model import Group, GroupCreateForm, GroupUpdateForm, \
     GroupDeleteForm
 
 
@@ -10,7 +10,7 @@ from flask import Blueprint, request, render_template, flash, redirect, \
 from flask_security import Security, login_required, current_user
 
 
-group = Blueprint('group', __name__)
+groups = Blueprint('groups', __name__)
 
 
 def filter_form(form):
@@ -28,7 +28,7 @@ def filter_form(form):
     return redirect(url_for('meetings.home'))
 
 
-@group.route('/', methods=['GET', 'POST'])
+@groups.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
     """ Displays All of the Current User's Groups on the Group Dashboard """
@@ -39,58 +39,60 @@ def home():
     return render_template('group/dashboard.html', groups=user.groups)
 
 
-@group.route('/create', methods=['POST'])
+@groups.route('/create', methods=['POST'])
 @login_required
 def create_group(form=None):
     """ Creates a new Group. """
 
-    if form is not None:
-        create_form = GroupCreateForm(form)
-        if create_form.validate():
-            try:
-                user = current_user._get_current_object()
+    if form is None:
+        flash('error Invalid Request to Create New Group.')
+        return redirect(url_for('groups.home'))
 
-                # generate the list of requested member emails
-                emails = create_form.emails.data.split(" ")
-                emails.append(user.email)
+    create_form = GroupCreateForm(form)
 
-                # generate the list of valid emails
-                query = User.objects(email__in=emails)
-                valid_emails = [u.email for u in query]
+    if not create_form.validate():
+        flash('error Could not Create New Group, Please Try Again.')
+        return redirect(request.args.get('next') or url_for('groups.home'))
 
-                # validate and create the new group
-                if len(emails) == len(valid_emails):
+    try:
+        user = current_user._get_current_object()
 
-                    g = Group(name=create_form.name.data, members=query,
-                              admins=[user]).save()
+        # generate the list of requested member emails
+        emails = create_form.emails.data.split(" ")
+        emails.append(user.email)
 
-                    # add the group to each member's list of groups
-                    for u in query():
-                        u.groups.append(g)
-                        u.save()
+        # generate the list of valid emails
+        query = User.objects(email__in=emails)
+        valid_emails = [u.email for u in query]
 
-                    flash('success New Group Created with Member(s): {}'.format(
-                        str(valid_emails)))
-                    return redirect(request.args.get('next') or
-                                    url_for('group.home'))
-                else:
-                    # determine the invalid emails
-                    invalid_emails = list(set(emails) - set(valid_emails))
-                    flash('error Could not Create New Group. Unable to Find User(s):'
-                          '{}'.format(invalid_emails))
-            except Exception as e:
-                flash('error An Error has Occured, Please Try Again. '
-                      '{}'.format(str(e)))
+        # validate and create the new group
+        if len(emails) == len(valid_emails):
+
+            g = Group(name=create_form.name.data, members=query,
+                        admins=[user]).save()
+
+            # add the group to each member's list of groups
+            for u in query():
+                u.groups.append(g)
+                u.save()
+
+            flash('success New Group Created with Member(s): {}'.format(
+                str(valid_emails)))
+            return redirect(request.args.get('next') or
+                            url_for('groups.home'))
         else:
-            # failed to validate form
-            flash('error Could not Create New Group, Please Try Again.')
-        return redirect(request.args.get('next') or url_for('group.home'))
+            # determine the invalid emails
+            invalid_emails = list(set(emails) - set(valid_emails))
+            flash('error Could not Create New Group. Unable to Find User(s):'
+                    '{}'.format(invalid_emails))
+    except Exception as e:
+        flash('error An Error has Occured, Please Try Again. '
+                '{}'.format(str(e)))
+    
+    return redirect(request.args.get('next') or url_for('groups.home'))
 
-    flash('error Invalid Request to Create New Group.')
-    return redirect(url_for('group.home'))
 
-
-@group.route('/update', methods=['POST'])
+@groups.route('/update', methods=['POST'])
 @login_required
 def update_group(form=None):
     """ Updates an Existing Group """
@@ -174,20 +176,20 @@ def update_group(form=None):
 
                 flash('success Group has been Successfully Updated')
                 return redirect(request.args.get('next') or
-                                url_for('group.home'))
+                                url_for('groups.home'))
             except Exception as e:
                 flash('error Unable to Update Group at this Time.  Please Try Again.'
                       '{}'.format(str(e)))
         else:
             # failed to validate form
             flash('error Could not Update Group, Please Try Again.')
-        return redirect(request.args.get('next') or url_for('group.home'))
+        return redirect(request.args.get('next') or url_for('groups.home'))
 
     flash('error Invalid Request to Update Group.')
-    return redirect(url_for('group.home'))
+    return redirect(url_for('groups.home'))
 
 
-@group.route('/delete', methods=['POST'])
+@groups.route('/delete', methods=['POST'])
 @login_required
 def delete_group(form=None):
     """ Deletes an Existing Group """
@@ -206,7 +208,7 @@ def delete_group(form=None):
                 if user not in admins:
                     flash('error You do not have permission to delete this group.')
                     return redirect(request.args.get('next') or
-                                    url_for('group.home'))
+                                    url_for('groups.home'))
 
                 # remove the group from each member's list of groups
                 for member in members:
@@ -224,17 +226,17 @@ def delete_group(form=None):
 
                 flash('success Group Successfully Deleted')
                 return redirect(request.args.get('next') or
-                                url_for('group.home'))
+                                url_for('groups.home'))
             except Exception as e:
                 flash('error An Error has Occured, Please Try Again.'
                       '{}'.format(str(e)))
         else:
             # failed to validate form
             flash('error Could not Delete Group, Please Try Again.')
-        return redirect(request.args.get('next') or url_for('group.home'))
+        return redirect(request.args.get('next') or url_for('groups.home'))
 
 
-@group.route('/search=<string:query>', methods=['GET', 'POST'])
+@groups.route('/search=<string:query>', methods=['GET', 'POST'])
 @login_required
 def search_groups(query):
     """ Displays the Groups that match the query on the Group Dashboard """
@@ -248,7 +250,7 @@ def search_groups(query):
     # search is too expensive
     if len(search) > 20:
         flash('error Could not Fulfill Search Request.')
-        return redirect(request.args.get('next') or url_for('group.home'))
+        return redirect(request.args.get('next') or url_for('groups.home'))
 
     # get the list of users to search for
     users = list(filter(lambda x: "@" in x, search))
@@ -272,7 +274,7 @@ def search_groups(query):
     return render_template('group/dashboard.html', groups=groups)
 
 
-@group.route('/is/admin/<string:group_id>')
+@groups.route('/is/admin/<string:group_id>')
 @login_required
 def get_group_admins(group_id):
     if len(group_id) == 24 and all(c in string.hexdigits for c in group_id):
@@ -287,7 +289,7 @@ def get_group_admins(group_id):
     return jsonify({'status': 400})
 
 
-@group.route('/info/<string:group_id>')
+@groups.route('/info/<string:group_id>')
 @login_required
 def get_group_by_id(group_id):
     # validate the given id
@@ -299,12 +301,12 @@ def get_group_by_id(group_id):
             if user not in group.members and current_user not in group.admins:
                 flash('error You do not have Permission to View this Group.')
                 return redirect(request.args.get('next') or
-                                url_for('group.home'))
+                                url_for('groups.home'))
 
             return jsonify(group)
         except Exception as e:
             flash('error An Error Occured. {}'.format(str(e)))
-            return redirect(request.args.get('next') or url_for('group.home'))
+            return redirect(request.args.get('next') or url_for('groups.home'))
     flash('error Invalid Group ID')
-    return redirect(request.args.get('next') or url_for('group.home'))
+    return redirect(request.args.get('next') or url_for('groups.home'))
   

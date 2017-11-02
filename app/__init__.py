@@ -19,12 +19,12 @@ def index():
 
 # Import Blueprint modules
 from app.modules.auth.controller import auth
-from app.modules.group.controller import group
-from app.modules.meeting.controller import meetings
-from app.modules.meeting.in_meeting import meeting
+from app.modules.groups.controller import groups
+from app.modules.meetings.controller import meetings
+from app.modules.meetings.in_meeting import meeting
 
 # Register Blueprints
 app.register_blueprint(auth, url_prefix='/auth')
-app.register_blueprint(group, url_prefix='/groups')
+app.register_blueprint(groups, url_prefix='/groups')
 app.register_blueprint(meetings, url_prefix='/meetings')
 app.register_blueprint(meeting, url_prefix='/meeting')
