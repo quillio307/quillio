@@ -4,6 +4,7 @@ from flask_security import Security, MongoEngineUserDatastore, \
     UserMixin, RoleMixin
 from wtforms import Form, StringField, PasswordField, validators
 
+from flask_sendgrid import SendGrid
 
 class Role(db.Document, RoleMixin):
     name = db.StringField(max_length=80, unique=True)
@@ -11,16 +12,26 @@ class Role(db.Document, RoleMixin):
 
 
 class User(db.Document, UserMixin):
+    meta = {'strict': False}
+
+    # identity fields
     email = db.EmailField(required=True, unique=True,
                           min_length=3, max_length=35)
     name = db.StringField(required=True, min_length=4, max_length=20)
     password = db.StringField(required=True, min_length=5, max_length=1000)
-    active = db.BooleanField(default=True)
-    authenticated = db.BooleanField(required=False, default=False)
-    roles = db.ListField(db.ReferenceField(Role), default=[])
+
+    # quillio fields
     groups = db.ListField(db.ReferenceField('Group'), default=[])
     meetings = db.ListField(db.ReferenceField('Meeting'), default=[])
-    meta = {'strict': False}
+
+    # authentication fields
+    activation_hash = db.StringField(required=True)
+    password_reset_hash = db.StringField()
+
+    # security fields
+    active = db.BooleanField(default=False)
+    authenticated = db.BooleanField(required=False, default=False)
+    roles = db.ListField(db.ReferenceField(Role), default=[])
 
     def is_authenticated(self):
         """ Determines if a User is authenticated """
@@ -30,29 +41,45 @@ class User(db.Document, UserMixin):
         """ Determines if a User is currently active """
         return self['active']
 
-    # NOTE: always returns false, anonymous users are not supported
     def is_anonymous(self):
         """ Determines if a User is anonymous; this will always return false
-        becuase this functionality is not currently supported """
+        becuase anonymous users are not currently supported """
         return False
 
     def get_id(self):
-        """ Fetches the unicode id for the Usera """
-        return str(User.objects(email__exact=self['email'])[0].id)
+        """ Fetches the unicode id for the User """
+        return str(User.objects.get(email=self['email']).id)
+
+
+class SignupForm(Form):
+    email = StringField('Email', [validators.DataRequired(),
+                                  validators.Length(min=6, max=35)])
+    name = StringField('Name', [validators.DataRequired(),
+                                validators.Length(min=4, max=25)])
+    password = PasswordField('Password', [validators.DataRequired(),
+                                          validators.Length(min=5, max=35)])
+
+
+class LoginForm(Form):
+    email = StringField('Email', [validators.DataRequired(),
+                                  validators.Length(min=4, max=25)])
+    password = PasswordField('Password', [validators.DataRequired(),
+                                          validators.Length(min=5, max=35)])
+
+
+class PasswordResetRequestForm(Form):
+    email = StringField('Email', [validators.DataRequired(),
+                                  validators.Length(min=4)])
+
+
+class PasswordResetForm(Form):
+    password = PasswordField('Password', [validators.DataRequired(),
+                                          validators.Length(min=5, max=35)])
 
 
 # Flask-Security Setup
 user_datastore = MongoEngineUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
-
-class SignupForm(Form):
-    email = StringField('Email', [validators.Length(min=6, max=35)])
-    name = StringField('Name', [validators.Length(min=4, max=25)])
-    password = PasswordField('Password', [validators.DataRequired(),
-                                          validators.Length(min=5, max=35)])
-
-
-class LoginForm(Form):
-    email = StringField('Email', [validators.Length(min=4, max=25)])
-    password = PasswordField('Password', [validators.DataRequired()])
+# Authentication Setup
+mail = SendGrid(app)

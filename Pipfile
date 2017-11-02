@@ -12,18 +12,13 @@ gunicorn = "*"
 "flask-login" = "*"
 "flask-wtf" = "*"
 "flask-mongoengine" = "*"
-<<<<<<< HEAD
 "flask-security" = "*"
 "flask-socketio" = "*"
 gevent = "*"
-=======
-<<<<<<< HEAD
-"flask-security" = "*"
 "flask-bcrypt" = "*"
 passlib = "*"
 bcrypt = "*"
 "flask-testing" = "*"
-=======
-"flask-security" = "*"
->>>>>>> ef9a686cff503143cda9f7907a8b888743b82dcb
->>>>>>> 72b1364719044081134a7cde4f4651e806b1d349
+"flask-socketio" = "*"
+"flask-sendgrid" = "*"
+sendgrid = "==3.6.5"
