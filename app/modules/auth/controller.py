@@ -89,15 +89,6 @@ def login():
 
         if user is not None:
             if verify_password(form.password.data, user.password):
-#<<<<<<< HEAD
-#<<<<<<< HEAD
-#=======
-                login_user(user)
-                flash('Logged in successfully, {}'.format(user.name))
-                return redirect(request.args.get('next') or url_for('meetings.home'))
-    #flash('Invalid Email or Password')
-
-#>>>>>>> AJ-meeting-modal
                 if user.is_authenticated():
                     login_user(user)
 
@@ -111,8 +102,8 @@ def login():
                 return redirect(url_for('auth.login'))
         else:
             flash('error Please Make Sure You Have Activated Your Account.')
+            return redirect(url_for('auth.login'))
     flash('error Invalid Email or Password.')
-#>>>>>>> 6d4eca2428cafe020bb75f7b22ccd65464502f71
     return redirect(url_for('auth.login'))
 
 
@@ -166,21 +157,6 @@ def reset_password(reset_token, email):
 
     # Could not find user
     flash('error Unable to Process Reset Request, Please Try Again.')
-# <<<<<<< HEAD
-# =======
-    login_user(user)
-# <<<<<<< HEAD
-    flash('Logged in successfully, {}'.format(user.name))
-    return redirect(request.args.get('next') or url_for('meetings.home'))
-    # flash('Invalid Email or Password')
-# =======
-#                 flash('success Logged in Successfully, {}'.format(user.name))
-#                 return redirect(request.args.get('next') or url_for('meeting.home'))
-#     flash('error Invalid Email or Password')
-# >>>>>>> 72b1364719044081134a7cde4f4651e806b1d349
-# >>>>>>> AJ-meeting-modal
-# =======
-# >>>>>>> AJ-meeting-modal
     return redirect(url_for('auth.login'))
 
 

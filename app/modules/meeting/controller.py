@@ -1,7 +1,7 @@
 import json
-from flask import request
 import string
 import time
+
 from datetime import datetime, timedelta
 from rake_nltk import Rake
 
@@ -26,9 +26,9 @@ def filter_form(form):
     elif form['submit'] == 'delete':
         return delete_meeting(form)
 
-
     flash('Could not Fulfill Request. Please Try Again.')
-    return redirect(url_for('meeting.home'))
+    return redirect(url_for('meetings.home'))
+
 
 @meetings.route('/edit/<id>', methods=['GET', 'POST'])
 @login_required
@@ -271,14 +271,9 @@ def search_meetings(query):
     return render_template('meeting/dashboard.html', meetings=meetings)
 
 
-#<<<<<<< HEAD
-
-#=======
-#>>>>>>> AJ-meeting-modal
-# CODE FOR REFERENCE
 
 
-@meetings.route('/active/<string:meeting_id>', methods=['GET'])
+@meetings.route('/info/<string:meeting_id>', methods=['GET'])
 @login_required
 def meeting_info(meeting_id):
     if len(meeting_id) == 24 and all(c in string.hexdigits for c in meeting_id):
@@ -293,7 +288,6 @@ def meeting_info(meeting_id):
             flash('error An Error Occured. {}'.format(str(e)))
             return redirect(request.args.get('next') or url_for('meetings.home'))
     flash('error Invalid Meeting Id.')
-#<<<<<<< HEAD
     return redirect(request.args.get('next') or url_for('meeting.meetings_page'))
 
 
@@ -315,9 +309,3 @@ def get_tags(meeting_id):
     #need to do a little more research into RAKE_NLTK --> remove punctuation from keywords
     #write algorithm to only return highest-ranked keywords (tbd)
     return render_template('meeting/tags.html', tags=tag_data)
-
-    #except Exception as e:
-    #    flash('error An Error has occurred, Please Try Again. {}'.format(e))
-#=======
-    #return redirect(request.args.get('next') or url_for('meetings.meetings_page'))
-#>>>>>>> AJ-meeting-modal

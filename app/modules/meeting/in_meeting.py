@@ -1,31 +1,48 @@
 import json
-from flask import Flask, render_template, abort, request, request
 import string
 import time
+
 from datetime import datetime, timedelta
-from flask_socketio import SocketIO, emit, join_room, leave_room, send, rooms
+
 from app import socketio
 from app.modules.auth.model import User
 from app.modules.meeting.model import Meeting, MeetingCreateForm, \
-    MeetingUpdateForm
+    MeetingUpdateForm, KeywordsForm
+
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
 from flask_security import current_user, login_required
+from flask_socketio import SocketIO, emit, join_room, leave_room, send, rooms
 
 
 meeting = Blueprint('meeting', __name__)
 
 
-@meeting.route('/<meeting_id>')
+@meeting.route('/<meeting_id>', methods=['GET', 'POST'])
 @login_required
 def meeting_page(meeting_id):
-    print("Receieved join request for: " + meeting_id)
-    meeting = Meeting.objects.with_id(meeting_id)
+    user = current_user._get_current_object()
+    meeting = Meeting.objects.get(id=meeting_id)
+
     if meeting is None:
         abort(404)
         return
 
-    return render_template('meeting/in_meeting.html', meeting={'title': meeting.name})
+    if user not in meeting.members:
+        flash('error You Do not Have Permission to Join This Meeting.')
+        return redirect(url_for('meetings.home'))
+
+    if request.method == 'GET':
+        return render_template('meeting/in_meeting.html', meeting={'title': meeting.name})
+
+    form = KeywordsForm(request.form)
+
+    if not form.validate():
+        flash('error Could not Join Meeting At This Time')
+        return redirect(url_for('meetings.home'))
+
+    keywords = form.keywords.data.split(", ")
+    return jsonify({'Keywords': keywords})
 
 
 @socketio.on('join', namespace='/meeting')
