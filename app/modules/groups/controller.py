@@ -4,7 +4,6 @@ from app.modules.auth.model import User
 from app.modules.groups.model import Group, GroupCreateForm, GroupUpdateForm, \
     GroupDeleteForm
 
-
 from flask import Blueprint, request, render_template, flash, redirect, \
     url_for, jsonify
 from flask_security import Security, login_required, current_user
