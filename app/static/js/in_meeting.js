@@ -1,32 +1,35 @@
 var socket;
-$(document).ready(function(){
 
-    $('#insertKeywordsModal').modal('show')
+$(window).on('load', function() {
+    console.log('loading modal')
+    $('#keywordsModal').modal('show')
+})
 
-    var url =window.location.href;
-    var args =url.split('/');
+$(document).ready(function () {
+    var url = window.location.href;
+    var args = url.split('/');
 
-    var user = args[args.length-2];
-    var room = args[args.length-1];
-    console.log("Room joined: " +room);
+    var user = args[args.length - 2];
+    var room = args[args.length - 1];
+    console.log("Room joined: " + room);
     var mic_toggle = false;
     $("#mic").click(function () {
 
         $("#mic").attr('style', '');
         mic_toggle = true;
-        socket.emit('silenceAll', {room: room, user: user});
+        socket.emit('silenceAll', { room: room, user: user });
         mediaStream.getAudioTracks()[0].enabled = true;
     });
 
     $("#start").click(function () {
-        socket.emit('start', {room: room, user: user})
+        socket.emit('start', { room: room, user: user })
     });
     $("#end").click(function () {
-        socket.emit('end', {room: room, user: user})
+        socket.emit('end', { room: room, user: user })
     });
     socket = io.connect('http://localhost:5000/meeting');
 
-    socket.on('receivemsg', function(msg) {
+    socket.on('receivemsg', function (msg) {
         console.log(msg);
         msglog(msg.data);
     });
@@ -45,28 +48,28 @@ $(document).ready(function(){
 
     var mediaRecorder;
     var mediaStream;
-    var handleSuccess = function(stream) {
+    var handleSuccess = function (stream) {
         mediaStream = stream;
-        const options = {mimeType: 'audio/webm'};
-        mediaRecorder= new MediaRecorder(stream, options);
+        const options = { mimeType: 'audio/webm' };
+        mediaRecorder = new MediaRecorder(stream, options);
         const recordedChunks = [];
-        mediaRecorder.addEventListener('dataavailable', function(e) {
-          if (e.data.size > 0) {
-              //if(mic_toggle){
-                  recordedChunks.push(e.data);
-              //}else{
-                  //recordedChunks.push(e.data.size)
-              //}
-          }
+        mediaRecorder.addEventListener('dataavailable', function (e) {
+            if (e.data.size > 0) {
+                //if(mic_toggle){
+                recordedChunks.push(e.data);
+                //}else{
+                //recordedChunks.push(e.data.size)
+                //}
+            }
         });
 
-        mediaRecorder.addEventListener('stop', function() {
-            saveData(new Blob(recordedChunks), "meeting_audio"+new Date()+".wav");
+        mediaRecorder.addEventListener('stop', function () {
+            saveData(new Blob(recordedChunks), "meeting_audio" + new Date() + ".wav");
         });
 
     };
     navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-      .then(handleSuccess);
+        .then(handleSuccess);
 
     socket.on('startMeeting', function () {
         msglog("Meeting Started");
@@ -77,8 +80,8 @@ $(document).ready(function(){
         mediaRecorder.stop();
     });
 
-    var msglog = function(txt) {
-        $('ul#msgboard').append('<li>'+ txt +'</li>');
+    var msglog = function (txt) {
+        $('ul#msgboard').append('<li>' + txt + '</li>');
     };
     var saveData = (function () {
         var a = document.createElement("a");

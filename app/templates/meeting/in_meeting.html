@@ -3,7 +3,7 @@
 {% block main %}
 
 <!-- Keywords Modal -->
-<div class="modal fade" id="insertKeywordsModal" tabindex="-1" role="dialog" aria-labelledby="insertKeywords" aria-hidden="true">
+<div class="modal fade" id="keywordsModal" tabindex="-1" role="dialog" aria-labelledby="keywordsModal" aria-hidden="true">
     <div class="modal-dialog cascading-modal" role="document">
         <div class="modal-content">
             <div class="modal-header darken-3 white-text" style="background-color: #45526E">
@@ -16,29 +16,30 @@
                 </button>
             </div>
 
+            {% if current_user.id == meeting.owner.id %}
             <form>
                 <div class="modal-body mb-0">
                     <div class="md-form form-sm">
-                        <input type="text" id="name" name="name" value="{{ request.form.name }}" class="form-control" required>
-                        <label for="name"> Keywords (Separate each keyword by comma) </label>
+                        <input type="text" id="keywords" name="keywords" value="{{ request.form.keywords }}" class="form-control" required>
+                        <label for="name"> Keywords (Separate each keyword by a space) </label>
                     </div>
 
                     <div class="text-center mt-1-half">
-                        <button id="insertKeywordButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="create"
-                            formmethod="post">
-                            Create
+                        <button id="insertKeywordButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="sendKeywords" formmethod="post">
+                            Submit 
                             <i class="fa fa-send ml-1"></i>
                         </button>
                     </div>
                 </div>
             </form>
+            {% endif %}
         </div>
     </div>
 </div>
 <!-- \Keywords Modal -->
 
 <div class="jumbotron">
-    <h1 class="h1-responsive">{{meeting.title}}</h1>
+    <h1 class="h1-responsive"> {{ meeting.title }} </h1>
     <button type="button" class="btn btn-success" id="start" data-toggle="modal" data-target="#insertKeywords"> Start </button>
     <button type="button" class="btn btn-danger" id="end"> End </button>
     <br>
@@ -49,10 +50,6 @@
     </a>
      <audio id="player" controls></audio>
 </div>
-
-<a class="btn-floating btn-lg pkColor" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm"><i class="fa fa-plus"></i></a>
-
-
 
 {% endblock %}
 

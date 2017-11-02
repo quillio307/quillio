@@ -90,10 +90,6 @@ def login():
 
         if user is not None:
             if verify_password(form.password.data, user.password):
-                login_user(user)
-                flash('success Logged in successfully, {}'.format(user.name))
-                return redirect(request.args.get('next') or url_for('meetings.home'))
-
                 if user.is_authenticated():
                     login_user(user)
 
@@ -107,6 +103,7 @@ def login():
                 return redirect(url_for('auth.login'))
         else:
             flash('error Please Make Sure You Have Activated Your Account.')
+            return redirect(url_for('auth.login'))
     flash('error Invalid Email or Password.')
     return redirect(url_for('auth.login'))
 

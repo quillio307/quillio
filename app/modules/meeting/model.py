@@ -41,3 +41,7 @@ class MeetingUpdateForm(Form):
 
 class MeetingDeleteForm(Form):
     meeting_id = StringField('Meeting ID', [validators.Required()])
+
+
+class KeywordsForm(Form):
+    keywords = StringField('Keywords', [validators.Required()])
