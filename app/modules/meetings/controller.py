@@ -88,7 +88,7 @@ def create_meeting(form=None):
                         u.meetings.append(m)
                         u.save()
 
-                    flash('success New Meeting has been Created with Member(s): {}'.format(", ".join(valid_emails)))
+                    flash('success New Meeting Created with Member(s): {}'.format(", ".join(valid_emails)))
                     return redirect(request.args.get('next') or url_for('meetings.home'))
                 else:
                     # determine the invalid emails
