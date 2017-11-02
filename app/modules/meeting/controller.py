@@ -271,10 +271,10 @@ def search_meetings(query):
     return render_template('meeting/dashboard.html', meetings=meetings)
 
 
-<<<<<<< HEAD
+#<<<<<<< HEAD
 
-=======
->>>>>>> AJ-meeting-modal
+#=======
+#>>>>>>> AJ-meeting-modal
 # CODE FOR REFERENCE
 
 
@@ -293,23 +293,31 @@ def meeting_info(meeting_id):
             flash('error An Error Occured. {}'.format(str(e)))
             return redirect(request.args.get('next') or url_for('meetings.home'))
     flash('error Invalid Meeting Id.')
-<<<<<<< HEAD
+#<<<<<<< HEAD
     return redirect(request.args.get('next') or url_for('meeting.meetings_page'))
 
 
-@meeting.route('/<string:meeting_id>/tags')
+@meetings.route('/<string:meeting_id>/tags', methods=['GET'])
 @login_required
 def get_tags(meeting_id):
-    if len(meeting_id) == 24 and all(c in string.hexdigits for c in meeting_id):
-        try:
-            meeting = Meeting.objects.get(id=meeting_id)
-            r = Rake() #initializes Rake with English (all punc) as default lang
-            string = "THIS SOME MOTHERFUCKING SAMPLE TEXT.An object that moves at a velocity greater than that of light is currently called a tachyon. No tachyon has ever been observed, but if it lost some of its kinetic energy, then (according to special relativity) it would speed up. It would have zero energy at infinite speed.Such a particle would have to have imaginary rest mass, but that’s not a serious problem, since the particle could never be brought to rest.The more serious issue is that for such a particle there is a valid reference frame in which it is moving backwards. So, for example, if you kill someone with a tachyon bullet, there would be a valid physics frame of reference in which the person was killed before you pull the trigger.(You could use this as a defense in a court of law by asking for a change of venue” to a different frame of reference. “Your honor”, you would say, “I’m innocent because the victim was dead before I pulled the trigger.This scenario doesn’t"
-            string = string +"violate physics, but it does violate a sense of free will. In that frame the death caused you to pull the trigger. I call this scenario the “tachyon murder paradox” and I discuss it in my book.This scenario explains why I have not bothered to look for tachyons. They are incompatible with free will. So if I found one, I couldn’t take any credit for doing so; it wasn’t my free will to do the experiment."
+    #return 'Tags: Coming Soon to a Quillio near you!'
+    #if len(meeting_id) == 24 and all(c in string.hexdigits for c in meeting_id):
+    #try:
+    #flash('tags')
+    #meeting = Meeting.objects.get(id=meeting_id)
+    r = Rake() #initializes Rake with English (all punc) as default lang
+    string = "THIS SOME SAMPLE TEXT.An object that moves at a velocity greater than that of light is currently called a tachyon. No tachyon has ever been observed, but if it lost some of its kinetic energy, then (according to special relativity) it would speed up. It would have zero energy at infinite speed.Such a particle would have to have imaginary rest mass, but that’s not a serious problem, since the particle could never be brought to rest.The more serious issue is that for such a particle there is a valid reference frame in which it is moving backwards. So, for example, if you kill someone with a tachyon bullet, there would be a valid physics frame of reference in which the person was killed before you pull the trigger.(You could use this as a defense in a court of law by asking for a change of venue” to a different frame of reference. “Your honor”, you would say, “I’m innocent because the victim was dead before I pulled the trigger.This scenario doesn’t"
+    r.extract_keywords_from_text(string)
+    tag_data=r.get_ranked_phrases()
+    #flash(r.get_ranked_phrases())
+    #console.log(r.get_ranked_phrases())
+    #string = string +"violate physics, but it does violate a sense of free will. In that frame the death caused you to pull the trigger. I call this scenario the “tachyon murder paradox” and I discuss it in my book.This scenario explains why I have not bothered to look for tachyons. They are incompatible with free will. So if I found one, I couldn’t take any credit for doing so; it wasn’t my free will to do the experiment."
 
-            return r.get_ranked_phrases()
-        except Exception as e:
-            flash('error An Error has occurred, Please Try Again. {}'.format(e))
-=======
-    return redirect(request.args.get('next') or url_for('meetings.meetings_page'))
->>>>>>> AJ-meeting-modal
+    #return r.get_ranked_phrases()
+    return render_template('meeting/tags.html', tags=tag_data)
+
+    #except Exception as e:
+    #    flash('error An Error has occurred, Please Try Again. {}'.format(e))
+#=======
+    #return redirect(request.args.get('next') or url_for('meetings.meetings_page'))
+#>>>>>>> AJ-meeting-modal

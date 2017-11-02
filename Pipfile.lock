@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e4246175bf9abfc6fc959b46f14cd64c124a79503af93de3bf742a61adffffa6"
+            "sha256": "12cc200e859c0905b15f4ec9cf50a443094d87155378313aafd65b3f61b5cfe5"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -292,6 +292,13 @@
             ],
             "version": "==0.14.3"
         },
+        "nltk": {
+            "hashes": [
+                "sha256:2661f9971d983db314bbebd51ba770811a362c6597fd0f303bb1d3beadcb4834",
+                "sha256:8a3bad9ff7f67d2828a7915c2fab93e6ca910c2015ef40799e1805fccf2354e5"
+            ],
+            "version": "==3.2.5"
+        },
         "passlib": {
             "hashes": [
                 "sha256:43526aea08fa32c6b6dbbbe9963c4c767285b78147b7437597f992812f69d280",
@@ -402,6 +409,12 @@
                 "sha256:fae4cffc040921b8a2d60c6cf0b5d662c1190fe54d718271db4eb17d44a185b7"
             ],
             "version": "==2017.3"
+        },
+        "rake-nltk": {
+            "hashes": [
+                "sha256:fb3893429b37da334203ec5c8947def9da9f6aa2e4dbe35376def96402bbff44"
+            ],
+            "version": "==1.0.1"
         },
         "sendgrid": {
             "hashes": [
