@@ -49,7 +49,7 @@ Installation steps were taken as follows:
 All set config variables should be displayed with the correct value. 
 
 ### Information on Email Testing Protocol
-Since our emailing service is run through a third party server, all tests were completed through Postman. Links sent in emails with private tokens and secure email addresses were run through postman to affirm that the appropriate responses came through with each post request. Other manual tests were ran that stress tested input, such as invalid email addresses, in order to affirm that our code was robust enough to handle production level input. 
+Since our emailing service is run through a third party server, all tests were completed through Postman. Links sent in emails with private tokens and secure email addresses were run through postman to affirm that the appropriate responses came through with each post request. Other manual tests were ran that stress tested input, such as invalid email addresses, in order to affirm that our code was robust enough to handle production level input. We also used the SendGrid API dashboard to monitor email usage statistics (sent, received, viewed, etc). 
 
 
 ## Missing Config.py File
