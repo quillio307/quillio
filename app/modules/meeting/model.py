@@ -18,6 +18,7 @@ class Meeting(db.Document):
     created_at_str = db.StringField(default=dt.now().strftime('%m-%d-%Y'))
     meta = {'strict': False}
 
+#need a class for updating tags
 
 class MeetingCreateForm(Form):
     name = StringField('Meeting Name', [validators.Length(min=3, max=100),
