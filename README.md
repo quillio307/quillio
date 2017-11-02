@@ -56,4 +56,4 @@ Since our emailing service is run through a third party server, all tests were c
 In order to keep sensitive data private and secure, such as API keys, security salts, and database urls, the config.py file is not included in this repository. Any future contributers to this project (outside of the members of the project that have access to code locally) will have to be given access to the config file contents in order to develop and test with our software. 
 
 ## Unit Tests
-All unit tests and integration tests for Quillio can be found in the quillio-test repository listed under the quillio organization on Github. Unit tests were written using the Mocha JS Framework. 
+All unit tests and integration tests for Quillio can be found in the quillio-test repository listed under the [quillio organization](https://github.com/quillio307). Unit tests were written using the Mocha JS Framework. 
