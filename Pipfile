@@ -1,21 +1,23 @@
 [[source]]
+
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 
+
 [dev-packages]
+
+
 
 [packages]
 
 flask = "*"
 gunicorn = "*"
 "pep8" = "*"
-"flask-login" = "*"
-"flask-wtf" = "*"
-"flask-mongoengine" = "*"
-"flask-security" = "*"
-"flask-testing" = "*"
-<<<<<<< HEAD
-=======
-"flask-sendgrid" = "*"
+flask-login = "*"
+flask-wtf = "*"
+flask-mongoengine = "*"
+flask-security = "*"
+flask-testing = "*"
+flask-sendgrid = "*"
 sendgrid = "==3.6.5"
->>>>>>> 65800b66555d7c07450fbd514939f386589f2a5e
+config = "*"
