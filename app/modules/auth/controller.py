@@ -4,7 +4,6 @@ import secrets
 from app import app
 from app.modules.auth.model import User, SignupForm, LoginForm, mail, \
     user_datastore, PasswordResetRequestForm, PasswordResetForm
-
 from flask import Blueprint, render_template, flash, request, redirect, url_for
 from flask_security import login_user, logout_user, login_required, \
     current_user
