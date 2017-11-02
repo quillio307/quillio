@@ -19,6 +19,14 @@ class Meeting(db.Document):
     meta = {'strict': False}
 
 
+    def is_in_meeting(self, user):
+        """ Determines if a User is allowed in this meeting """
+        if user in self.members:
+            return True
+        return False
+
+
+
 class MeetingCreateForm(Form):
     name = StringField('Meeting Name', [validators.Length(min=3, max=100),
                                         validators.DataRequired()])
@@ -35,3 +43,7 @@ class MeetingUpdateForm(Form):
 
 class MeetingDeleteForm(Form):
     meeting_id = StringField('Meeting ID', [validators.Required()])
+
+
+class KeywordsForm(Form):
+    keywords = StringField('Keywords', [validators.Required()])

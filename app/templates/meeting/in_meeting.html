@@ -1,0 +1,59 @@
+{% extends"helpers/dashboard.html" %} {% block title %}Meeting In Progress{% endblock %}
+
+{% block main %}
+
+<!-- Keywords Modal -->
+<div class="modal fade" id="keywordsModal" tabindex="-1" role="dialog" aria-labelledby="keywordsModal" aria-hidden="true">
+    <div class="modal-dialog cascading-modal" role="document">
+        <div class="modal-content">
+            <div class="modal-header darken-3 white-text" style="background-color: #45526E">
+                <h4 class=" title">
+                    <i class="fa fa-pencil"></i>
+                    Insert Keywords
+                </h4>
+                <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            {% if current_user.id == meeting.owner.id %}
+            <form>
+                <div class="modal-body mb-0">
+                    <div class="md-form form-sm">
+                        <input type="text" id="keywords" name="keywords" value="{{ request.form.keywords }}" class="form-control" required>
+                        <label for="name"> Keywords (Separate each keyword by a space) </label>
+                    </div>
+
+                    <div class="text-center mt-1-half">
+                        <button id="insertKeywordButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="sendKeywords" formmethod="post">
+                            Submit 
+                            <i class="fa fa-send ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<!-- \Keywords Modal -->
+
+<div class="jumbotron">
+    <h1 class="h1-responsive"> {{ meeting.title }} </h1>
+    <button type="button" class="btn btn-success" id="start" data-toggle="modal" data-target="#insertKeywords"> Start </button>
+    <button type="button" class="btn btn-danger" id="end"> End </button>
+    <br>
+    <ul id="msgboard"></ul>
+    <br>
+    <a class="btn-floating btn-lg pkColor" id="mic" style="background:gray;">
+        <i class="fa fa-microphone fa-5x"></i>
+    </a>
+     <audio id="player" controls></audio>
+</div>
+
+{% endblock %}
+
+{% block js_import %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script type="text/javascript" src="/static/js/in_meeting.js"></script>
+{% endblock %}
