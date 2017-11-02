@@ -26,17 +26,9 @@ def filter_form(form):
     elif form['submit'] == 'delete':
         return delete_meeting(form)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     flash('Could not Fulfill Request. Please Try Again.')
     return redirect(url_for('meeting.home'))
-=======
-    flash('error Could not Fulfill Request. Please Try Again.')
-    return redirect(url_forl('meeting.home'))
->>>>>>> 72b1364719044081134a7cde4f4651e806b1d349
-=======
-    flash('error Could not Fulfill Request. Please Try Again.')
-    return redirect(url_for('meetings.home'))
+
 
 
 @meetings.route('/edit/<id>', methods=['GET', 'POST'])
@@ -55,7 +47,7 @@ def edit_meeting(id):
             return redirect(request.args.get('next') or url_for('meetings.home'))
     flash('error Invalid Meeting Id.')
     return redirect(request.args.get('next') or url_for('meetings.home'))
->>>>>>> 6d4eca2428cafe020bb75f7b22ccd65464502f71
+#>>>>>>> 6d4eca2428cafe020bb75f7b22ccd65464502f71
 
 
 @meetings.route('/', methods=['GET', 'POST'])
