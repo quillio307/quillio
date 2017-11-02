@@ -1,4 +1,3 @@
-import os
 import secrets
 
 from app import app
@@ -21,37 +20,40 @@ def signup():
     if request.method == 'GET':
         return render_template('auth/signup.html', form=form)
 
-    if form.validate():
-        try:
-            # generate activation token
-            activation_token = secrets.token_urlsafe(32)
+    # user has sent invalid input
+    if not form.validate():
+        flash('error Invalid Email or Password')
+        return redirect(url_for('auth.signup'))
 
-            # send registration email
-            mail.send_email(
-                from_email=app.config['SENDGRID_DEFAULT_FROM'],
-                to_email=form.email.data,
-                subject='Welcome to Quillio',
-                html=activate_html(form.name.data, activation_token,
-                                   form.email.data)
-            )
+    try:
+        # generate activation token
+        activation_token = secrets.token_urlsafe(32)
 
-            # add user to the database
-            user_datastore.create_user(
-                email=form.email.data,
-                name=form.name.data,
-                password=hash_password(form.password.data),
-                activation_hash=hash_password(activation_token),
-                active=True,
-                authenticated=False
-            )
+        # send registration email
+        mail.send_email(
+            from_email=app.config['SENDGRID_DEFAULT_FROM'],
+            to_email=form.email.data,
+            subject='Welcome to Quillio',
+            html=activate_html(form.name.data, activation_token,
+                               form.email.data)
+        )
 
-            return render_template('auth/activation_request.html')
-        except Exception as e:
-            flash('error An Error has Occured, Please Try Again! {}'.format(e))
-            return redirect(url_for('auth.signup'))
+        # add user to the database
+        user_datastore.create_user(
+            email=form.email.data,
+            name=form.name.data,
+            password=hash_password(form.password.data),
+            activation_hash=hash_password(activation_token),
+            active=True,
+            authenticated=False
+        )
 
-    flash('error Invalid Email or Password')
-    return redirect(url_for('auth.signup'))
+        flash('Please Check Your Email For An Activation Request.')
+        return redirect(url_for('auth.login'))
+    except Exception as e:
+        print(str(e))
+        flash('error An Error has Occured, Please Try Again!')
+        return redirect(url_for('auth.signup'))
 
 
 @auth.route('/activate/<activation_token>/<email>', methods=['GET'])
@@ -60,20 +62,21 @@ def activate_account(activation_token, email):
         signing up. """
 
     user = user_datastore.find_user(email=email)
-    if user is not None:
-        if verify_password(activation_token, user.activation_hash):
-            user.authenticated = True
-            user.save()
 
-            login_user(user)
-            flash("success Successfully Authenticated account!")
-            return redirect(url_for('meeting.home'))
-        else:
-            flash('error Could not Validate Activation Token.')
-            return redirect(url_for('auth.signup'))
+    if user is None:
+        flash('error Invalid Email, Please Create an Account.')
+        return redirect(url_for('auth.signup'))
 
-    flash("error Invalid Email, Please Create an Account.")
-    return redirect(url_for('auth.signup'))
+    if not verify_password(activation_token, user.activation_hash):
+        flash('error Could not Validate Activation Token.')
+        return redirect(url_for('auth.signup'))
+
+    user.authenticated = True
+    user.save()
+
+    login_user(user)
+    flash("success Successfully Authenticated account!")
+    return redirect(url_for('meetings.home'))
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -85,26 +88,31 @@ def login():
     if request.method == 'GET':
         return render_template('auth/login.html', form=form)
 
-    if form.validate():
-        user = user_datastore.find_user(email=form.email.data)
+    if not form.validate():
+        flash('error Invalid Email or Password.')
+        return redirect(url_for('auth.login'))
 
-        if user is not None:
-            if verify_password(form.password.data, user.password):
-                if user.is_authenticated():
-                    login_user(user)
+    user = user_datastore.find_user(email=form.email.data)
 
-                    flash('success Logged in Successfully, {}'.format(user.name))
-                    return redirect(request.args.get('next') or url_for('meeting.home'))
-                else:
-                    flash('error Please Authenticate Your Account.')
-                    return redirect(url_for('auth.login'))
-            else:
-                flash('error Invalid Email or Password.')
-                return redirect(url_for('auth.login'))
-        else:
-            flash('error Please Make Sure You Have Activated Your Account.')
-    flash('error Invalid Email or Password.')
-    return redirect(url_for('auth.login'))
+    # user does not exist
+    if user is None:
+        flash('error Please Make Sure You Have Created an Account.')
+        return redirect(url_for('auth.signup'))
+
+    # user provided invalid password
+    if not verify_password(form.password.data, user.password):
+        flash('error Invalid Email or Password.')
+        return redirect(url_for('auth.login'))
+
+    # user has not authenticated their account
+    if not user.is_authenticated():
+        flash('error Please Authenticate Your Account.')
+        return redirect(url_for('auth.login'))
+
+    login_user(user)
+
+    flash('success Logged in Successfully, {}'.format(user.name))
+    return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
 @auth.route('/forgot_password', methods=['GET', 'POST'])
@@ -116,30 +124,38 @@ def forgot_password():
     if request.method == 'GET':
         return render_template('auth/password_reset_request.html', form=form)
 
-    if form.validate():
-        user = user_datastore.find_user(email=form.email.data)
-        if user is not None:
-            # generate reset token
-            reset_token = secrets.token_urlsafe(32)
+    if not form.validate():
+        flash('error Could not Reset Password at this Time.')
+        return redirect(url_for('auth.signup'))
 
-            # update the user's password reset hash
-            user.password_reset_hash = hash_password(reset_token)
-            user.save()
+    user = user_datastore.find_user(email=form.email.data)
 
-            # send the password reset email
-            mail.send_email(
-                from_email=app.config['SENDGRID_DEFAULT_FROM'],
-                to_email=user.email,
-                subject='Quillio Reset Password',
-                html=password_html(user.name, reset_token, form.email.data)
-            )
+    if user is None:
+        flash('error Invalid Email. Please Create an Account.')
+        return redirect(url_for('auth.signup'))
 
-            return render_template('auth/reset_confirmation.html')
-        else:
-            flash('error Invalid Email. Please Create an Account.')
-            return redirect(url_for('auth.signup'))
-    flash('error Could not Reset Password at this Time.')
-    return redirect(url_for('auth.signup'))
+    # generate reset token
+    reset_token = secrets.token_urlsafe(32)
+
+    # update the user's password reset hash
+    user.password_reset_hash = hash_password(reset_token)
+    user.save()
+
+    try:
+        # send the password reset email
+        mail.send_email(
+            from_email=app.config['SENDGRID_DEFAULT_FROM'],
+            to_email=user.email,
+            subject='Quillio Reset Password',
+            html=password_html(user.name, reset_token, form.email.data)
+        )
+
+        flash('success Please Check Your Email For a Reset Confirmation.')
+        return redirect(url_for('auth.login'))
+    except Exception as e:
+        print(str(e))
+        flash('error Could Not Send Reset Request.')
+        return redirect(url_for('auth.login'))
 
 
 @auth.route('/reset_password/<reset_token>/<email>', methods=['GET'])
@@ -148,16 +164,15 @@ def reset_password(reset_token, email):
 
     user = user_datastore.find_user(email=email)
 
-    if user is not None:
-        if verify_password(reset_token, user.password_reset_hash):
-            return redirect(url_for('auth.reset_form', email=email))
-        else:
-            flash('error Could not Validate Reset Request. Please Try Again.')
-            return redirect(url_for('auth.login'))
+    if user is None:
+        flash('error Unable To Process Reset Request. Please Try Agiain.')
+        return redirect(url_for('auth.login'))
 
-    # Could not find user
-    flash('error Unable to Process Reset Request, Please Try Again.')
-    return redirect(url_for('auth.login'))
+    if not verify_password(reset_token, user.password_reset_hash):
+        flash('error Could not Validate Reset Request. Please Try Again.')
+        return redirect(url_for('auth.login'))
+
+    return redirect(url_for('auth.reset_form', email=email))
 
 
 @auth.route('/reset_form/<email>', methods=['GET', 'POST'])
@@ -169,20 +184,21 @@ def reset_form(email):
     if request.method == 'GET':
         return render_template('auth/password_reset.html', form=form)
 
-    if form.validate():
-        user = user_datastore.find_user(email=email)
-        if user is not None:
-            # update the user's password
-            user.password = hash_password(form.password.data)
-            user.save()
+    if not form.validate():
+        flash("error An Error has Occurred, Please try again.")
+        return redirect(url_for('auth.login'))
 
-            flash("success Password Successfully Reset!")
-            return redirect(url_for('auth.login'))
-        else:
-            flash('error Could Not Find the Specified User.')
-            return redirect(url_for('auth.login'))
+    user = user_datastore.find_user(email=email)
 
-    flash("error An Error has Occurred, Please try again.")
+    if user is None:
+        flash('error Could Not Find the Specified User.')
+        return redirect(url_for('auth.login'))
+
+    # update the user's password
+    user.password = hash_password(form.password.data)
+    user.save()
+
+    flash("success Password Successfully Reset!")
     return redirect(url_for('auth.login'))
 
 
@@ -203,7 +219,7 @@ def invite_user(email):
     except Exception as e:
         flash('error Could not Create Invitation. {}'.format(e))
 
-    return redirect(request.args.get('next') or url_for('meeting.home'))
+    return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
 @auth.route('/logout')
