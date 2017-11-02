@@ -1,4 +1,5 @@
 import secrets
+import json
 
 from app import app
 from app.modules.auth.model import User, SignupForm, LoginForm, mail, \
@@ -220,6 +221,13 @@ def invite_user(email):
         flash('error Could not Create Invitation. {}'.format(e))
 
     return redirect(request.args.get('next') or url_for('meetings.home'))
+
+
+@auth.route('/getUser')
+@login_required
+def get_user():
+    usr = current_user._get_current_object()
+    return json.dumps({'name': usr.name, 'email': usr.email, 'id': str(usr.id)})
 
 
 @auth.route('/logout')
