@@ -95,7 +95,10 @@
 <!-- \Row -->
 
 {% endblock %} {% block js_import %}
+<!-- script for quill.js -->
 <script src="https://cdn.quilljs.com/1.3.3/quill.js"></script>
+<!-- \script for quill.js -->
+<!-- script for quill.js configuration -->
 <script>
     var quill = new Quill('#editor', {
         modules: {
@@ -121,7 +124,10 @@
         quill.enable(false)
     }
 </script>
+<!-- \script for quill.js configuration -->
+<!-- script for sidenav collapse -->
 <script>
     $(".button-collapse").sideNav();
 </script>
+<!-- \script for sidenav collapse -->
 {% endblock %}
