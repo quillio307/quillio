@@ -189,7 +189,7 @@ def delete_meeting(form=None):
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
     delete_form = MeetingDeleteForm(form)
-    
+
     if not delete_form.validate():
         flash('error Could not Delete Meeting, Please Try Again.')
         return redirect(request.args.get('next') or url_for('meetings.home'))
@@ -298,22 +298,46 @@ def meeting_info(meeting_id):
         flash('error An Error Occured')
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
-
-@meetings.route('/<string:meeting_id>/tags', methods=['GET'])
+@meetings.route('/<meeting_id>/tags', methods=['GET'])
 @login_required
 def get_tags(meeting_id):
-    # return 'Tags: Coming Soon to a Quillio near you!'
-    # try:
+    #return 'Tags: Coming Soon to a Quillio near you!'
+    #try:
+    print(meeting_id)
+    mtng = Meeting.objects.with_id(meeting_id)
+    print(mtng.transcript[0].transcription)
+    #tranmscript = meeting.transcript
 
-    meeting = Meeting.objects.get(id=meeting_id)
-    meeting
-    r = Rake()  # initializes Rake with English (all punc) as default lang
-    string = "THIS SOME SAMPLE TEXT.An object that moves at a velocity greater than that of light is currently called a tachyon. No tachyon has ever been observed, but if it lost some of its kinetic energy, then (according to special relativity) it would speed up. It would have zero energy at infinite speed.Such a particle would have to have imaginary rest mass, but that’s not a serious problem, since the particle could never be brought to rest.The more serious issue is that for such a particle there is a valid reference frame in which it is moving backwards. So, for example, if you kill someone with a tachyon bullet, there would be a valid physics frame of reference in which the person was killed before you pull the trigger.(You could use this as a defense in a court of law by asking for a change of venue” to a different frame of reference. “Your honor”, you would say, “I’m innocent because the victim was dead before I pulled the trigger.This scenario doesn’t"
+
+    r = Rake() #initializes Rake with English (all punc) as default lang
+    string = "Conservatism often punches down."
+    #string = string + "Just today I read something by a lady describing why she is a conservative. Basically, she was on welfare for awhile but because she worked hard and got an education it made her feel angry at anyone who received benefits for their children through the headstart program… Think about that for a minute, this self-professed Christian woman is basically saying that it’s not right that children born to families poorer than hers should be given these benefits because it’s “unfair”. I can’t help but "
+    #string = string + "feel like that’s a whole collection of sins ranging from envy to lack of compassion, not to mention that it’s extremely judgmental because she had no information other than what she observed from a distance."
+    #string = string + "Can you imagine if everyone who was higher up in the social strata thought that way about everyone less fortunate? In that scenario, I could dismiss her as someone who doesn’t deserve anything from the rest of us because well, I’ve managed to live my life without taking any benefits from anyone, she should just work harder. Also screw her children, they had the bad luck to be born into the wrong family. Pretty nasty right? "
+    #string = string +" These kinds of statements are something I hear with regularity from conservatives and it disappoints me because I think that it’s just a lie that has been told over and over again so that too many people believe it. The myth of the lazy poor person that is “taking your benefits” really needs to die. It’s petty, cruel and beneath people of good moral character, whether liberal or conservative."
     r.extract_keywords_from_text(string)
-    tag_data = r.get_ranked_phrases()
-    # need to save tags into database (field already exists)
-    # need to correctly format tags page
-    # need to connect function to transcript saved in database for retreived meeting
-    # need to do a little more research into RAKE_NLTK --> remove punctuation from keywords
-    # write algorithm to only return highest-ranked keywords (tbd)
-    return render_template('meeting/tags.html', tags=tag_data)
+    #tag_data=r.get_ranked_phrases_with_scores()
+    #tag_data=r.get_word_degrees()
+    #flash(r._generate_phrases(string))
+    tag_data=r.get_ranked_phrases_with_scores()
+    count = 0
+    return_data = []
+    for tag in tag_data:
+        if tag[0] < 5 or count == 10:
+            break
+        else:
+            return_data.append(str(tag[1]))
+            count = count + 1
+
+    #need to save tags into database (field already exists)
+    #need to correctly format tags page
+    #need to connect function to transcript saved in database for retreived meeting
+    #need to do a little more research into RAKE_NLTK --> remove punctuation from keywords
+    #write algorithm to only return highest-ranked keywords (tbd)
+    return render_template('meeting/tags.html', tags=return_data)
+
+    #except Exception as e:
+    #    flash('error An Error has occurred, Please Try Again. {}'.format(e))
+#=======
+    #return redirect(request.args.get('next') or url_for('meetings.meetings_page'))
+#>>>>>>> AJ-meeting-modal
