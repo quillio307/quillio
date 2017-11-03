@@ -324,17 +324,17 @@ def get_tags(meeting_id):
     #tag_data=r.get_ranked_phrases_with_scores()
     #tag_data=r.get_word_degrees()
     #flash(r._generate_phrases(string))
-    tag_data=r.get_ranked_phrases_with_scores()
+    topic_data=r.get_ranked_phrases_with_scores()
     count = 0
     return_data = []
-    for tag in tag_data:
-        if tag[0] < 5 or count == 10:
+    for topic in topic_data:
+        if topic[0] < 5 or count == 10:
             break
         else:
-            return_data.append(str(tag[1]))
+            return_data.append(str(topic[1]))
             count = count + 1
 
-    meeting.tags = meeting.tags + return_data
+    meeting.topics = meeting.topics + return_data
     meeting.save()
     #need to save tags into database (field already exists)
     #need to correctly format tags page
