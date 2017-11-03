@@ -39,6 +39,7 @@ def meeting_page(meeting_id):
         return
     if meeting.status() is 2:
         abort(400)
+        return
     return render_template('meeting/in_meeting.html', meeting={'title': meeting.name})
 
 
@@ -60,31 +61,37 @@ def on_join(data):
 @authenticated_only
 def start_meeting(data):
     meeting = Meeting.objects.with_id(data['room_id'])
-    meeting.status = 1
-    emit('startMeeting', room=data['room'])
+    meeting.active = True
+    meeting.save()
+    emit('startMeeting', room=data['room_id'])
 
 
 @socketio.on('end', namespace='/meeting')
 @authenticated_only
 def start_meeting(data):
     meeting = Meeting.objects.with_id(data['room_id'])
-    meeting.status = 2
-    emit('endMeeting', room=data['room'])
+    meeting.active = False
+    meeting.save()
+    emit('endMeeting', room=data['room_id'])
+    pt = ""
+    for ts in meeting.transcript:
+        pt += '{0}: {1}\n'.format(ts.user.name, ts.transcription)
+    meeting.transcriptText = pt
+    meeting.save()
 
 
 @socketio.on('silenceAll', namespace='/meeting')
 @authenticated_only
 def silence_all(data):
-    emit('silence', {}, room=data['room'], include_self=False)
-    emit('receivemsg', {'data': data['user'] + " is talking."}, room=data['room'])
+    emit('silence', {}, room=data['room_id'], include_self=False)
+    emit('receivemsg', {'data': data['user'] + " is talking."}, room=data['room_id'])
 
 
 @socketio.on('leave', namespace='/meeting')
 @authenticated_only
 def on_leave(data):
-    room = data['room']
-    emit('receivemsg', {'data': current_user.name + ' has left the room.'})
-    leave_room(room)
+    emit('receivemsg', {'data': current_user.name + ' has left the room.'}, room=data['room_id'])
+    leave_room(data['room_id'])
 
 
 @socketio.on('transcription', namespace='/meeting')
@@ -93,15 +100,7 @@ def transcription(data):
     usr = current_user._get_current_object()
     tscript = data['transcript']
     meeting = Meeting.objects.with_id(data['room_id'])
-    if meeting.status is 1:
-        meeting.note.add_transcription(usr, tscript)
+    if meeting.status() is 1:
+        meeting.add_transcription(usr, tscript)
         meeting.save()
         emit('receivemsg', {'data': usr.name + ' - ' + tscript}, room=data['room_id'])
-
-
-@socketio.on('sendmsg', namespace='/meeting')
-@authenticated_only
-def test_message(message):
-    username = message['username']
-    room = message['room']
-    emit('receivemsg', {'data': username + ": " + message['data']}, room=room)
