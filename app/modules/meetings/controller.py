@@ -305,25 +305,16 @@ def get_tags(meeting_id):
     #try:
     print(meeting_id)
     meeting = Meeting.objects.with_id(meeting_id)
-    #print(mtng.transcript[0].transcription)
+
     transcripts = meeting.transcript
     string = ""
     for t in transcripts:
         string = string + t.transcription + "\n"
 
     r = Rake() #initializes Rake with English (all punc) as default lang
-    #string = "Conservatism often punches down."
-    #string = string + "Just today I read something by a lady describing why she is a conservative. Basically, she was on welfare for awhile but because she worked hard and got an education it made her feel angry at anyone who received benefits for their children through the headstart program… Think about that for a minute, this self-professed Christian woman is basically saying that it’s not right that children born to families poorer than hers should be given these benefits because it’s “unfair”. I can’t help but "
-    #string = string + "feel like that’s a whole collection of sins ranging from envy to lack of compassion, not to mention that it’s extremely judgmental because she had no information other than what she observed from a distance."
-    #string = string + "Can you imagine if everyone who was higher up in the social strata thought that way about everyone less fortunate? In that scenario, I could dismiss her as someone who doesn’t deserve anything from the rest of us because well, I’ve managed to live my life without taking any benefits from anyone, she should just work harder. Also screw her children, they had the bad luck to be born into the wrong family. Pretty nasty right? "
-    #string = string +" These kinds of statements are something I hear with regularity from conservatives and it disappoints me because I think that it’s just a lie that has been told over and over again so that too many people believe it. The myth of the lazy poor person that is “taking your benefits” really needs to die. It’s petty, cruel and beneath people of good moral character, whether liberal or conservative."
-    #print(string)
-    #string = "Fuck you This is a test meeting I am creating transcription objects My name is Anoop I am a God. Just reiterating, this is a meeting This is definitely just a meeting"
     r.extract_keywords_from_text(string)
     print(r.get_ranked_phrases)
-    #tag_data=r.get_ranked_phrases_with_scores()
-    #tag_data=r.get_word_degrees()
-    #flash(r._generate_phrases(string))
+
     topic_data=r.get_ranked_phrases_with_scores()
     count = 0
     return_data = []
@@ -336,15 +327,4 @@ def get_tags(meeting_id):
 
     meeting.topics = meeting.topics + return_data
     meeting.save()
-    #need to save tags into database (field already exists)
-    #need to correctly format tags page
-    #need to connect function to transcript saved in database for retreived meeting
-    #need to do a little more research into RAKE_NLTK --> remove punctuation from keywords
-    #write algorithm to only return highest-ranked keywords (tbd)
     return render_template('meeting/tags.html', tags=return_data)
-
-    #except Exception as e:
-    #    flash('error An Error has occurred, Please Try Again. {}'.format(e))
-#=======
-    #return redirect(request.args.get('next') or url_for('meetings.meetings_page'))
-#>>>>>>> AJ-meeting-modal
