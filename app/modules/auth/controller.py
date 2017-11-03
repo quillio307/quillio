@@ -5,7 +5,8 @@ from app import app
 from app.modules.auth.model import User, SignupForm, LoginForm, mail, \
     user_datastore, PasswordResetRequestForm, PasswordResetForm
 
-from flask import Blueprint, render_template, flash, request, redirect, url_for
+from flask import Blueprint, render_template, flash, request, redirect, \
+    url_for, jsonify, abort
 from flask_security import login_user, logout_user, login_required, \
     current_user
 from flask_security.utils import hash_password, verify_password
@@ -17,33 +18,42 @@ auth = Blueprint('auth', __name__)
 def signup():
     """ Signs the Current User In """
 
-    form = SignupForm(request.form)
     if request.method == 'GET':
-        return render_template('auth/signup.html', form=form)
+        return render_template('auth/signup.html', form=SignupForm())
 
-    # user has sent invalid input
+    form = SignupForm(request.form)
+
     if not form.validate():
         flash('error Invalid Email or Password')
         return redirect(url_for('auth.signup'))
 
+    name = form.name.data
+    email = form.email.data
+    password = form.password.data
+
     try:
+        # validate that the user does not already exist
+        if User.objects(email__exact=email).count() != 0:
+            flash('error An Account Is Already Using That Email.')
+            return redirect(url_for('auth.login'))
+
         # generate activation token
         activation_token = secrets.token_urlsafe(32)
 
         # send registration email
         mail.send_email(
             from_email=app.config['SENDGRID_DEFAULT_FROM'],
-            to_email=form.email.data,
+            to_email=email,
             subject='Welcome to Quillio',
-            html=activate_html(form.name.data, activation_token,
-                               form.email.data)
+            html=activate_html(name, activation_token,
+                               email)
         )
 
         # add user to the database
         user_datastore.create_user(
-            email=form.email.data,
-            name=form.name.data,
-            password=hash_password(form.password.data),
+            email=email,
+            name=name,
+            password=hash_password(password),
             activation_hash=hash_password(activation_token),
             active=True,
             authenticated=False
@@ -84,16 +94,22 @@ def activate_account(activation_token, email):
 def login():
     """ Creates a session for the current user """
 
-    form = LoginForm(request.form)
-
     if request.method == 'GET':
-        return render_template('auth/login.html', form=form)
+        return render_template('auth/login.html', form=LoginForm())
 
+    # if not request.form:
+    #     data = request.get_json()
+    #     email = data['email']
+    #     password = data['password']
+    # else:
+    form = LoginForm(request.form)
     if not form.validate():
         flash('error Invalid Email or Password.')
         return redirect(url_for('auth.login'))
+    email = form.email.data
+    password = form.password.data
 
-    user = user_datastore.find_user(email=form.email.data)
+    user = user_datastore.find_user(email=email)
 
     # user does not exist
     if user is None:
@@ -101,7 +117,7 @@ def login():
         return redirect(url_for('auth.signup'))
 
     # user provided invalid password
-    if not verify_password(form.password.data, user.password):
+    if not verify_password(password, user.password):
         flash('error Invalid Email or Password.')
         return redirect(url_for('auth.login'))
 
@@ -238,6 +254,38 @@ def logout():
     logout_user()
     flash('success Successfully Logged Out')
     return redirect(url_for('auth.login'))
+
+
+@auth.route('/delete', methods=['POST'])
+def delete_user():
+    form = LoginForm(request.form)
+    if not form.validate():
+        flash('error Could Not Delete User')
+        return redirect(url_for('auth.login'))
+
+    email = form.email.data
+    password = form.password.data
+
+    try:
+        user = User.objects.get(email=email)
+    except Exception as e:
+        return jsonify({'error': 'user not found'})
+
+    if not verify_password(password, user.password):
+        return jsonify({'error': 'invalid password'})
+
+    meetings = user.meetings
+    for meeting in meetings:
+        meeting.members.remove(user)
+
+    groups = user.groups
+    for group in groups:
+        group.members.remove(user)
+        group.admins.remove(user)
+
+    user.delete()
+
+    return jsonify({'success': True})
 
 
 def activate_html(name, token, email):
