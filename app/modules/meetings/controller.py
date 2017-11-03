@@ -97,7 +97,7 @@ def create_meeting(form=None):
 
         # validate and create the meeting
         m = Meeting(name=create_form.name.data,
-                    members=query, owner=user, active=True).save()
+                    members=query, owner=user, active=False).save()
 
         # insert the meeting in each user's list of meetings
         for u in query:
