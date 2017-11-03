@@ -337,7 +337,7 @@ def update_transcript(meeting_id):
     """ """
     if request.form is None:
         print('Form is invalid')
-    
+
     transcript = request.form['transcript']
 
     if transcript is None:
