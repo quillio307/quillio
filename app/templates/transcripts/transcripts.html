@@ -62,22 +62,23 @@
                     <div class="card-header quillioColor" role="tab" id="headingThree">
                         <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                             <h5 class="white-text">
-                                Topics
+                                Tags
                                 <i class="fa fa-angle-down rotate-icon"></i>
                             </h5>
                         </a>
                     </div>
                     <div id="collapseThree" class="collapse show" role="tabpanel" aria-labelledby="headingThree">
                         <div id="reloadTags" class="card-body">
-                            {% for topic in meeting.topics %} {{ topic }} <br>{% endfor %}
+                            <textarea style="height:auto" class="form-control" id="newTags" rows="8">{% for topic in meeting.topics %}{{ topic }} {% endfor %}</textarea>
+                            <button onclick="saveTags()" id="updateTags" class="btn quillioColor flex-center">Update</button>
                         </div>
                     </div>
                 </div>
-                <div class="card">
+                <!-- <div class="card">
                     <div class="card-header quillioColor" role="tab" id="headingFive">
                         <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
                             <h5 class="white-text">
-                                Tags
+                                Topics
                                 <i class="fa fa-angle-down rotate-icon"></i>
                             </h5>
                         </a>
@@ -86,7 +87,7 @@
                         <div class="card-body">
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -137,6 +138,22 @@
             })
             .then(function() {
                 window.location.href = "/meetings/{{ meeting.id }}/tags"
+            })
+    }
+</script>
+<script>
+    function saveTags() {
+        var tags = $('#newTags').val();
+        var id = `{{ meeting.id }}`
+        const params = new URLSearchParams()
+        params.append('tags', tags)
+
+        fetch('/meetings/{{ meeting.id }}/updateTags', {
+                method: 'POST',
+                body: params
+            })
+            .then(function(res) {
+                console.log(JSON.stringify(res, undefined, 2))
             })
     }
 </script>
