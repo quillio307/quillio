@@ -1,4 +1,4 @@
-{% extends"helpers/dashboard.html" %} {% block title %} Meeting Name Here {% endblock %} {% block main %}
+{% extends"helpers/dashboard.html" %} {% block title %} {{ meeting.name }}{% endblock %} {% block main %}
 <!-- Row -->
 <div class="row">
     <!-- column to split editor from sidebar -->
@@ -15,7 +15,7 @@
                     </a>
                 </div>
                 <div class="col-md-1">
-                    <a class="btn-floating btn-md quillioButton" onclick="saveTranscript()">
+                    <a id="saveTrans" class="btn-floating btn-md quillioButton" onclick="saveTranscript()">
                         <i class="fa fa-save"></i>
                     </a>
                 </div>
@@ -68,8 +68,8 @@
                         </a>
                     </div>
                     <div id="collapseThree" class="collapse show" role="tabpanel" aria-labelledby="headingThree">
-                        <div class="card-body">
-                            <!-- insert topics -->
+                        <div id="reloadTags" class="card-body">
+                            {% for topic in meeting.topics %} {{ topic }} <br>{% endfor %}
                         </div>
                     </div>
                 </div>
@@ -122,6 +122,7 @@
 
     function saveTranscript() {
         var transcript = quill.getText(0, quill.getLength())
+        var id = `{{ meeting.id }}`
         const params = new URLSearchParams()
         params.append('transcript', transcript)
 
@@ -132,6 +133,10 @@
             .then(function(res) {
                 quill.enable(false)
                 console.log(JSON.stringify(res, undefined, 2))
+
+            })
+            .then(function() {
+                window.location.href = "/meetings/{{ meeting.id }}/tags"
             })
     }
 </script>

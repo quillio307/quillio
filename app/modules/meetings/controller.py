@@ -66,7 +66,6 @@ def home():
 @login_required
 def create_meeting(form=None):
     """ Creates a new Meeting. """
-
     if form is None:
         flash('error Invalid Request to Create Meeting.')
         return redirect(request.args.get('next') or url_for('meetings.home'))
@@ -299,17 +298,23 @@ def meeting_info(meeting_id):
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
-@meetings.route('/<string:meeting_id>/tags', methods=['GET'])
+@meetings.route('/<meeting_id>/tags', methods=['GET'])
 @login_required
 def get_tags(meeting_id):
-    # return 'Tags: Coming Soon to a Quillio near you!'
-    # try:
+    #return 'Tags: Coming Soon to a Quillio near you!'
+    #try:
+    meeting = Meeting.objects.with_id(meeting_id)
 
-    meeting = Meeting.objects.get(id=meeting_id)
-    meeting
-    r = Rake()  # initializes Rake with English (all punc) as default lang
-    string = "THIS SOME SAMPLE TEXT.An object that moves at a velocity greater than that of light is currently called a tachyon. No tachyon has ever been observed, but if it lost some of its kinetic energy, then (according to special relativity) it would speed up. It would have zero energy at infinite speed.Such a particle would have to have imaginary rest mass, but that’s not a serious problem, since the particle could never be brought to rest.The more serious issue is that for such a particle there is a valid reference frame in which it is moving backwards. So, for example, if you kill someone with a tachyon bullet, there would be a valid physics frame of reference in which the person was killed before you pull the trigger.(You could use this as a defense in a court of law by asking for a change of venue” to a different frame of reference. “Your honor”, you would say, “I’m innocent because the victim was dead before I pulled the trigger.This scenario doesn’t"
+    # transcripts=meeting.transcript
+    # string = ""
+    # for t in transcripts:
+    #     string = string + t.transcription + "\n"
+
+    string = meeting.transcriptText.replace("\n", " ")
+
+    r = Rake() # initializes Rake with English (all punc) as default lang
     r.extract_keywords_from_text(string)
+    
     topic_data=r.get_ranked_phrases_with_scores()
     count = 0
     return_data = []
@@ -320,14 +325,11 @@ def get_tags(meeting_id):
             return_data.append(str(topic[1]))
             count = count + 1
 
-    meeting.topics = meeting.topics + return_data
-    tag_data = r.get_ranked_phrases()
-    # need to save tags into database (field already exists)
-    # need to correctly format tags page
-    # need to connect function to transcript saved in database for retreived meeting
-    # need to do a little more research into RAKE_NLTK --> remove punctuation from keywords
-    # write algorithm to only return highest-ranked keywords (tbd)
-    return render_template('meeting/tags.html', tags=tag_data)
+    meeting.topics = return_data
+    meeting.save()
+    return redirect(url_for('meetings.edit_meeting', id=meeting_id))
+    #return render_template('#', tags=return_data)
+
 
 @meetings.route('/<meeting_id>/updateTranscript', methods=['POST'])
 def update_transcript(meeting_id):

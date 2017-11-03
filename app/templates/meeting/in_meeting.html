@@ -13,35 +13,30 @@
 </div>
 
 <!--Modal: Contact form-->
-<div class="modal fade" id="createMeetingForm" tabindex="-1" role="dialog" aria-labelledby="createMeetingForm" aria-hidden="true">
+<div class="modal fade" id="insertKeywords" tabindex="-1" role="dialog" aria-labelledby="insertKeywords" aria-hidden="true">
     <div class="modal-dialog cascading-modal" role="document">
         <!--Content-->
         <div class="modal-content">
             <!--Header-->
             <div class="modal-header darken-3 white-text" style="background-color: #45526E">
-                <h4 class=" title"><i class="fa fa-pencil"></i>Create Meeting</h4>
+                <h4 class=" title"><i class="fa fa-pencil"></i>Insert Keywords</h4>
                 <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
             </div>
             <!--Body-->
-            <form>
-                <div class="modal-body mb-0">
-                    <div class="md-form form-sm">
-                        <input type="text" id="name" name="name" value="{{ request.form.name }}" class="form-control" required>
-                        <label for="name"> Meeting Name </label>
-                    </div>
-
-                    <div class="md-form form-sm">
-                        <input type="text" id="emails" name="emails" value="{{ request.form.emails }}" class="form-control" required>
-                        <label for="emails"> Member Emails </label>
-                    </div>
-
-                    <div class="text-center mt-1-half">
-                        <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="create" formmethod="post"> Create <i class="fa fa-send ml-1"></i></button>
-                    </div>
+            <div class="modal-body mb-0">
+                <div class="md-form form-sm">
+                    <input type="text" id="keywords" name="keywords" value="" class="form-control" required>
+                    <label for="keywords"> Insert Keywords </label>
                 </div>
-            </form>
+            </div>
+            <div class="text-center mt-1-half">
+                <button id="keywordAddButton" class="btn btn-mdb mdb-2">
+                            Enter
+                            <i class="fa fa-send ml-1"></i>
+                        </button>
+            </div>
         </div>
         <!--/.Content-->
     </div>
@@ -52,5 +47,6 @@
 <script type="text/javascript" src="/static/js/in_meeting.js"></script>
 <script>
     $(".button-collapse").sideNav();
+    $('#insertKeywords').modal('show');
 </script>
 {% endblock %}
