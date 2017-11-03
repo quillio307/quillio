@@ -17,10 +17,7 @@ In order to implement some features with Quillio, we used the following third pa
 
 * Google Speech to Text API
 * SendGrid Mailing Services
-* ...
-
-
-
+* SMMRY API
 
 
 ## Information on SendGrid
@@ -57,3 +54,7 @@ In order to keep sensitive data private and secure, such as API keys, security s
 
 ## Unit Tests
 All unit tests and integration tests for Quillio can be found in the quillio-test repository listed under the [quillio organization](https://github.com/quillio307). Unit tests were written using the Mocha JS Framework. 
+
+
+## Reasearch on Meeting Summarization
+We researched some information on text summarization during the duration of our second sprint. We researched integrating third party summarization APIs and tools, such as SMMRY API, TensorFlow, and TextSummarizer. We researched the different types of text summarization, of which fulfill different purposes in different applications. We looked into extraction based summarization, abstraction based summarization, and aided summarization. For the purpose of summarizing group meetings (which is the target usage for Quillio). Based on these definitions and our intended uses, we will be using an extraction based summarization algorithm. Of all the APIs we looked into to do summarization, it was determined that SMMRY API was our best option. We worked with the UI version of SMMRY with sample conversational text to test the output and gauge its results in comparison to our needs. During the next sprint, we plan to implement meeting summarization using SMMRY.
