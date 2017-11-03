@@ -354,7 +354,7 @@ def update_tags(meeting_id):
     """ """
     if request.form is None:
         print('Form is invalid')
-    
+
     tags = request.form['tags']
 
     if tags is None:

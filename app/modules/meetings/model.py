@@ -17,7 +17,7 @@ class Meeting(db.Document):
     name = db.StringField(required=True, min_length=3, max_length=50)
     members = db.ListField(db.ReferenceField(User))
     active = db.BooleanField(default=False)
-    tags = db.ListField(db.StringField(min_length=1, max_length=1000))
+    tags = db.ListField(db.StringField(min_length=0, max_length=1000))
     topics = db.ListField(db.StringField(min_length=1, max_length=1000))
     created_at = db.DateTimeField(default=dt.now())
     created_at_str = db.StringField(default=dt.now().strftime('%m-%d-%Y'))
