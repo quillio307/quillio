@@ -101,6 +101,7 @@ function init() {
     });
     socket.on('endMeeting', function () {
         msglog("Meeting Ended");
+        window.location.href = "/meetings";
     });
 
     var msglog = function(txt) {
