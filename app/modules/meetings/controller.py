@@ -255,7 +255,7 @@ def search_meetings(query):
     for t in tags:
         try:
             t = t.lower()
-            meetings = list(filter(lambda x: t in x.tags, meetings))
+            meetings = list(filter(lambda x: t[1:] in " ".join(x.tags).split(" "), meetings))
         except Exception as e:
             return render_template('meetings.home', meetings=[])
 
@@ -326,6 +326,7 @@ def get_tags(meeting_id):
             count = count + 1
 
     meeting.topics = return_data
+    meeting.tags = return_data
     meeting.save()
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
     #return render_template('#', tags=return_data)
@@ -344,6 +345,23 @@ def update_transcript(meeting_id):
 
     meeting = Meeting.objects.get(id=meeting_id)
     meeting.transcriptText = transcript
+    meeting.save()
+
+    return json.dumps({'status': 'success'})
+
+@meetings.route('/<meeting_id>/updateTags', methods=['POST'])
+def update_tags(meeting_id):
+    """ """
+    if request.form is None:
+        print('Form is invalid')
+    
+    tags = request.form['tags']
+
+    if tags is None:
+        return json.dumps({'error': 'invalid tags'})
+
+    meeting = Meeting.objects.get(id=meeting_id)
+    meeting.tags = tags.split(" ")
     meeting.save()
 
     return json.dumps({'status': 'success'})
