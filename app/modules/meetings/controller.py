@@ -313,7 +313,7 @@ def get_tags(meeting_id):
 
     r = Rake() #initializes Rake with English (all punc) as default lang
     r.extract_keywords_from_text(string)
-    print(r.get_ranked_phrases)
+    #print(r.get_ranked_phrases)
 
     topic_data=r.get_ranked_phrases_with_scores()
     count = 0
