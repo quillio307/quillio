@@ -1,8 +1,6 @@
 {% extends"helpers/dashboard.html" %} {% block title %}Meeting In Progress{% endblock %} {% block main %}
 <div class="jumbotron">
     <h1 class="h1-responsive">{{meeting.title}}</h1>
-    <button type="button" class="btn btn-success" id="start">Start</button>
-    <button type="button" class="btn btn-danger" id="end">End</button>
     <br>
     <ul id="msgboard" style="list-style-type: none;padding-left:0;"></ul>
     <p id="tempChunk"></p>
@@ -10,6 +8,8 @@
     <a class="btn-floating btn-lg pkColor" id="mic" style="background:gray;">
         <i class="fa fa-microphone fa-5x"></i>
     </a>
+    <button type="button" class="btn btn-success" id="start">Start</button>
+    <button type="button" class="btn btn-danger" id="end">End</button>
 </div>
 
 <!--Modal: Contact form-->
