@@ -22,8 +22,9 @@ function convertFloat32ToInt16(buffer) {
 
 function init() {
     var context = new AudioContext();
-//     // Create WebSocket connection.
+    // Create WebSocket connection.
     const speechsocket = new WebSocket(`ws://quillio-ws-st.herokuapp.com/?sampRate=${context.sampleRate}`);
+    socket = io.connect('http://localhost:5000/meeting');
 
     speechsocket.addEventListener('message', function (event) {
         let msg = JSON.parse(event.data);
@@ -32,9 +33,8 @@ function init() {
             console.log(msg[0].isFinal);
             if(msg[0].isFinal === true){
                 $('#tempChunk').html('');
-                $('ul#msgboard').append('<li>' + user.name + ': ' + alt.transcript +'</li>');
+                socket.emit('transcription', {room_id:room, transcript:alt.transcript});
             }else{
-                console.log(alt.transcript);
                 $('#tempChunk').html(alt.transcript);
             }
         }
@@ -50,25 +50,22 @@ function init() {
 
         $("#mic").attr('style', '');
         mic_toggle = true;
-        socket.emit('silenceAll', {room: room, user: user.name});
+        socket.emit('silenceAll', {room_id: room, user: user.name});
         mediaStream.getAudioTracks()[0].enabled = true;
     });
 
     $("#start").click(function () {
-        socket.emit('start', {room: room, user: user.name})
+        socket.emit('start', {room_id: room});
     });
     $("#end").click(function () {
-        socket.emit('end', {room: room, user: user.name})
+        socket.emit('end', {room_id: room});
     });
-    socket = io.connect('http://localhost:5000/meeting');
 
     socket.on('receivemsg', function(msg) {
-        console.log(msg);
         msglog(msg.data);
     });
 
     socket.emit('join', {
-        user_id: user,
         room_id: room
     });
 
@@ -99,14 +96,11 @@ function init() {
   navigator.mediaDevices.getUserMedia({ audio: true, video: false })
       .then(handleSuccess);
 
-
     socket.on('startMeeting', function () {
         msglog("Meeting Started");
-        mediaRecorder.start();
     });
     socket.on('endMeeting', function () {
         msglog("Meeting Ended");
-        mediaRecorder.stop();
     });
 
     var msglog = function(txt) {

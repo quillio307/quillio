@@ -7,7 +7,7 @@ from flask_security import MongoEngineUserDatastore
 from wtforms import Form, validators, StringField
 
 
-class Transcription(db.Document):
+class Transcription(db.EmbeddedDocument):
     user = db.ReferenceField(User)
     transcription = db.StringField()
 
@@ -16,12 +16,12 @@ class Meeting(db.Document):
     owner = db.ReferenceField(User, required=True)
     name = db.StringField(required=True, min_length=3, max_length=50)
     members = db.ListField(db.ReferenceField(User))
-    active = db.BooleanField()
+    active = db.BooleanField(default=False)
     tags = db.ListField(db.StringField(min_length=1, max_length=50))
     topics = db.ListField(db.StringField(min_length=1, max_length=50))
     created_at = db.DateTimeField(default=dt.now())
     created_at_str = db.StringField(default=dt.now().strftime('%m-%d-%Y'))
-    transcript = db.ListField(db.ReferenceField(Transcription), default=[])
+    transcript = db.ListField(db.EmbeddedDocumentField(Transcription))
     summary = db.StringField()
     recording = db.StringField()
     meta = {'strict': False}
@@ -33,7 +33,7 @@ class Meeting(db.Document):
         return False
 
     def status(self):
-        if self.active:
+        if self.active is True:
             return 1  # Active
         if not self.transcript:
             return 0  # Not started
