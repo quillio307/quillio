@@ -24,6 +24,7 @@ class Meeting(db.Document):
     transcript = db.ListField(db.EmbeddedDocumentField(Transcription))
     summary = db.StringField()
     recording = db.StringField()
+    transcriptText = db.StringField()
     meta = {'strict': False}
 
     def is_in_meeting(self, user):

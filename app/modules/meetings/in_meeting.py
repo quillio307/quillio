@@ -73,6 +73,11 @@ def start_meeting(data):
     meeting.active = False
     meeting.save()
     emit('endMeeting', room=data['room_id'])
+    pt = ""
+    for ts in meeting.transcript:
+        pt += '{0}: {1}\n'.format(ts.user.name, ts.transcription)
+    meeting.transcriptText = pt
+    meeting.save()
 
 
 @socketio.on('silenceAll', namespace='/meeting')
