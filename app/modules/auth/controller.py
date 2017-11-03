@@ -294,7 +294,7 @@ def activate_html(name, token, email):
     header = '<nav style="height:50px" class="navbar navbar-expand-lg pkColor"></nav><h2 align="center"> Account Activation </h2>'
     body = '<p>Dear ' + name + \
         ',</p><br><p> Welcome to Quillio! To activate your account, please follow the following link: </p>'
-    link = '<a href=http://localhost:5000' + \
+    link = '<a href=http://0.0.0.0:5000' + \
         url_for('auth.activate_account', activation_token=token,
                 email=email) + '> Activate account </a></br>'
     close = '<p> Thanks! </p><br><p> The Quillio Team </p>'
@@ -307,7 +307,7 @@ def password_html(name, token, email):
     header = '<nav style="height:50px" class="navbar navbar-expand-lg pkColor"></nav><h2 align="center">Account Activation</h2>'
     body = '<p>Dear ' + name + ',</p><br><p>We received your request for password reset. If you did not request to reset your password, please disregard this email and do not share it with anyone.<p>'
     body2 = '<p>Follow this link to reset your password: </p><br>'
-    link = '<a href=http://localhost:5000' + \
+    link = '<a href=http://0.0.0.0:5000' + \
         url_for('auth.reset_password', reset_token=token,
                 email=email) + '> Reset Password </a><br>'
     close = '<p>Thanks!</p><br><p>The Quillio Team</p>'
@@ -320,7 +320,7 @@ def invite_html(user_email, email):
     header = '<nav style="height:50px" class="navbar navbar-expand-lg pkColor"></nav><h2 align="center">Account Activation</h2>'
     body = '<p> Dear ' + email + ',</p><br><p>' + user_email + \
         ' has invited you to join us at Quillio. </p><br><p> Come see what we can do for you!</p><br>'
-    link = '<a href=http://localhost:5000' + \
+    link = '<a href=http://0.0.0.0:5000' + \
         url_for('auth.signup') + '> Create an Account </a><br>'
     close = '<p>Thanks!</p><br><p>The Quillio Team</p>'
     return header + body + link + close
