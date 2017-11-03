@@ -310,6 +310,17 @@ def get_tags(meeting_id):
     r = Rake()  # initializes Rake with English (all punc) as default lang
     string = "THIS SOME SAMPLE TEXT.An object that moves at a velocity greater than that of light is currently called a tachyon. No tachyon has ever been observed, but if it lost some of its kinetic energy, then (according to special relativity) it would speed up. It would have zero energy at infinite speed.Such a particle would have to have imaginary rest mass, but that’s not a serious problem, since the particle could never be brought to rest.The more serious issue is that for such a particle there is a valid reference frame in which it is moving backwards. So, for example, if you kill someone with a tachyon bullet, there would be a valid physics frame of reference in which the person was killed before you pull the trigger.(You could use this as a defense in a court of law by asking for a change of venue” to a different frame of reference. “Your honor”, you would say, “I’m innocent because the victim was dead before I pulled the trigger.This scenario doesn’t"
     r.extract_keywords_from_text(string)
+    topic_data=r.get_ranked_phrases_with_scores()
+    count = 0
+    return_data = []
+    for topic in topic_data:
+        if topic[0] < 5 or count == 10:
+            break
+        else:
+            return_data.append(str(topic[1]))
+            count = count + 1
+
+    meeting.topics = meeting.topics + return_data
     tag_data = r.get_ranked_phrases()
     # need to save tags into database (field already exists)
     # need to correctly format tags page
