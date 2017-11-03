@@ -113,7 +113,7 @@
         placeholder: 'Compose an epic...',
         theme: 'snow',
     });
-    quill.setText('SUH DUDES');
+    quill.setText(`{{ meeting.transcriptText }}`);
     quill.enable(false);
 
     function editTranscript() {
@@ -121,7 +121,18 @@
     }
 
     function saveTranscript() {
-        quill.enable(false)
+        var transcript = quill.getText(0, quill.getLength())
+        const params = new URLSearchParams()
+        params.append('transcript', transcript)
+
+        fetch('/meetings/{{ meeting.id }}/updateTranscript', {
+                method: 'POST',
+                body: params
+            })
+            .then(function(res) {
+                quill.enable(false)
+                console.log(JSON.stringify(res, undefined, 2))
+            })
     }
 </script>
 <!-- \script for quill.js configuration -->

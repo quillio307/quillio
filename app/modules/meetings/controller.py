@@ -317,3 +317,20 @@ def get_tags(meeting_id):
     # need to do a little more research into RAKE_NLTK --> remove punctuation from keywords
     # write algorithm to only return highest-ranked keywords (tbd)
     return render_template('meeting/tags.html', tags=tag_data)
+
+@meetings.route('/<meeting_id>/updateTranscript', methods=['POST'])
+def update_transcript(meeting_id):
+    """ """
+    if request.form is None:
+        print('Form is invalid')
+    
+    transcript = request.form['transcript']
+
+    if transcript is None:
+        return json.dumps({'error': 'invalid transcript'})
+
+    meeting = Meeting.objects.get(id=meeting_id)
+    meeting.transcriptText = transcript
+    meeting.save()
+
+    return json.dumps({'status': 'success'})
