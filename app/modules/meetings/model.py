@@ -21,7 +21,7 @@ class Meeting(db.Document):
     topics = db.ListField(db.StringField(min_length=1, max_length=50))
     created_at = db.DateTimeField(default=dt.now())
     created_at_str = db.StringField(default=dt.now().strftime('%m-%d-%Y'))
-    transcript = db.ListField(db.EmbeddedDocumentField(Transcription))
+    transcript = db.ListField(db.EmbeddedDocumentField(Transcription), default=[])
     summary = db.StringField()
     recording = db.StringField()
     transcriptText = db.StringField()
