@@ -25,14 +25,18 @@
                     </button>
             </div>
             <!--Body-->
-            <form>
-                <div class="modal-body mb-0">
-                    <div class="md-form form-sm">
-                        <input type="textarea" id="name" name="name" value="{{ request.form.name }}" class="form-control" required>
-                        <label for="name"> Insert Keywords </label>
-                    </div>
+            <div class="modal-body mb-0">
+                <div class="md-form form-sm">
+                    <input type="text" id="keywords" name="keywords" value="" class="form-control" required>
+                    <label for="keywords"> Insert Keywords </label>
                 </div>
-            </form>
+            </div>
+            <div class="text-center mt-1-half">
+                <button id="keywordAddButton" class="btn btn-mdb mdb-2">
+                            Enter
+                            <i class="fa fa-send ml-1"></i>
+                        </button>
+            </div>
         </div>
         <!--/.Content-->
     </div>
