@@ -1,0 +1,166 @@
+{% extends"helpers/dashboard.html" %} {% block title %} {{ meeting.name }}{% endblock %} {% block main %}
+<!-- Row -->
+<div class="row">
+    <!-- column to split editor from sidebar -->
+    <div class="col-md-8">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10">
+                    <h3 class="flex-center"> {{ meeting.name }}
+                    </h3>
+                </div>
+                <div class="col-md-1">
+                    <a class="btn-floating btn-md quillioButton" onclick="editTranscript()">
+                        <i class="fa fa-edit"></i>
+                    </a>
+                </div>
+                <div class="col-md-1">
+                    <a id="saveTrans" class="btn-floating btn-md quillioButton" onclick="saveTranscript()">
+                        <i class="fa fa-save"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div id="editor">
+        </div>
+    </div>
+    <!-- \column to split editor from sidebar -->
+    <!-- column for sidebar -->
+    <div class="col-md-4">
+        <div class="container">
+            <div class="accordion" id="" role="tablist" aria-multiselectable="true">
+                <div class="card">
+                    <div class="card-header quillioColor" role="tab" id="headingOne">
+                        <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            <h5 class="white-text">
+                                Meeting Participants
+                                <i class="fa fa-angle-down rotate-icon"></i>
+                            </h5>
+                        </a>
+                    </div>
+                    <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne">
+                        <div class="card-body">
+                            {% for member in meeting.members %} {{ member.name }} {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header quillioColor" role="tab" id="headingTwo">
+                        <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <h5 class="white-text">
+                                Meeting Date<i class="fa fa-angle-down rotate-icon"></i>
+                            </h5>
+                        </a>
+                    </div>
+                    <div id="collapseTwo" class="collapse show" role="tabpanel" aria-labelledby="headingTwo">
+                        <div class="card-body">
+                            {{ meeting.created_at_str }}
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header quillioColor" role="tab" id="headingThree">
+                        <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            <h5 class="white-text">
+                                Tags
+                                <i class="fa fa-angle-down rotate-icon"></i>
+                            </h5>
+                        </a>
+                    </div>
+                    <div id="collapseThree" class="collapse show" role="tabpanel" aria-labelledby="headingThree">
+                        <div id="reloadTags" class="card-body">
+                            <textarea style="height:auto" class="form-control" id="newTags" rows="8">{% for tag in meeting.tags %}{{ tag }} {% endfor %}</textarea>
+                            <button onclick="saveTags()" id="updateTags" class="btn quillioColor flex-center">Update</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="card">
+                    <div class="card-header quillioColor" role="tab" id="headingFive">
+                        <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            <h5 class="white-text">
+                                Topics
+                                <i class="fa fa-angle-down rotate-icon"></i>
+                            </h5>
+                        </a>
+                    </div>
+                    <div id="collapseFour" class="collapse show" role="tabpanel" aria-labelledby="headingFive">
+                        <div class="card-body">
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+    <!-- \column for sidebar -->
+</div>
+<!-- \Row -->
+
+{% endblock %} {% block js_import %}
+<!-- script for quill.js -->
+<script src="https://cdn.quilljs.com/1.3.3/quill.js"></script>
+<!-- \script for quill.js -->
+<!-- script for quill.js configuration -->
+<script>
+    var quill = new Quill('#editor', {
+        modules: {
+            toolbar: [
+                [{
+                    header: [1, 2, false]
+                }],
+                ['bold', 'italic', 'underline'],
+                ['image', 'code-block']
+            ]
+        },
+        placeholder: 'Compose an epic...',
+        theme: 'snow',
+    });
+    quill.setText(`{{ meeting.transcriptText }}`);
+    quill.enable(false);
+
+    function editTranscript() {
+        quill.enable()
+    }
+
+    function saveTranscript() {
+        var transcript = quill.getText(0, quill.getLength())
+        var id = `{{ meeting.id }}`
+        const params = new URLSearchParams()
+        params.append('transcript', transcript)
+
+        fetch('/meetings/{{ meeting.id }}/updateTranscript', {
+                method: 'POST',
+                body: params
+            })
+            .then(function(res) {
+                quill.enable(false)
+                console.log(JSON.stringify(res, undefined, 2))
+
+            })
+            .then(function() {
+                window.location.href = "/meetings/{{ meeting.id }}/tags"
+            })
+    }
+</script>
+<script>
+    function saveTags() {
+        var tags = $('#newTags').val();
+        var id = `{{ meeting.id }}`
+        const params = new URLSearchParams()
+        params.append('tags', tags)
+
+        fetch('/meetings/{{ meeting.id }}/updateTags', {
+                method: 'POST',
+                body: params
+            })
+            .then(function(res) {
+                console.log(JSON.stringify(res, undefined, 2))
+            })
+    }
+</script>
+<!-- \script for quill.js configuration -->
+<!-- script for sidenav collapse -->
+<script>
+    $(".button-collapse").sideNav();
+</script>
+<!-- \script for sidenav collapse -->
+{% endblock %}

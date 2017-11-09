@@ -54,7 +54,12 @@ coverage.xml
 *.log
 .static_storage/
 .media/
-local_settings.py
+local_settings.py# update the user's password
+    user.password = hash_password(form.password.data)
+    user.save()
+
+    flash("success Password Successfully Reset!")
+    return redirect(url_for('auth.login'))
 
 # Flask stuff:
 instance/
@@ -109,3 +114,6 @@ venv.bak/
 **.swp
 **/.vscode
 **/Pipfile.lock
+
+# Sensitive information
+config.py
