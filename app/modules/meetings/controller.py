@@ -188,7 +188,7 @@ def delete_meeting(form=None):
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
     delete_form = MeetingDeleteForm(form)
-    
+
     if not delete_form.validate():
         flash('error Could not Delete Meeting, Please Try Again.')
         return redirect(request.args.get('next') or url_for('meetings.home'))
@@ -314,7 +314,7 @@ def get_tags(meeting_id):
 
     r = Rake() # initializes Rake with English (all punc) as default lang
     r.extract_keywords_from_text(string)
-    
+
     topic_data=r.get_ranked_phrases_with_scores()
     count = 0
     return_data = []
