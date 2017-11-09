@@ -33,6 +33,9 @@ class User(db.Document, UserMixin):
     authenticated = db.BooleanField(default=False)
     roles = db.ListField(db.ReferenceField(Role), default=[])
 
+    # statistics fields
+    meeting_count = db.IntegerField(default=0)
+    
     def is_authenticated(self):
         """ Determines if a User is authenticated """
         return self['authenticated']
