@@ -8,6 +8,7 @@ from rake_nltk import Rake
 from app.modules.meetings.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm, MeetingDeleteForm
 from app.modules.auth.model import User
+from app.modules.pairs.model import Pair
 
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
@@ -102,6 +103,34 @@ def create_meeting(form=None):
         for u in query:
             u.meetings.append(m)
             u.save()
+        
+        #update each user's meeting count
+        for u in query:
+            u.meeting_count = u.meeting_count + 1
+            u.save()
+        
+        #update pairs in database -> query db, update meeting count, then update the frequent members
+        important_pairs = Pair.objects(user_one__in=query and user_two__in=query)
+        for pair in important_pairs:
+            pair.meeting_count = pair.meeting_count + 1
+        
+        for user in query:
+            if not user.member_frequency:   # if member frequency list is empty, put the first five of important_pairs
+                if len(important_pairs) <= 5:
+                    for pair in important_pairs:
+                        user.member_frequency.append(pair)
+                    user.save()
+                else:
+                    i = 0
+                    while i < 5:
+                        user.member_frequency.append(important_pairs[i])
+                        i = i + 1
+                    user.save()
+            else:
+                # if size of member_freq is not max, then put highest vals in member_freq to max it out at five
+                #otherwise sort important_pairs by meeting number, put biggest vals in to member freq until the biggest is smaller than the min of members_freq or you hit the end
+                
+
 
         flash('success New Meeting Created with Member(s): {}'.format(
             ", ".join(valid_emails)))
