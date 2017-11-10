@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Test</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap core CSS -->
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="static/css/mdb.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link href="static/css/style.css" rel="stylesheet">
+    <!-- Quill Editor  -->
+    <link href="https://cdn.quilljs.com/1.3.3/quill.snow.css" rel="stylesheet">
+    <!-- Quill JS   -->
+    <script src="https://cdn.quilljs.com/1.3.3/quill.min.js"></script>
+    <!-- set favicon -->
+    <link rel="shortcut icon" href="/static/img/logo/favicon.ico" type="image/x-icon">
+
+</head>
+
+<body class="hidden-sn white-skin">
+    <!--Navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark unique-color-dark">
+
+        <!-- Navbar brand -->
+        <a class="navbar-brand" href="#">
+            <img style="max-width:100px;height:auto" src="/../static/img/logo/quillioBlack.png">
+        </a>
+
+        <!-- Collapse button -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Collapsible content -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <!-- Links -->
+            <ul class="navbar-nav mr-auto">
+                
+            </ul>
+            <!-- Links -->
+        </div>
+        <!-- Collapsible content -->
+    </nav>
+    <div id="content">
+        <div class="list-group" id="myList">
+  <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">Ammar</h5>
+      <small class="text-muted"><i class="fa fa-times"></i></small>
+    </div>
+    <textarea type="text" id="form8" class="md-textarea">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</textarea>
+  </a>
+  <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">PK</h5>
+      <small class="text-muted"><i class="fa fa-times"></i></small>
+    </div>
+    <textarea type="text" id="form8" class="md-textarea">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</textarea>
+  </a>
+  <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">Ammu</h5>
+      <small class="text-muted"><i class="fa fa-times"></i></small>
+    </div>
+
+    <textarea type="text" id="form8" class="md-textarea">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</textarea>
+    
+  </a>
+</div>
+
+    </div>
+<a class="btn-floating btn-lg quillioButton" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm">
+    <i class="fa fa-plus"></i>
+</a>
+    <!-- SCRIPTS -->
+    <!-- JQuery -->
+    <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="static/js/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="static/js/bootstrap.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="static/js/mdb.min.js"></script>
+    
+
+    <!-- Flashed Messages  -->
+    <ul class=flashes>
+        <script type='text/javascript'>
+
+            $('#myList a').click(function (e) {
+              e.preventDefault()
+              $(this).tab('show');
+              $('textarea').attr("style", "")
+              $('i').attr("style", "")
+              $('textarea', this).attr("style", "color:white;")
+              $('i', this).attr("style", "color:white;")
+            });
+        </script>
+    </ul>
+    <!-- \Flashed Messaged -->
+</body>
+
+</html>
