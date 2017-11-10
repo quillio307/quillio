@@ -114,6 +114,9 @@ def create_meeting(form=None):
         for pair in important_pairs:
             pair.meeting_count = pair.meeting_count + 1
         
+        #sort important_pairs in descending order -> insertion sort function 
+        sort(important_pairs)
+
         for user in query:
             if not user.member_frequency:   # if member frequency list is empty, put the first five of important_pairs
                 if len(important_pairs) <= 5:
@@ -128,8 +131,14 @@ def create_meeting(form=None):
                     user.save()
             else:
                 # if size of member_freq is not max, then put highest vals in member_freq to max it out at five
-                #otherwise sort important_pairs by meeting number, put biggest vals in to member freq until the biggest is smaller than the min of members_freq or you hit the end
-                
+                #otherwise put biggest vals in to member freq until the biggest is smaller than the min of members_freq or you hit the end
+                if len(user.member_frequency) < 5:
+                    i = 0
+                    while len(user.member_frequency) < 5:
+                        user.member_frequency.append(important_pairs[i])
+                        i = i + 1
+                else: 
+                    
 
 
         flash('success New Meeting Created with Member(s): {}'.format(
@@ -139,6 +148,17 @@ def create_meeting(form=None):
 
     return redirect(request.args.get('next') or url_for('meetings.home'))
 
+
+def sort(pairs):
+    """ Sorts a list of pairs in descending order by number of meetings """
+    # insertion sort is ok here -> no return necessary 
+    for i in range(1, len(pairs)):
+        current = pairs[i].meeting_count
+        pos = i
+        while pos > 0 and pairs[pos - 1].meeting_count > current: 
+            pairs[pos] = pairs[pos - 1]
+            pos = pos - 1
+        pais[ pos ] = current
 
 @meetings.route('/update', methods=['PUT'])
 @login_required
