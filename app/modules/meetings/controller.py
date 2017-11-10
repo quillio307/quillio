@@ -137,9 +137,15 @@ def create_meeting(form=None):
                     while len(user.member_frequency) < 5:
                         user.member_frequency.append(important_pairs[i])
                         i = i + 1
+                    user.save()
                 else: 
-                    
-
+                    for pair in important_pairs:
+                        min_pair = get_min(user.member_frequency)
+                        if(pair.meeting_count > min_pair.meeting_count):
+                            #remove min pair from user.member_frequency and append 
+                            user.member_frequency.remove(min_pair)
+                            user.member_frequency.append(pain)
+                    user.save()
 
         flash('success New Meeting Created with Member(s): {}'.format(
             ", ".join(valid_emails)))
@@ -148,6 +154,11 @@ def create_meeting(form=None):
 
     return redirect(request.args.get('next') or url_for('meetings.home'))
 
+
+def get_min(pair_list):
+    """ Returns the smallest pair in a list by the number of meetings in the pair """
+    sort(pair_list) # sorted in descending order 
+    return pair_list[len(pair_list) - 1]
 
 def sort(pairs):
     """ Sorts a list of pairs in descending order by number of meetings """
