@@ -110,7 +110,7 @@ def create_meeting(form=None):
             u.save()
         
         #update pairs in database -> query db, update meeting count, then update the frequent members
-        important_pairs = Pair.objects(user_one__in=query and user_two__in=query)
+        important_pairs = Pair.objects(Q(user_one__in=query) & Q(user_two__in=query))
         for pair in important_pairs:
             pair.meeting_count = pair.meeting_count + 1
         
