@@ -219,6 +219,12 @@ def reset_form(email):
     return redirect(url_for('auth.login'))
 
 
+@auth.route('/profile/<user_id>', methods=['GET'])
+@login_required
+def view_profile(user_id):
+    """ Get information and statistics to view user's profile """
+    return render_template('auth/profile.html')
+
 @auth.route('/invite/<email>', methods=['GET'])
 @login_required
 def invite_user(email):
