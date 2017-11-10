@@ -35,7 +35,7 @@ class User(db.Document, UserMixin):
     roles = db.ListField(db.ReferenceField(Role), default=[])
 
     # statistics fields
-    meeting_count = db.IntegerField(default=0)
+    meeting_count = db.IntField(default=0)
     member_frequency = db.ListField(db.ReferenceField(Pair), defaut=[])
     
     def is_authenticated(self):

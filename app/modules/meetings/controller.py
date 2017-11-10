@@ -7,7 +7,7 @@ from rake_nltk import Rake
 
 from app.modules.meetings.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm, MeetingDeleteForm
-from app.modules.auth.model import User
+#from app.modules.auth.model import User
 from app.modules.pairs.model import Pair
 
 from flask import Blueprint, render_template, flash, request, redirect, \
