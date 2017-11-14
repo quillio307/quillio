@@ -6,7 +6,6 @@ from rake_nltk import Rake
 from app.modules.auth.model import User
 from app.modules.meetings.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm, MeetingDeleteForm
-from app.modules.pairs.model import Pair
 
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
@@ -27,27 +26,6 @@ def filter_form(form):
 
     flash('Could not Fulfill Request. Please Try Again.')
     return redirect(url_for('meetings.home'))
-
-
-@meetings.route('/edit/<id>', methods=['GET', 'POST'])
-@login_required
-def edit_meeting(id):
-    if len(id) != 24 or not all(c in string.hexdigits for c in id):
-        flash('error Invalid Meeting Id.')
-        return redirect(request.args.get('next') or url_for('meetings.home'))
-
-    try:
-        meeting = Meeting.objects.get(id=id)
-        user = current_user._get_current_object()
-
-        if user not in meeting.members:
-            flash('error You are not a member of that meeting.')
-            return redirect(url_for('meetings.meetings_page'))
-
-        return render_template('transcripts/transcripts.html', meeting=meeting)
-    except Exception as e:
-        flash('error An Error Occured. {}'.format(str(e)))
-        return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
 @meetings.route('/', methods=['GET', 'POST'])
@@ -98,51 +76,11 @@ def create_meeting(form=None):
         m = Meeting(name=create_form.name.data,
                     members=query, owner=user, active=False).save()
 
-        # insert the meeting in each user's list of meetings and
-        # update each users' total meeting count
+        # insert the meeting in each user's list of meetings
         for u in query:
             u.meetings.append(m)
             u.meeting_count = u.meeting_count + 1
             u.save()
-
-        # update pairs in database -> query db, update meeting count, then update the frequent members
-        important_pairs = Pair.objects(Q(user_one__in=query) & Q(user_two__in=query))
-        for pair in important_pairs:
-            pair.meeting_count = pair.meeting_count + 1
-
-        # sort important_pairs in descending order -> insertion sort function
-        sort(important_pairs)
-
-        for user in query:
-            # if member frequency list is empty, put the first five of important_pairs
-            if not user.member_frequency:
-                if len(important_pairs) <= 5:
-                    for pair in important_pairs:
-                        user.member_frequency.append(pair)
-                    user.save()
-                else:
-                    i = 0
-                    while i < 5:
-                        user.member_frequency.append(important_pairs[i])
-                        i = i + 1
-                    user.save()
-            else:
-                # if size of member_freq is not max, then put highest vals in member_freq to max it out at five
-                # otherwise put biggest vals in to member freq until the biggest is smaller than the min of members_freq or you hit the end
-                if len(user.member_frequency) < 5:
-                    i = 0
-                    while len(user.member_frequency) < 5:
-                        user.member_frequency.append(important_pairs[i])
-                        i = i + 1
-                    user.save()
-                else:
-                    for pair in important_pairs:
-                        min_pair = get_min(user.member_frequency)
-                        if(pair.meeting_count > min_pair.meeting_count):
-                            # remove min pair from user.member_frequency and append
-                            user.member_frequency.remove(min_pair)
-                            user.member_frequency.append(pair)
-                    user.save()
 
         flash('success New Meeting Created with Member(s): {}'.format(
             ", ".join(valid_emails)))
@@ -150,26 +88,6 @@ def create_meeting(form=None):
         flash('error An Error has occurred, Please Try Again. {}'.format(e))
 
     return redirect(request.args.get('next') or url_for('meetings.home'))
-
-
-def get_min(pair_list):
-    """ Returns the smallest pair in a list by the number of meetings in the pair """
-
-    sort(pair_list)  # sorted in descending order
-    return pair_list[len(pair_list) - 1]
-
-
-def sort(pairs):
-    """ Sorts a list of pairs in descending order by number of meetings """
-
-    # insertion sort is ok here -> no return necessary
-    for i in range(1, len(pairs)):
-        current = pairs[i].meeting_count
-        pos = i
-        while pos > 0 and pairs[pos - 1].meeting_count > current:
-            pairs[pos] = pairs[pos - 1]
-            pos = pos - 1
-        pairs[pos] = current
 
 
 @meetings.route('/update', methods=['PUT'])
@@ -206,6 +124,7 @@ def update_meeting(form=None):
             # remove the meeting from each members list of meetings
             for member in members_to_remove:
                 if meeting in member.meetings:
+                    member.meeting_count = member.meeting_count - 1
                     member.meetings.remove(meeting)
                     member.save()
 
@@ -243,7 +162,7 @@ def update_meeting(form=None):
 @meetings.route('/delete', methods=['POST'])
 @login_required
 def delete_meeting(form=None):
-    """ Deletes an Existing Group """
+    """ Deletes an Existing Meeting """
 
     if form is None:
         flash('error Invalid Request to Delete Meeting.')
@@ -267,10 +186,11 @@ def delete_meeting(form=None):
             flash('error You do not have Permission to Delete this Meeting.')
             return redirect(url_for('meetings.home'))
 
-        # remove the meeting from each member's list of meetings
+        # remove the meeting from each member's list of meeting
         for member in members:
             if meeting in member.meetings:
                 member.meetings.remove(meeting)
+                member.meeting_count = member.meeting_count - 1
                 member.save()
 
         # remove meeting from owner's list of meetings
@@ -286,6 +206,27 @@ def delete_meeting(form=None):
               '{}'.format(str(e)))
 
     return redirect(request.args.get('next') or url_for('meetings.home'))
+
+
+@meetings.route('/edit/<id>', methods=['GET', 'POST'])
+@login_required
+def edit_meeting(id):
+    if len(id) != 24 or not all(c in string.hexdigits for c in id):
+        flash('error Invalid Meeting Id.')
+        return redirect(request.args.get('next') or url_for('meetings.home'))
+
+    try:
+        meeting = Meeting.objects.get(id=id)
+        user = current_user._get_current_object()
+
+        if user not in meeting.members:
+            flash('error You are not a member of that meeting.')
+            return redirect(url_for('meetings.meetings_page'))
+
+        return render_template('transcripts/transcripts.html', meeting=meeting)
+    except Exception as e:
+        flash('error An Error Occured. {}'.format(str(e)))
+        return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
 @meetings.route('/search=<string:query>', methods=['GET', 'POST'])
@@ -318,8 +259,8 @@ def search_meetings(query):
     for t in tags:
         try:
             t = t.lower()
-            meetings = list(filter(
-                lambda x: t[1:] in " ".join(x.tags).split(" "), meetings))
+            meetings = list(filter(lambda x: t[1:] in
+                                   " ".join(x.tags).split(" "), meetings))
 
         except Exception as e:
             return render_template('meetings.home', meetings=[])
@@ -328,8 +269,7 @@ def search_meetings(query):
     for u in users:
         try:
             user = User.objects.get(email=u[1:])
-            meetings = list(filter(
-                lambda x: user in x.members, meetings))
+            meetings = list(filter(lambda x: user in x.members, meetings))
         except Exception as e:
             return render_template('meetings.home', meetings=[])
 
