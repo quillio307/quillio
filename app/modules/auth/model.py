@@ -4,7 +4,7 @@ from flask_security import Security, MongoEngineUserDatastore, \
     UserMixin, RoleMixin
 from wtforms import Form, StringField, PasswordField, validators
 
-from flask_sendgrid import SendGrid
+
 
 
 class Role(db.Document, RoleMixin):
@@ -86,4 +86,4 @@ user_datastore = MongoEngineUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
 # Authentication Setup
-mail = SendGrid(app)
+# mail = SendGrid(app)

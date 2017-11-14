@@ -2,7 +2,7 @@ import secrets
 import json
 
 from app import app
-from app.modules.auth.model import User, SignupForm, LoginForm, mail, \
+from app.modules.auth.model import User, SignupForm, LoginForm, \
     user_datastore, PasswordResetRequestForm, PasswordResetForm
 
 from flask import Blueprint, render_template, flash, request, redirect, \
@@ -10,6 +10,7 @@ from flask import Blueprint, render_template, flash, request, redirect, \
 from flask_security import login_user, logout_user, login_required, \
     current_user
 from flask_security.utils import hash_password, verify_password
+from flask_sendgrid import SendGrid
 
 auth = Blueprint('auth', __name__)
 
@@ -39,6 +40,8 @@ def signup():
 
         # generate activation token
         activation_token = secrets.token_urlsafe(32)
+
+        mail = SendGrid(app)
 
         # send registration email
         mail.send_email(
@@ -159,6 +162,8 @@ def forgot_password():
     user.save()
 
     try:
+        mail = SendGrid(app)
+
         # send the password reset email
         mail.send_email(
             from_email=app.config['SENDGRID_DEFAULT_FROM'],
@@ -231,6 +236,8 @@ def view_profile(user_id):
 def invite_user(email):
     try:
         user = current_user._get_current_object()
+
+        mail = SendGrid(app)
 
         mail.send_email(
             from_email=app.config['SENDGRID_DEFAULT_FROM'],
