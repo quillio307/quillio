@@ -1,13 +1,11 @@
 import json
 import string
-import time
 
-from datetime import datetime, timedelta
 from rake_nltk import Rake
 
+from app.modules.auth.model import User
 from app.modules.meetings.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm, MeetingDeleteForm
-#from app.modules.auth.model import User
 from app.modules.pairs.model import Pair
 
 from flask import Blueprint, render_template, flash, request, redirect, \
@@ -67,6 +65,7 @@ def home():
 @login_required
 def create_meeting(form=None):
     """ Creates a new Meeting. """
+
     if form is None:
         flash('error Invalid Request to Create Meeting.')
         return redirect(request.args.get('next') or url_for('meetings.home'))
@@ -103,18 +102,18 @@ def create_meeting(form=None):
         for u in query:
             u.meetings.append(m)
             u.save()
-        
-        #update each user's meeting count
+
+        # update each user's meeting count
         for u in query:
             u.meeting_count = u.meeting_count + 1
             u.save()
-        
-        #update pairs in database -> query db, update meeting count, then update the frequent members
+
+        # update pairs in database -> query db, update meeting count, then update the frequent members
         important_pairs = Pair.objects(Q(user_one__in=query) & Q(user_two__in=query))
         for pair in important_pairs:
             pair.meeting_count = pair.meeting_count + 1
-        
-        #sort important_pairs in descending order -> insertion sort function 
+
+        # sort important_pairs in descending order -> insertion sort function 
         sort(important_pairs)
 
         for user in query:
@@ -138,7 +137,7 @@ def create_meeting(form=None):
                         user.member_frequency.append(important_pairs[i])
                         i = i + 1
                     user.save()
-                else: 
+                else:
                     for pair in important_pairs:
                         min_pair = get_min(user.member_frequency)
                         if(pair.meeting_count > min_pair.meeting_count):
@@ -374,7 +373,7 @@ def get_tags(meeting_id):
 
     r = Rake() # initializes Rake with English (all punc) as default lang
     r.extract_keywords_from_text(string)
-    
+
     topic_data=r.get_ranked_phrases_with_scores()
     count = 0
     return_data = []
