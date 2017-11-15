@@ -6,7 +6,7 @@ from app.modules.groups.model import Group, GroupCreateForm, GroupUpdateForm, \
 
 from flask import Blueprint, request, render_template, flash, redirect, \
     url_for, jsonify
-from flask_security import Security, login_required, current_user
+from flask_security import login_required, current_user
 
 
 groups = Blueprint('groups', __name__)

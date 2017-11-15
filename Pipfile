@@ -12,7 +12,6 @@ verify_ssl = true
 
 flask = "*"
 gunicorn = "*"
-"pep8" = "*"
 flask-login = "*"
 flask-wtf = "*"
 flask-mongoengine = "*"
@@ -23,3 +22,4 @@ sendgrid = "==3.6.5"
 flask-socketio = "*"
 gevent = "*"
 rake-nltk = "*"
+pycodestyle = "*"

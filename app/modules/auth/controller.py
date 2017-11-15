@@ -6,7 +6,7 @@ from app.modules.auth.model import User, SignupForm, LoginForm, \
     user_datastore, PasswordResetRequestForm, PasswordResetForm
 
 from flask import Blueprint, render_template, flash, request, redirect, \
-    url_for, jsonify, abort
+    url_for, jsonify
 from flask_security import login_user, logout_user, login_required, \
     current_user
 from flask_security.utils import hash_password, verify_password
@@ -222,6 +222,13 @@ def reset_form(email):
 
     flash("success Password Successfully Reset!")
     return redirect(url_for('auth.login'))
+
+
+@auth.route('/profile/<user_id>', methods=['GET'])
+@login_required
+def view_profile(user_id):
+    """ Get information and statistics to view user's profile """
+    return render_template('auth/profile.html')
 
 
 @auth.route('/invite/<email>', methods=['GET'])

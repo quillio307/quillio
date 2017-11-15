@@ -1,13 +1,11 @@
 import json
 import string
-import time
 
-from datetime import datetime, timedelta
 from rake_nltk import Rake
 
+from app.modules.auth.model import User
 from app.modules.meetings.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm, MeetingDeleteForm
-from app.modules.auth.model import User
 
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
@@ -30,27 +28,6 @@ def filter_form(form):
     return redirect(url_for('meetings.home'))
 
 
-@meetings.route('/edit/<id>', methods=['GET', 'POST'])
-@login_required
-def edit_meeting(id):
-    if len(id) != 24 or not all(c in string.hexdigits for c in id):
-        flash('error Invalid Meeting Id.')
-        return redirect(request.args.get('next') or url_for('meetings.home'))
-
-    try:
-        meeting = Meeting.objects.get(id=id)
-        user = current_user._get_current_object()
-
-        if user not in meeting.members:
-            flash('error You are not a member of that meeting.')
-            return redirect(url_for('meetings.meetings_page'))
-
-        return render_template('transcripts/transcripts.html', meeting=meeting)
-    except Exception as e:
-        flash('error An Error Occured. {}'.format(str(e)))
-        return redirect(request.args.get('next') or url_for('meetings.home'))
-
-
 @meetings.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
@@ -66,6 +43,7 @@ def home():
 @login_required
 def create_meeting(form=None):
     """ Creates a new Meeting. """
+
     if form is None:
         flash('error Invalid Request to Create Meeting.')
         return redirect(request.args.get('next') or url_for('meetings.home'))
@@ -101,6 +79,7 @@ def create_meeting(form=None):
         # insert the meeting in each user's list of meetings
         for u in query:
             u.meetings.append(m)
+            u.meeting_count = u.meeting_count + 1
             u.save()
 
         flash('success New Meeting Created with Member(s): {}'.format(
@@ -145,6 +124,7 @@ def update_meeting(form=None):
             # remove the meeting from each members list of meetings
             for member in members_to_remove:
                 if meeting in member.meetings:
+                    member.meeting_count = member.meeting_count - 1
                     member.meetings.remove(meeting)
                     member.save()
 
@@ -178,17 +158,18 @@ def update_meeting(form=None):
 
     return redirect(request.args.get('next') or url_for('meetings.home'))
 
+
 @meetings.route('/delete', methods=['POST'])
 @login_required
 def delete_meeting(form=None):
-    """ Deletes an Existing Group """
+    """ Deletes an Existing Meeting """
 
     if form is None:
         flash('error Invalid Request to Delete Meeting.')
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
     delete_form = MeetingDeleteForm(form)
-    
+
     if not delete_form.validate():
         flash('error Could not Delete Meeting, Please Try Again.')
         return redirect(request.args.get('next') or url_for('meetings.home'))
@@ -205,10 +186,11 @@ def delete_meeting(form=None):
             flash('error You do not have Permission to Delete this Meeting.')
             return redirect(url_for('meetings.home'))
 
-        # remove the meeting from each member's list of meetings
+        # remove the meeting from each member's list of meeting
         for member in members:
             if meeting in member.meetings:
                 member.meetings.remove(meeting)
+                member.meeting_count = member.meeting_count - 1
                 member.save()
 
         # remove meeting from owner's list of meetings
@@ -221,15 +203,37 @@ def delete_meeting(form=None):
 
     except Exception as e:
         flash('error An Error has Occured, Please Try Again.'
-                '{}'.format(str(e)))
+              '{}'.format(str(e)))
 
     return redirect(request.args.get('next') or url_for('meetings.home'))
+
+
+@meetings.route('/edit/<id>', methods=['GET', 'POST'])
+@login_required
+def edit_meeting(id):
+    if len(id) != 24 or not all(c in string.hexdigits for c in id):
+        flash('error Invalid Meeting Id.')
+        return redirect(request.args.get('next') or url_for('meetings.home'))
+
+    try:
+        meeting = Meeting.objects.get(id=id)
+        user = current_user._get_current_object()
+
+        if user not in meeting.members:
+            flash('error You are not a member of that meeting.')
+            return redirect(url_for('meetings.meetings_page'))
+
+        return render_template('transcripts/transcripts.html', meeting=meeting)
+    except Exception as e:
+        flash('error An Error Occured. {}'.format(str(e)))
+        return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
 @meetings.route('/search=<string:query>', methods=['GET', 'POST'])
 @login_required
 def search_meetings(query):
-    """ Displays the Meetings to the User's Dashboard that match the given criteria """
+    """ Displays the Meetings to the User's Dashboard that match the given
+        criteria """
 
     if request.method == 'POST':
         return filter_form(request.form)
@@ -255,7 +259,9 @@ def search_meetings(query):
     for t in tags:
         try:
             t = t.lower()
-            meetings = list(filter(lambda x: t[1:] in " ".join(x.tags).split(" "), meetings))
+            meetings = list(filter(lambda x: t[1:] in
+                                   " ".join(x.tags).split(" "), meetings))
+
         except Exception as e:
             return render_template('meetings.home', meetings=[])
 
@@ -263,8 +269,7 @@ def search_meetings(query):
     for u in users:
         try:
             user = User.objects.get(email=u[1:])
-            meetings = list(filter(
-                lambda x: user in x.members, meetings))
+            meetings = list(filter(lambda x: user in x.members, meetings))
         except Exception as e:
             return render_template('meetings.home', meetings=[])
 
@@ -280,9 +285,11 @@ def search_meetings(query):
 @meetings.route('/info/<string:meeting_id>', methods=['GET'])
 @login_required
 def meeting_info(meeting_id):
-    if len(meeting_id) != 24 or not all(c in string.hexdigits for c in meeting_id):
+    if len(meeting_id) != 24 or \
+       not all(c in string.hexdigits for c in meeting_id):
         flash('error Invalid Meeting Id.')
-        return redirect(request.args.get('next') or url_for('meeting.meetings_page'))
+        return redirect(request.args.get('next') or
+                        url_for('meeting.meetings_page'))
 
     try:
         meeting = Meeting.objects.get(id=meeting_id)
@@ -301,23 +308,19 @@ def meeting_info(meeting_id):
 @meetings.route('/<meeting_id>/tags', methods=['GET'])
 @login_required
 def get_tags(meeting_id):
-    #return 'Tags: Coming Soon to a Quillio near you!'
-    #try:
-    meeting = Meeting.objects.with_id(meeting_id)
+    """ generates topics for the meeting with the given id """
 
-    # transcripts=meeting.transcript
-    # string = ""
-    # for t in transcripts:
-    #     string = string + t.transcription + "\n"
+    meeting = Meeting.objects.with_id(meeting_id)
 
     string = meeting.transcriptText.replace("\n", " ")
 
-    r = Rake() # initializes Rake with English (all punc) as default lang
+    r = Rake()  # initializes Rake with English (all punc) as default lang
     r.extract_keywords_from_text(string)
-    
-    topic_data=r.get_ranked_phrases_with_scores()
+
+    topic_data = r.get_ranked_phrases_with_scores()
     count = 0
     return_data = []
+
     for topic in topic_data:
         if topic[0] < 5 or count == 10:
             break
@@ -329,12 +332,10 @@ def get_tags(meeting_id):
     meeting.tags = return_data
     meeting.save()
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
-    #return render_template('#', tags=return_data)
 
 
 @meetings.route('/<meeting_id>/updateTranscript', methods=['POST'])
 def update_transcript(meeting_id):
-    """ """
     if request.form is None:
         print('Form is invalid')
 
@@ -349,9 +350,9 @@ def update_transcript(meeting_id):
 
     return json.dumps({'status': 'success'})
 
+
 @meetings.route('/<meeting_id>/updateTags', methods=['POST'])
 def update_tags(meeting_id):
-    """ """
     if request.form is None:
         print('Form is invalid')
 
