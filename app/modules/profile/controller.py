@@ -11,8 +11,9 @@ def home():
 
     user = current_user._get_current_object()
 
-    # generate count of meetings with each meeting member
     friends = dict()
+    topics = dict()
+
     for meeting in user.meetings:
         for member in meeting.members:
             if member == current_user._get_current_object():
@@ -22,12 +23,23 @@ def home():
             else:
                 friends[member.name] = 1
 
+        for topic in meeting.topics:
+            if topic in topics:
+                topics[topic] = topics[topic] + 1
+            else:
+                topics[topic] = 1
+
     # determine best friends
-    winners = sorted(friends, key=friends.get, reverse=True)
+    sorted_friends = sorted(friends, key=friends.get, reverse=True)
+
+    # determine favorite topics
+    sorted_topics = sorted(topics, key=topics.get, reverse=True)
 
     best_friends = dict()
+    favorite_topics = dict()
 
     for i in range(0, 3):
-        best_friends[i] = winners[i], friends[winners[i]]
+        best_friends[i] = sorted_friends[i], friends[sorted_friends[i]]
+        favorite_topics[i] = sorted_topics[i], topics[sorted_topics[i]]
 
-    return jsonify({'Best Friends': best_friends, 'Meeting Count': user.meeting_count})
+    return jsonify({'Best Friends': best_friends, 'Favorite Topics': favorite_topics, 'Meeting Count': user.meeting_count})
