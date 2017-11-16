@@ -1,6 +1,6 @@
 {% extends"helpers/landing_page.html" %} {% block title %} {{ meeting.name }}{% endblock %} {% block content %}
 {% landing_content %}
-{% for group_row in groups | batch(3) %}
+{% for group_row in group.meetings | batch(3) %}
 <div class="container">
     <br>
     <div class="row">
