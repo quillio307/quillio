@@ -371,4 +371,4 @@ def update_tags(meeting_id):
     meeting.tags = tags.split(" ")
     meeting.save()
 
-    return json.dumps({'stGatus': 'success'})
+    return json.dumps({'status': 'success'})
