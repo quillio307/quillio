@@ -1,6 +1,7 @@
 from app import db
 
 from app.modules.auth.model import User
+from app.modules.meetings.model import Meeting
 
 from wtforms import Form, validators
 from wtforms import StringField
@@ -11,6 +12,8 @@ class Group(db.Document):
     name = db.StringField(max_length=80)
     members = db.ListField(field=db.ReferenceField(User), default=[])
     admins = db.ListField(field=db.ReferenceField(User), default=[])
+    meetings = db.ListField(db.ReferenceField(Meeting))
+    contr = db.DictField()
     meta = {'strict': False}
 
     def user_is_admin(self, user):
@@ -18,6 +21,15 @@ class Group(db.Document):
         if user in self.admins:
             return True
         return False
+
+    def update_contr(self):
+        for m in meetings:
+            mdict = m.get_contr
+            self.contr = dict(self.contr.items() + mdict.items() +
+                    [(k, self.contr[k] + mdict[k])
+                    for k in set(self.contr) & set(mdict)])
+        self.save()
+        return
 
 
 class GroupCreateForm(Form):

@@ -318,6 +318,7 @@ def get_tags(meeting_id):
     r.extract_keywords_from_text(string)
 
     topic_data = r.get_ranked_phrases_with_scores()
+    
     count = 0
     return_data = []
 
