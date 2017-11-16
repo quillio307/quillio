@@ -305,35 +305,34 @@ def meeting_info(meeting_id):
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
-@meetings.route('/<meeting_id>/tags', methods=['GET'])
+# @meetings.route('/<meeting_id>/tags', methods=['GET'])
 @login_required
 def get_tags(meeting_id):
     """ generates topics for the meeting with the given id """
-
     meeting = Meeting.objects.with_id(meeting_id)
-
     string = meeting.transcriptText.replace("\n", " ")
-
     r = Rake()  # initializes Rake with English (all punc) as default lang
     r.extract_keywords_from_text(string)
 
     topic_data = r.get_ranked_phrases_with_scores()
-    
-    count = 0
-    return_data = []
+    ret_data = []
+    for topic in topic_data:
+        ret_data = ret_data + topic.split()
 
+    count = 0
+    data = []
     for topic in topic_data:
         if topic[0] < 5 or count == 10:
             break
         else:
-            return_data.append(str(topic[1]))
+            data.append(str(topic[1]))
             count = count + 1
 
+    return_data = " ".join(data).split(" ")
     meeting.topics = return_data
     meeting.tags = return_data
     meeting.save()
-    return redirect(url_for('meetings.edit_meeting', id=meeting_id))
-
+    # return redirect(url_for('meetings.edit_meeting', id=meeting_id))
 
 @meetings.route('/<meeting_id>/updateTranscript', methods=['POST'])
 def update_transcript(meeting_id):
