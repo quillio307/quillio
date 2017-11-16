@@ -3,7 +3,6 @@ from datetime import datetime as dt
 
 from app.modules.auth.model import User
 
-from flask_security import MongoEngineUserDatastore
 from wtforms import Form, validators, StringField
 
 
