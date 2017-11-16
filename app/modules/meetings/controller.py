@@ -305,7 +305,7 @@ def meeting_info(meeting_id):
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
-# @meetings.route('/<meeting_id>/tags', methods=['GET'])
+@meetings.route('/<meeting_id>/tags', methods=['GET'])
 @login_required
 def get_tags(meeting_id):
     """ generates topics for the meeting with the given id """
@@ -315,9 +315,6 @@ def get_tags(meeting_id):
     r.extract_keywords_from_text(string)
 
     topic_data = r.get_ranked_phrases_with_scores()
-    ret_data = []
-    for topic in topic_data:
-        ret_data = ret_data + topic.split()
 
     count = 0
     data = []
@@ -332,7 +329,7 @@ def get_tags(meeting_id):
     meeting.topics = return_data
     meeting.tags = return_data
     meeting.save()
-    # return redirect(url_for('meetings.edit_meeting', id=meeting_id))
+    return redirect(url_for('meetings.edit_meeting', id=meeting_id))
 
 @meetings.route('/<meeting_id>/updateTranscript', methods=['POST'])
 def update_transcript(meeting_id):
