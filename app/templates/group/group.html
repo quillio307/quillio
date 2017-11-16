@@ -1,39 +1,46 @@
-{% extends"helpers/landing_page.html" %} {% block title %} {{ meeting.name }}{% endblock %} {% block content %}
-{% landing_content %}
-{% for group_row in group.meetings | batch(3) %}
+{% extends"helpers/landing_page.html" %} {% block title %} {{ group.name }}{% endblock %}
+{% block landing_content %}
+{% for meeting_row in group.meetings | batch(3) %}
 <div class="container">
     <br>
     <div class="row">
-        {% for group in group_row %}
+        {% for meeting in meeting_row %}
         <div class="card col-md-4">
-            <div class="view overlay hm-white-slight">
+            <div class=" view overlay hm-white-slight">
                 <img src="https://mdbootstrap.com/img/Photos/Others/food.jpg" class="img-fluid" alt="">
                 <a>
                     <div class="mask"></div>
                 </a>
             </div>
 
-            <a class="btn-floating btn-action" onclick="getGroupInfo('{{ group.id }}')">
+            {% if meeting.status() == 2 %}
+            <a href="edit/{{ meeting.id }}" style="background-color:#696773" class="btn-floating btn-action">
                 <i class="fa fa-chevron-right"></i>
             </a>
+            {% else %}
+
+            <a href="/meeting/{{ meeting.id }}" style="background-color:#06D6A0" class="btn-floating btn-action">
+                <i class="fa fa-chevron-right"></i>
+            </a>
+            {% endif %}
 
             <div class="card-body">
-                <h4 class="card-title"> {{ group.name }}</h4>
+                <h4 class="card-title">{{ meeting.name }}</h4>
                 <hr>
-                <p class="card-text"> {{ group.description }} </p>
+                <p class="card-text"> {{ meeting.description }} </p>
             </div>
-
             <div class="card-data flex-center">
                 <ul>
                     <li>
-                        <a href="#">
-                            <i class="fa fa-users"></i> {{ group.members|length }}
-                        </a>
-                    </li>
-                    <!-- Add Edit Meeting Option if Current user is an Admin in the Group -->
-                    {% if current_user in group.admins %}
+                        <i class="fa fa-clock-o"></i> {{ meeting.created_at_str }}</li>
                     <li>
-                        <a data-toggle="modal" data-target="#editGroupForm" id="{{ group.id }}" onclick="setGroup('{{ group.id }}', '{{ group.name }}', '{{ group.description }}')">
+                        <a href="#">
+                            <i class="fa fa-users"> </i>{{ meeting.members|length }}</a>
+                    </li>
+                    <!-- Add Edit Meeting Option if Current user is the owner of the Meeting -->
+                    {% if current_user.id == meeting.owner.id %}
+                    <li>
+                        <a data-toggle="modal" data-target="#editMeetingForm" id="{{ meeting.id }}" onclick="setMeeting('{{ meeting.id }}', '{{ meeting.name }}')">
                             Edit
                         </a>
                     </li>
@@ -46,21 +53,21 @@
 </div>
 {% endfor %}
 {% endblock %}
-{% sidebar_content %}
+{% block sidebar_content %}
 <div class="container">
     <div class="accordion" id="" role="tablist" aria-multiselectable="true">
         <div class="card">
             <div class="card-header quillioColor" role="tab" id="headingOne">
                 <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
                     <h5 class="white-text">
-                        Meeting Participants
+                        {{ group.name }}
                         <i class="fa fa-angle-down rotate-icon"></i>
                     </h5>
                 </a>
             </div>
             <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne">
                 <div class="card-body">
-                    {% for member in meeting.members %} {{ member.name }} {% endfor %}
+                    {% for member in group.members %} {{ member.name }} {% endfor %}
                 </div>
             </div>
         </div>
@@ -74,44 +81,12 @@
             </div>
             <div id="collapseTwo" class="collapse show" role="tabpanel" aria-labelledby="headingTwo">
                 <div class="card-body">
-                    {{ meeting.created_at_str }}
+                    random date
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-header quillioColor" role="tab" id="headingThree">
-                <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                    <h5 class="white-text">
-                        Tags
-                        <i class="fa fa-angle-down rotate-icon"></i>
-                    </h5>
-                </a>
-            </div>
-            <div id="collapseThree" class="collapse show" role="tabpanel" aria-labelledby="headingThree">
-                <div id="reloadTags" class="card-body">
-                    <textarea style="height:auto" class="form-control" id="newTags" rows="8">{% for tag in meeting.tags %}{{ tag }} {% endfor %}</textarea>
-                    <button onclick="saveTags()" id="updateTags" class="btn quillioColor flex-center">Update</button>
-                </div>
-            </div>
-        </div>
-        <!-- <div class="card">
-            <div class="card-header quillioColor" role="tab" id="headingFive">
-                <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                    <h5 class="white-text">
-                        Topics
-                        <i class="fa fa-angle-down rotate-icon"></i>
-                    </h5>
-                </a>
-            </div>
-            <div id="collapseFour" class="collapse show" role="tabpanel" aria-labelledby="headingFive">
-                <div class="card-body">
-                </div>
-            </div>
-        </div> -->
     </div>
 </div>
-</div>
-{% endblock %}
 {% endblock %}
 {% block js_import %}
 <!-- script for sidenav collapse -->
