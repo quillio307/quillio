@@ -198,6 +198,11 @@ def delete_meeting(form=None):
             owner.meetings.remove(meeting)
             owner.save()
 
+        for group in user.groups:
+            if meeting in group.meetings:
+                group.meetings.remove(meeting)
+                group.save();
+
         meeting.delete()
         flash('success Meeting Successfully Deleted.')
 
@@ -318,7 +323,7 @@ def get_tags(meeting_id):
     r.extract_keywords_from_text(string)
 
     topic_data = r.get_ranked_phrases_with_scores()
-    
+
     count = 0
     return_data = []
 
