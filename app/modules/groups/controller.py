@@ -291,8 +291,12 @@ def get_group_by_id(group_id):
         if user not in group.members:
             flash('error You Are Not A Member Of This Group.')
             return redirect(request.args.get('next') or url_for('groups.home'))
+        emails = []
+        for u in group.members:
+            curr = u.email
+            emails.append(curr)
 
-        return render_template('group/group.html', group = group)
+        return render_template('group/group.html', group = group, emails = emails)
 
     except Exception as e:
         flash('error An Error Occured. {}'.format(str(e)))
