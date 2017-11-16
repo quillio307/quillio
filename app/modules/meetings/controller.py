@@ -318,6 +318,7 @@ def get_tags(meeting_id):
     r.extract_keywords_from_text(string)
 
     topic_data = r.get_ranked_phrases_with_scores()
+
     count = 0
     return_data = []
 
@@ -365,4 +366,4 @@ def update_tags(meeting_id):
     meeting.tags = tags.split(" ")
     meeting.save()
 
-    return json.dumps({'status': 'success'})
+    return json.dumps({'stGatus': 'success'})
