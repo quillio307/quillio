@@ -3,7 +3,6 @@ from datetime import datetime as dt
 
 from app.modules.auth.model import User
 
-from flask_security import MongoEngineUserDatastore
 from wtforms import Form, validators, StringField
 
 
@@ -43,6 +42,19 @@ class Meeting(db.Document):
 
     def add_transcription(self, user, transcription):
         self.transcript.append(Transcription(user, transcription))
+
+    def get_contr(self):
+        try:
+            word_count = {}
+            for t in self.transcript:
+                if t.user.name in word_count:
+                    word_count[t.user.name] = word_count[t.user.name] + len(t.transcript.split(" "))
+                else:
+                    word_count[t.user.name] = len(t.transcript.split(" "))
+            return word_count
+        except Exception as e:
+            flash('error An Error Occured')
+            return
 
 
 class MeetingCreateForm(Form):

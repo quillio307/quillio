@@ -4,7 +4,8 @@ from flask_security import Security, MongoEngineUserDatastore, \
     UserMixin, RoleMixin
 from wtforms import Form, StringField, PasswordField, validators
 
-from flask_sendgrid import SendGrid
+
+
 
 class Role(db.Document, RoleMixin):
     name = db.StringField(max_length=80, unique=True)
@@ -32,6 +33,9 @@ class User(db.Document, UserMixin):
     active = db.BooleanField(default=False)
     authenticated = db.BooleanField(default=False)
     roles = db.ListField(db.ReferenceField(Role), default=[])
+
+    # statistics fields
+    meeting_count = db.IntField(default=0)
 
     def is_authenticated(self):
         """ Determines if a User is authenticated """
@@ -82,4 +86,4 @@ user_datastore = MongoEngineUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
 # Authentication Setup
-mail = SendGrid(app)
+# mail = SendGrid(app)

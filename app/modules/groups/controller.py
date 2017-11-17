@@ -6,7 +6,7 @@ from app.modules.groups.model import Group, GroupCreateForm, GroupUpdateForm, \
 
 from flask import Blueprint, request, render_template, flash, redirect, \
     url_for, jsonify
-from flask_security import Security, login_required, current_user
+from flask_security import login_required, current_user
 
 
 groups = Blueprint('groups', __name__)
@@ -276,7 +276,7 @@ def search_groups(query):
     return render_template('group/dashboard.html', groups=groups)
 
 
-@groups.route('/info/<string:group_id>')
+@groups.route('/<group_id>')
 @login_required
 def get_group_by_id(group_id):
     # validate the given id
@@ -288,11 +288,12 @@ def get_group_by_id(group_id):
         user = current_user._get_current_object()
         group = Group.objects.get(id=group_id)
 
-        if user not in group.members and user not in group.admins:
+        if user not in group.members:
             flash('error You Are Not A Member Of This Group.')
             return redirect(request.args.get('next') or url_for('groups.home'))
 
-        return jsonify(group)
+        return render_template('group/group.html', group = group)
+
     except Exception as e:
         flash('error An Error Occured. {}'.format(str(e)))
         return redirect(request.args.get('next') or url_for('groups.home'))
