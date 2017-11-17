@@ -50,33 +50,35 @@
     </nav>
     <div id="content">
         <div class="list-group" id="myList">
-  <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+  <li href="" id="chunk" class="list-group-item list-group-item-action flex-column align-items-start">
     <div class="d-flex w-100 justify-content-between">
       <h5 class="mb-1">Ammar</h5>
-      <small class="text-muted"><i class="fa fa-times"></i></small>
+      <small id="remove" class="text-muted"><i class="fa fa-times"></i></small>
     </div>
-    <textarea type="text" id="form8" class="md-textarea">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</textarea>
-  </a>
-  <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+    <textarea type="text" id="form8" class="md-textarea">
+        Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.
+    </textarea>
+  </li>
+  <li id="chunk" class="list-group-item list-group-item-action flex-column align-items-start">
     <div class="d-flex w-100 justify-content-between">
       <h5 class="mb-1">PK</h5>
-      <small class="text-muted"><i class="fa fa-times"></i></small>
+      <small id="remove" class="text-muted"><i class="fa fa-times"></i></small>
     </div>
     <textarea type="text" id="form8" class="md-textarea">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</textarea>
-  </a>
-  <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+  </li>
+  <li href="" id="chunk" class="list-group-item list-group-item-action flex-column align-items-start">
     <div class="d-flex w-100 justify-content-between">
       <h5 class="mb-1">Ammu</h5>
-      <small class="text-muted"><i class="fa fa-times"></i></small>
+      <small id="remove" class="text-muted"><i class="fa fa-times"></i></small>
     </div>
 
     <textarea type="text" id="form8" class="md-textarea">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</textarea>
     
-  </a>
+  </li>
 </div>
 
     </div>
-<a class="btn-floating btn-lg quillioButton" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm">
+<a class="btn-floating btn-lg quillioButton" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm" id="add">
     <i class="fa fa-plus"></i>
 </a>
     <!-- SCRIPTS -->
@@ -88,20 +90,39 @@
     <script type="text/javascript" src="static/js/bootstrap.js"></script>
     <!-- MDB core JavaScript -->
     <script type="text/javascript" src="static/js/mdb.min.js"></script>
+    <script type="text/javascript" src="static/js/jquery_autogrow.js"></script>
+    
     
 
     <!-- Flashed Messages  -->
     <ul class=flashes>
         <script type='text/javascript'>
+            $( document ).ready(function() {
+                $("textarea").autogrow();
+                $("textarea").val($("textarea").val());
+                $('#remove').click(function(e){
+                    console.log("click");
+                    $(this).closest("#chunk").remove();
+                });
+                $('#myList a').click(function (e) {
+                  e.preventDefault()
+                  $(this).tab('show');
+                  $('textarea').attr("style", "")
+                  $('i').attr("style", "")
+                  $('textarea', this).attr("style", "color:white;")
+                  $('i', this).attr("style", "color:white;")
+                });
+                
+                $('#add').click(function(e){
+                    var activeChunk = $('.active');
+                    if(activeChunk.length > 0){
 
-            $('#myList a').click(function (e) {
-              e.preventDefault()
-              $(this).tab('show');
-              $('textarea').attr("style", "")
-              $('i').attr("style", "")
-              $('textarea', this).attr("style", "color:white;")
-              $('i', this).attr("style", "color:white;")
+                    }else{
+
+                    }
+                });
             });
+            
         </script>
     </ul>
     <!-- \Flashed Messaged -->
