@@ -14,6 +14,7 @@ class Group(db.Document):
     admins = db.ListField(field=db.ReferenceField(User), default=[])
     meetings = db.ListField(db.ReferenceField(Meeting))
     contr = db.DictField()
+    topic = db.StringField()
     meta = {'strict': False}
 
     def user_is_admin(self, user):
@@ -30,6 +31,9 @@ class Group(db.Document):
                     for k in set(self.contr) & set(mdict)])
         self.save()
         return
+
+    def update_topic(self):
+        for m in meetings:
 
 
 class GroupCreateForm(Form):
