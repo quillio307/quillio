@@ -293,9 +293,9 @@ def get_group_by_id(group_id):
             return redirect(request.args.get('next') or url_for('groups.home'))
         emails = []
         for u in group.members:
-            curr = u.email
-            emails.append(curr)
-
+            if u.email != user.email:
+                emails.append(u.email)
+        emails =" ".join(emails)
         return render_template('group/group.html', group = group, emails = emails)
 
     except Exception as e:
