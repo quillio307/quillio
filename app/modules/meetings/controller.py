@@ -198,6 +198,11 @@ def delete_meeting(form=None):
             owner.meetings.remove(meeting)
             owner.save()
 
+        for group in user.groups:
+            if meeting in group.meetings:
+                group.meetings.remove(meeting)
+                group.save();
+
         meeting.delete()
         flash('success Meeting Successfully Deleted.')
 
@@ -366,4 +371,4 @@ def update_tags(meeting_id):
     meeting.tags = tags.split(" ")
     meeting.save()
 
-    return json.dumps({'stGatus': 'success'})
+    return json.dumps({'status': 'success'})
