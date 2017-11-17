@@ -19,12 +19,68 @@ def filter_form(form):
         return create_group(form)
     elif form['submit'] == 'update':
         return update_group(form)
-
     elif form['submit'] == 'delete':
         return delete_group(form)
 
     flash('error Could not Fulfill Request. Please Try Again.')
     return redirect(url_for('meetings.home'))
+
+def group_filter_form(form):
+    """ Router for CRUD Forms Recevied in the Group Landing Page """
+
+    if form['submit'] == 'create':
+        return create_group_meeting(form)
+
+@groups.route('/create-meeting', methods=['POST'])
+@login_required
+def create_group_meeting(form=None):
+    """ Creates a new meeting from the group landing page """
+    if form is None:
+        flash("error Invalid Request to create meeting")
+        return redirect(request.args.get('next') or url_for('groups.home'))
+    create_form = MeetingCreateForm(form)
+
+    if not create_form.validate():
+        flash("error Could not create new meeting, please try again")
+        return redirect(request.args.get('next') or url_for('groups.home'))
+    try: 
+        user = current_user._get_current_object()
+
+        emails = create_form.emails.data.split(" ")
+        emails.append(user.email)
+
+        # generate list of valid emails - should be valid unless a user is deleted
+        query = User.objects(email__in=emails)
+        valid_emails = [u.email for u in query]
+
+        # check if emails are complete, if not, display incorrect and cancel request
+        if len(valid_emails) != len(emails):
+            invalid_emails = list(set(emails) - set(valid_emails))
+            flash("error We were unable to find user(s): {}".format(invalid_emails))
+            return redirect(url_for('groups.home'))
+        # validate and create meeting 
+        m = Meeting(name=create_form.name.data,
+                    members=query,
+                    owner=user,
+                    active=False).save()
+        # insert meeting into each user's list of meetings
+        for u in query:
+            u.meetings.append(m)
+            u.meeting_count = u.meeting_count + 1
+            u.save()
+        
+        # insert meeting into this group
+        # query to find group associated
+        g = Group.objects.get(members=query)
+        for group in g:
+            g.meetings.append(m)
+            g.save()
+
+        flash("success Meeting successfully created with group {}".format(g.name))
+        return redirect(url_for('groups.get_group_by_id', group_id = g.id))
+    except Exception as e:
+        flash("error An error has occcured, please try again: {}".format(e))
+    return redirect(url_for('groups.home'))
 
 
 @groups.route('/', methods=['GET', 'POST'])
@@ -282,7 +338,7 @@ def get_group_by_id(group_id, form=None):
     # validate the given id
     if request.method == 'POST':
         # help
-        return redirect(url_for('groups.get_group_by_id', group_id=group_id))
+        return group_filter_form(request.form)
 
     if len(group_id) != 24 or not all(c in string.hexdigits for c in group_id):
         flash('error Invalid Group ID')
