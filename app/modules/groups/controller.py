@@ -3,7 +3,7 @@ import string
 from app.modules.auth.model import User
 from app.modules.groups.model import Group, GroupCreateForm, GroupUpdateForm, \
     GroupDeleteForm
-
+from app.modules.meetings.model import Meeting, MeetingCreateForm
 from flask import Blueprint, request, render_template, flash, redirect, \
     url_for, jsonify
 from flask_security import login_required, current_user
@@ -276,13 +276,17 @@ def search_groups(query):
     return render_template('group/dashboard.html', groups=groups)
 
 
-@groups.route('/<group_id>')
+@groups.route('/<group_id>', methods=['GET', 'POST'])
 @login_required
-def get_group_by_id(group_id):
+def get_group_by_id(group_id, form=None):
     # validate the given id
+    if request.method == 'POST':
+        # help
+        return redirect(url_for('groups.get_group_by_id', group_id=group_id))
+
     if len(group_id) != 24 or not all(c in string.hexdigits for c in group_id):
         flash('error Invalid Group ID')
-        return redirect(request.args.get('next') or url_for('groups.home'))
+        return redirect(request.args.get('next') or url_for('groups.get_group_by_id', group_id=group_id))
 
     try:
         user = current_user._get_current_object()
