@@ -3,9 +3,9 @@
 <div class="row">
     <!-- column to split editor from sidebar -->
     <div class="col-md-8">
-        <div class="container">
+        <div class="container sticky2" style="background:white;padding-top: 10px; padding-bottom: 10px">
             <div class="row">
-                <div class="col-md-10">
+                <div class="col-md-9">
                     <h3 class="flex-center"> {{ meeting.name }}
                     </h3>
                 </div>
@@ -19,15 +19,29 @@
                         <i class="fa fa-save"></i>
                     </a>
                 </div>
+                <div class="col-md-1">
+                    <a id="add" class="btn-floating btn-md quillioButton" onclick="saveTranscript()">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                </div>
             </div>
         </div>
-        <div id="editor">
+        <div class="card scrollbar-ripe-malinka">
+            <div class="card-body">
+
+
+<ul id="transcriptEditor" class="list-group">
+     </ul>
+
+
+
+            </div>
         </div>
     </div>
     <!-- \column to split editor from sidebar -->
     <!-- column for sidebar -->
     <div class="col-md-4">
-        <div class="container">
+        <div class="container sticky">
             <div class="accordion" id="" role="tablist" aria-multiselectable="true">
                 <div class="card">
                     <div class="card-header quillioColor" role="tab" id="headingOne">
@@ -98,9 +112,115 @@
 {% endblock %} {% block js_import %}
 <!-- script for quill.js -->
 <script src="https://cdn.quilljs.com/1.3.3/quill.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <!-- \script for quill.js -->
 <!-- script for quill.js configuration -->
 <script>
+    $(function () {
+        $(".sticky").sticky({
+            topSpacing: 90
+            , zIndex: 2
+
+        });
+         $(".sticky2").sticky({
+            topSpacing: 48
+            , zIndex: 2
+
+        });
+    });
+
+    let memberToName = {};
+
+    let urltoks = window.location.href.split("/");
+    let meeting_id = urltoks[urltoks.length-1];
+
+
+
+    function addChunk(chnk) {
+        let option;
+        if(!chnk){
+            option = `<select class="mdb-select"><option value="" disabled selected>Choose your speaker</option>`;
+        }else{
+            option = `<select class="mdb-select"><option value="" disabled>Choose your speaker</option>`;
+        }
+
+        for(let prop in memberToName){
+            if(chnk && chnk.user === prop){
+                option += `<option value="${prop}" selected>${memberToName[prop]}</option>`;
+            }else{
+                option += `<option value="${prop}">${memberToName[prop]}</option>`;
+            }
+        }
+        option += `</select>`;
+
+        let li;
+        if(chnk && chnk.user && chnk.transcription){
+            li = `<li class="list-group-item list-group-item-action flex-column align-items-start chunk ui-state-default">
+                        <div class="d-flex w-100 justify-content-between">
+                             ${option}
+                            <small class="text-muted remove"><i class="fa fa-times"></i></small>
+                        </div>
+                        <textarea type="text" id="form8" class="md-textarea">${chnk.transcription}</textarea>
+                    </li>`;
+        }else{
+            let prp;
+            for (var prop in memberToName) {
+                prp = prop;
+                break;
+            }
+            li = `<li class="list-group-item list-group-item-action flex-column align-items-start chunk ui-state-default">
+                        <div class="d-flex w-100 justify-content-between">
+
+                           ${option}
+
+                            <small class="text-muted remove"><i class="fa fa-times"></i></small>
+                        </div>
+                        <textarea type="text" id="form8" class="md-textarea"></textarea>
+                    </li>`;
+        }
+
+        let activeChunk = $('.active');
+        if(activeChunk.length > 0){
+            activeChunk.after(li);
+        }else{
+            $('#transcriptEditor').append(li);
+        }
+        $('#transcriptEditor li').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+            $('textarea').attr("style", "");
+            $('i').attr("style", "");
+            $('select').attr("style", "");
+            $('textarea', this).attr("style", "color:white;");
+            $('i', this).attr("style", "color:white;");
+            $('select', this).attr("style", "color:white;");
+        });
+        $('.remove').click(function(e){
+            console.log("click");
+            $(this).closest(".chunk").remove();
+        });
+        $('.mdb-select').material_select('destroy');
+        $('.mdb-select').material_select();
+
+    }
+    $('#transcriptEditor').sortable();
+    //$( "#transcriptEditor" ).disableSelection();
+    $('#add').click(addChunk);
+
+    $.ajax({
+        type: 'GET',
+        url:`/meetings/${meeting_id}/getTranscript`,
+        dataType: 'json',
+        success: function(result){
+            console.log(result);
+            for(let i = 0; i < result.members.length; i++){
+                memberToName[result.members[i].id] = result.members[i].name;
+            }
+            for(let i = 0; i < result.transcript.length; i++){
+                addChunk(result.transcript[i]);
+            }
+    }});
+
     var quill = new Quill('#editor', {
         modules: {
             toolbar: [

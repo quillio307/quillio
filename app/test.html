@@ -50,26 +50,26 @@
     </nav>
     <div id="content">
         <div class="list-group" id="myList">
-  <li href="" id="chunk" class="list-group-item list-group-item-action flex-column align-items-start">
+  <li class="list-group-item list-group-item-action flex-column align-items-start chunk">
     <div class="d-flex w-100 justify-content-between">
       <h5 class="mb-1">Ammar</h5>
-      <small id="remove" class="text-muted"><i class="fa fa-times"></i></small>
+      <small class="text-muted remove"><i class="fa fa-times"></i></small>
     </div>
     <textarea type="text" id="form8" class="md-textarea">
         Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.
     </textarea>
   </li>
-  <li id="chunk" class="list-group-item list-group-item-action flex-column align-items-start">
+  <li id="chunk" class="list-group-item list-group-item-action flex-column align-items-start chunk">
     <div class="d-flex w-100 justify-content-between">
       <h5 class="mb-1">PK</h5>
-      <small id="remove" class="text-muted"><i class="fa fa-times"></i></small>
+      <small class="text-muted remove"><i class="fa fa-times"></i></small>
     </div>
     <textarea type="text" id="form8" class="md-textarea">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</textarea>
   </li>
-  <li href="" id="chunk" class="list-group-item list-group-item-action flex-column align-items-start">
+  <li id="chunk" class="list-group-item list-group-item-action flex-column align-items-start chunk">
     <div class="d-flex w-100 justify-content-between">
       <h5 class="mb-1">Ammu</h5>
-      <small id="remove" class="text-muted"><i class="fa fa-times"></i></small>
+      <small class="text-muted remove"><i class="fa fa-times"></i></small>
     </div>
 
     <textarea type="text" id="form8" class="md-textarea">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</textarea>
@@ -78,7 +78,7 @@
 </div>
 
     </div>
-<a class="btn-floating btn-lg quillioButton" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm" id="add">
+<a id="add" class="btn-floating btn-lg quillioButton" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm" id="add">
     <i class="fa fa-plus"></i>
 </a>
     <!-- SCRIPTS -->
@@ -100,11 +100,13 @@
             $( document ).ready(function() {
                 $("textarea").autogrow();
                 $("textarea").val($("textarea").val());
-                $('#remove').click(function(e){
+
+                $('.remove').click(function(e){
                     console.log("click");
-                    $(this).closest("#chunk").remove();
+                    $(this).closest(".chunk").remove();
                 });
-                $('#myList a').click(function (e) {
+
+                $('#myList li').click(function (e) {
                   e.preventDefault()
                   $(this).tab('show');
                   $('textarea').attr("style", "")
@@ -116,9 +118,29 @@
                 $('#add').click(function(e){
                     var activeChunk = $('.active');
                     if(activeChunk.length > 0){
+                        activeChunk.after(`
+                            <li id="chunk" class="list-group-item list-group-item-action flex-column align-items-start chunk">
+                            <div class="d-flex w-100 justify-content-between">
+                              <h5 class="mb-1">Ammu</h5>
+                              <small class="text-muted remove"><i class="fa fa-times"></i></small>
+                            </div>
 
-                    }else{
+                            <textarea type="text" id="form8" class="md-textarea">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</textarea>
 
+                          </li>
+                        `);
+                        $('#myList li').click(function (e) {
+                          e.preventDefault()
+                          $(this).tab('show');
+                          $('textarea').attr("style", "")
+                          $('i').attr("style", "")
+                          $('textarea', this).attr("style", "color:white;")
+                          $('i', this).attr("style", "color:white;")
+                        });
+                        $('.remove').click(function(e){
+                            console.log("click");
+                            $(this).closest(".chunk").remove();
+                        });
                     }
                 });
             });
