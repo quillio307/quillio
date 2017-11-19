@@ -359,14 +359,14 @@ def update_tags(meeting_id):
     if request.form is None:
         print('Form is invalid')
 
-    tags = request.form['tags']
+    print(request.data)
 
-    if tags is None:
-        return json.dumps({'error': 'invalid tags'})
-
-    meeting = Meeting.objects.get(id=meeting_id)
-    meeting.tags = tags.split(" ")
-    meeting.save()
+    # if tags is None:
+    #     return json.dumps({'error': 'invalid tags'})
+    #
+    # meeting = Meeting.objects.get(id=meeting_id)
+    # meeting.tags = tags.split(" ")
+    # meeting.save()
 
     return json.dumps({'status': 'success'})
 

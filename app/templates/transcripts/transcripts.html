@@ -20,7 +20,7 @@
                     </a>
                 </div>
                 <div class="col-md-1">
-                    <a id="add" class="btn-floating btn-md quillioButton" onclick="saveTranscript()">
+                    <a id="add" class="btn-floating btn-md quillioButton" onclick="addChunk()">
                         <i class="fa fa-plus"></i>
                     </a>
                 </div>
@@ -30,8 +30,8 @@
             <div class="card-body">
 
 
-<ul id="transcriptEditor" class="list-group">
-     </ul>
+        <div id="transcriptEditor">
+        </div>
 
 
 
@@ -111,6 +111,8 @@
 
 {% endblock %} {% block js_import %}
 <!-- script for quill.js -->
+{#    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>#}
+
 <script src="https://cdn.quilljs.com/1.3.3/quill.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <!-- \script for quill.js -->
@@ -187,13 +189,21 @@
         }
         $('#transcriptEditor li').click(function (e) {
             e.preventDefault();
-            $(this).tab('show');
-            $('textarea').attr("style", "");
-            $('i').attr("style", "");
-            $('select').attr("style", "");
-            $('textarea', this).attr("style", "color:white;");
-            $('i', this).attr("style", "color:white;");
-            $('select', this).attr("style", "color:white;");
+            if(!$(this).hasClass('active')){
+                $(this).tab('show');
+                $('textarea').attr("style", "");
+                $('i').attr("style", "");
+                $('select').attr("style", "");
+                $('textarea', this).attr("style", "color:white;");
+                $('i', this).attr("style", "color:white;");
+                $('select', this).attr("style", "color:white;");
+            }else{
+                $('textarea').attr("style", "");
+                $('i').attr("style", "");
+                $('select').attr("style", "");
+                $(this).toggleClass('active');
+            }
+
         });
         $('.remove').click(function(e){
             console.log("click");
@@ -201,11 +211,10 @@
         });
         $('.mdb-select').material_select('destroy');
         $('.mdb-select').material_select();
-
     }
+
     $('#transcriptEditor').sortable();
     //$( "#transcriptEditor" ).disableSelection();
-    $('#add').click(addChunk);
 
     $.ajax({
         type: 'GET',
@@ -221,44 +230,25 @@
             }
     }});
 
-    var quill = new Quill('#editor', {
-        modules: {
-            toolbar: [
-                [{
-                    header: [1, 2, false]
-                }],
-                ['bold', 'italic', 'underline'],
-                ['image', 'code-block']
-            ]
-        },
-        placeholder: 'Compose an epic...',
-        theme: 'snow',
-    });
-    quill.setText(`{{ meeting.transcriptText }}`);
-    quill.enable(false);
+    let editMode = false;
 
     function editTranscript() {
-        quill.enable()
+        editMode = true;
     }
 
     function saveTranscript() {
-        var transcript = quill.getText(0, quill.getLength())
-        var id = `{{ meeting.id }}`
-        const params = new URLSearchParams()
-        params.append('transcript', transcript)
-
-        fetch('/meetings/{{ meeting.id }}/updateTranscript', {
-                method: 'POST',
-                body: params
-            })
-            .then(function(res) {
-                quill.enable(false)
-                console.log(JSON.stringify(res, undefined, 2))
-
-            })
-            .then(function() {
-                window.location.href = "/meetings/{{ meeting.id }}/tags"
-            })
+        let payload = [];
+        $('#transcriptEditor li').each(function( index ) {
+            let usr = $('select', this).val();
+            if(usr != undefined){
+                payload.push({
+                    user: usr,
+                    transcription: $('textarea', this).text()
+                });
+            }
+        });
+        console.log(payload);
+        editMode = false;
     }
 </script>
 <script>
