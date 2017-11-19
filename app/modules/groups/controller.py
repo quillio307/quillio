@@ -266,7 +266,7 @@ def delete_group(form=None):
 
         members = group.members
         admins = group.admins
-
+        meetings = group.meetings
         # validate that the user is an admin for the group
         if user not in admins:
             flash('error You do not have permission to delete this group.')
@@ -285,6 +285,20 @@ def delete_group(form=None):
                 admin.groups.remove(group)
                 admin.save()
 
+        # delete all meetings associated with group
+        for meeting in meetings:
+            # remove meeting from all member's list of meetings
+            for member in members:
+                member.meetings.remove(meeting)
+                member.save()
+
+            # remove meeting from each admin's list of meetings
+            for admin in admins:
+                admin.meetings.remove(meeting)
+                admin.save()
+
+            # now delete the entire meeting from the database
+            meeting.delete()
         group.delete()
 
         flash('success Group Successfully Deleted')
