@@ -36,7 +36,7 @@ def home():
         return filter_form(request.form)
 
     user = current_user._get_current_object()
-    return render_template('meeting/dashboard.html', meetings=user.meetings)
+    return render_template('meeting/dashboard.html', meetings=current_user.meetings)
 
 
 @meetings.route('/create', methods=['POST'])

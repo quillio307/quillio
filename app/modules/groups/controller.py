@@ -25,11 +25,13 @@ def filter_form(form):
     flash('error Could not Fulfill Request. Please Try Again.')
     return redirect(url_for('meetings.home'))
 
+
 def group_filter_form(form):
     """ Router for CRUD Forms Recevied in the Group Landing Page """
 
     if form['submit'] == 'create':
         return create_group_meeting(form)
+
 
 @groups.route('/create-meeting', methods=['POST'])
 @login_required
@@ -43,7 +45,7 @@ def create_group_meeting(form=None):
     if not create_form.validate():
         flash("error Could not create new meeting, please try again")
         return redirect(request.args.get('next') or url_for('groups.home'))
-    try: 
+    try:
         user = current_user._get_current_object()
 
         emails = create_form.emails.data.split(" ")
@@ -58,7 +60,7 @@ def create_group_meeting(form=None):
             invalid_emails = list(set(emails) - set(valid_emails))
             flash("error We were unable to find user(s): {}".format(invalid_emails))
             return redirect(url_for('groups.home'))
-        # validate and create meeting 
+        # validate and create meeting
         m = Meeting(name=create_form.name.data,
                     members=query,
                     owner=user,
@@ -68,16 +70,15 @@ def create_group_meeting(form=None):
             u.meetings.append(m)
             u.meeting_count = u.meeting_count + 1
             u.save()
-        
+
         # insert meeting into this group
         # query to find group associated
         g = Group.objects.get(members=query)
-        for group in g:
-            g.meetings.append(m)
-            g.save()
+        g.meetings.append(m)
+        g.save()
 
         flash("success Meeting successfully created with group {}".format(g.name))
-        return redirect(url_for('groups.get_group_by_id', group_id = g.id))
+        return redirect(url_for('groups.get_group_by_id', group_id=g.id))
     except Exception as e:
         flash("error An error has occcured, please try again: {}".format(e))
     return redirect(url_for('groups.home'))
@@ -355,8 +356,8 @@ def get_group_by_id(group_id, form=None):
         for u in group.members:
             if u.email != user.email:
                 emails.append(u.email)
-        emails =" ".join(emails)
-        return render_template('group/group.html', group = group, emails = emails)
+        emails = " ".join(emails)
+        return render_template('group/group.html', group=group, emails=emails)
 
     except Exception as e:
         flash('error An Error Occured. {}'.format(str(e)))
