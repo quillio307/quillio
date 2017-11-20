@@ -6,7 +6,7 @@ from rake_nltk import Rake
 from app.modules.auth.model import User
 from app.modules.meetings.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm, MeetingDeleteForm
-
+from app.modules.groups.model import Group
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
 from flask_security import current_user, login_required
@@ -36,7 +36,7 @@ def home():
         return filter_form(request.form)
 
     user = current_user._get_current_object()
-    return render_template('meeting/dashboard.html', meetings=user.meetings)
+    return render_template('meeting/dashboard.html', meetings=current_user.meetings)
 
 
 @meetings.route('/create', methods=['POST'])
@@ -177,6 +177,7 @@ def delete_meeting(form=None):
     try:
         user = current_user._get_current_object()
         meeting = Meeting.objects.get(id=delete_form.meeting_id.data)
+        groups = Group.objects(meetings__contains=meeting)
 
         members = meeting.members
         owner = meeting.owner
@@ -197,6 +198,11 @@ def delete_meeting(form=None):
         if meeting in owner.meetings:
             owner.meetings.remove(meeting)
             owner.save()
+
+        # remove meeting from a group's list of meetings
+        for group in groups:
+            group.meetings.remove(meeting)
+            group.save()
 
         meeting.delete()
         flash('success Meeting Successfully Deleted.')
