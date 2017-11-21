@@ -339,16 +339,12 @@ def get_tags(meeting_id):
 
 @meetings.route('/<meeting_id>/updateTranscript', methods=['POST'])
 def update_transcript(meeting_id):
-    if request.form is None:
-        print('Form is invalid')
-
-    transcript = request.form['transcript']
-
-    if transcript is None:
-        return json.dumps({'error': 'invalid transcript'})
+    payload = request.get_json()
 
     meeting = Meeting.objects.get(id=meeting_id)
-    meeting.transcriptText = transcript
+    meeting.transcript = []
+    for chunk in payload:
+        meeting.add_transcription(chunk['user'], chunk['transcription'])
     meeting.save()
 
     return json.dumps({'status': 'success'})
@@ -359,14 +355,14 @@ def update_tags(meeting_id):
     if request.form is None:
         print('Form is invalid')
 
-    print(request.data)
+    tags = request.form['tags']
 
-    # if tags is None:
-    #     return json.dumps({'error': 'invalid tags'})
-    #
-    # meeting = Meeting.objects.get(id=meeting_id)
-    # meeting.tags = tags.split(" ")
-    # meeting.save()
+    if tags is None:
+        return json.dumps({'error': 'invalid tags'})
+
+    meeting = Meeting.objects.get(id=meeting_id)
+    meeting.tags = tags.split(" ")
+    meeting.save()
 
     return json.dumps({'status': 'success'})
 

@@ -122,6 +122,7 @@
 <!-- \script for quill.js -->
 <!-- script for quill.js configuration -->
 <script>
+    /*
     $(function () {
         $(".sticky").sticky({
             topSpacing: 90
@@ -134,11 +135,11 @@
 
         });
     });
-
+*/
     let memberToName = {};
 
     let urltoks = window.location.href.split("/");
-    let meeting_id = urltoks[urltoks.length-1];
+    let meeting_id = "{{ meeting.id }}";
 
 
 
@@ -252,17 +253,27 @@
 
     function saveTranscript() {
         let payload = [];
-        $('#transcriptEditor li').each(function( index ) {
+        $('#transcriptEditor .chunk').each(function( index ) {
             let usr = $('select', this).val();
             if(usr != undefined){
                 payload.push({
                     user: usr,
-                    transcription: $('textarea', this).text()
+                    transcription: $('textarea', this).val()
                 });
             }
         });
         console.log(payload);
         editMode = false;
+
+        $.ajax({
+          type: "POST",
+          url: `/meetings/${meeting_id}/updateTranscript`,
+          data: JSON.stringify(payload),
+          success: function (data) {
+              console.log(data);
+          },
+          contentType:"application/json"
+        });
     }
 </script>
 <script>
