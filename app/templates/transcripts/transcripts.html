@@ -197,20 +197,25 @@
                 if($('.chunk', this).hasClass("blue") === true){
                     console.log("Has class blue");
                     $('.chunk').removeClass("blue");
+                    $('textarea', $('#transcriptEditor')).attr("style", "");
+                    $('i', $('#transcriptEditor')).attr("style", "");
+                    $('input', $('#transcriptEditor')).attr("style", "");
+                    $('.caret', $('#transcriptEditor')).attr("style", "");
                 }else{
                     console.log("Does not have class blue");
                      $('.chunk').removeClass("blue");
                     $('.chunk', this).addClass("blue");
+
+
+                     $('textarea', $('#transcriptEditor')).attr("style", "");
+                    $('i', $('#transcriptEditor')).attr("style", "");
+                    $('input', $('#transcriptEditor')).attr("style", "");
+                    $('.caret', $('#transcriptEditor')).attr("style", "");
+                     $('textarea', this).attr("style", "color:white;");
+                    $('i', this).attr("style", "color:white;");
+                    $('input', this).attr("style", "color:white;");
+                    $('.caret', this).attr("style", "color:white;");
                 }
-
-
-                //$('textarea').attr("style", "");
-                //$('i').attr("style", "");
-                //$('select').attr("style", "");
-
-                //$('textarea', this).attr("style", "color:white;");
-                //$('i', this).attr("style", "color:white;");
-                //$('select', this).attr("style", "color:white;");
 
         });
         $('.remove').click(function(e){
