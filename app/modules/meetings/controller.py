@@ -379,13 +379,13 @@ def update_grammar(meeting_id):
     string = meeting.transcriptText.replace("\n", " ")
 
     #punctuation = re.compile(r'[-,":;()\']')
-    punctuation = [',','\"','-']
+    punctuation = [',','\"','-','\’']
     exclude = set(punctuation)
     tokens =word_tokenize(string)
-    print(tokens)
     tokens = [w.lower() for w in tokens]
-    tokens = ''.join(ch for ch in tokens if ch not in punctuation)
-    meeting.transcriptText = "".join(str(tok) for tok in tokens)
+    print(tokens)
+    tokens = ''.join(ch+" " for ch in tokens if ch not in punctuation)
+    meeting.transcriptText = tokens
     meeting.save()
 
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
