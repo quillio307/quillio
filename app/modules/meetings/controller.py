@@ -1,7 +1,11 @@
 import json
 import string
+import re
 
 from rake_nltk import Rake
+from nltk.tokenize import word_tokenize
+from nltk.tokenize import RegexpTokenizer
+
 
 from app.modules.auth.model import User
 from app.modules.meetings.model import Meeting, MeetingCreateForm, \
@@ -367,3 +371,21 @@ def update_tags(meeting_id):
     meeting.save()
 
     return json.dumps({'status': 'success'})
+
+@meetings.route('/<meeting_id>/updateTranscriptGrammar', methods=['GET'])
+@login_required
+def update_grammar(meeting_id):
+    meeting = Meeting.objects.with_id(meeting_id)
+    string = meeting.transcriptText.replace("\n", " ")
+
+    #punctuation = re.compile(r'[-,":;()\']')
+    punctuation = [',','\"','-']
+    exclude = set(punctuation)
+    tokens =word_tokenize(string)
+    print(tokens)
+    tokens = [w.lower() for w in tokens]
+    tokens = ''.join(ch for ch in tokens if ch not in punctuation)
+    meeting.transcriptText = "".join(str(tok) for tok in tokens)
+    meeting.save()
+
+    return redirect(url_for('meetings.edit_meeting', id=meeting_id))
