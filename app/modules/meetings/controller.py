@@ -199,10 +199,11 @@ def delete_meeting(form=None):
             owner.meetings.remove(meeting)
             owner.save()
 
+        # remove meeting from owner's list of groups
         for group in user.groups:
             if meeting in group.meetings:
                 group.meetings.remove(meeting)
-                group.save();
+                group.save()
 
         meeting.delete()
         flash('success Meeting Successfully Deleted.')
