@@ -1,6 +1,7 @@
 import json
 import string
 import re
+import requests
 
 from rake_nltk import Rake
 from nltk.tokenize import word_tokenize
@@ -396,8 +397,10 @@ def update_grammar(meeting_id):
                 #print(tok)
                 retStr = retStr[:-1]
 
+    r = requests.post('http://bark.phon.ioc.ee/punctuator',data={'text':retStr})
+    print(r.text)
 
-    meeting.transcriptText = retStr
+    meeting.transcriptText = r.text
     meeting.save()
 
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
