@@ -397,8 +397,8 @@ def update_grammar(meeting_id):
                 #print(tok)
                 retStr = retStr[:-1]
 
-    r = requests.post('http://bark.phon.ioc.ee/punctuator',data={'text':retStr})
-    print(r.text)
+    r = requests.post('http://bark.phon.ioc.ee/punctuator',data={'text':string})
+    print(string)
 
     meeting.transcriptText = r.text
     meeting.save()
