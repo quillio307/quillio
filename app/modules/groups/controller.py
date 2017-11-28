@@ -64,6 +64,7 @@ def create_group_meeting(form=None):
         m = Meeting(name=create_form.name.data,
                     members=query,
                     owner=user,
+                    meeting_nature=create_form.nature.data,
                     active=False).save()
         # insert meeting into each user's list of meetings
         for u in query:
@@ -371,7 +372,8 @@ def get_group_by_id(group_id, form=None):
             if u.email != user.email:
                 emails.append(u.email)
         emails = " ".join(emails)
-        return render_template('group/group.html', group=group, emails=emails)
+        form = MeetingCreateForm()
+        return render_template('group/group.html', group=group, emails=emails, form=form)
 
     except Exception as e:
         flash('error An Error Occured. {}'.format(str(e)))
