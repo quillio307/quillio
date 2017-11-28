@@ -201,7 +201,7 @@ def delete_meeting(form=None):
         for group in user.groups:
             if meeting in group.meetings:
                 group.meetings.remove(meeting)
-                group.save();
+                group.save()
 
         meeting.delete()
         flash('success Meeting Successfully Deleted.')
@@ -257,8 +257,11 @@ def search_meetings(query):
     # get the list of tags to search for
     tags = list(filter(lambda x: "#" in x, search))
 
+    # get the list of groups to search for
+    groups = list(filter(lambda x: "$" in x, search))
+
     # get the other search criteria
-    search = list(set(search) - set(users) - set(tags))
+    search = list(set(search) - set(users) - set(tags) - set(groups))
 
     # filter the meetings to only contain meetings with desired tags
     for t in tags:
@@ -277,6 +280,14 @@ def search_meetings(query):
             meetings = list(filter(lambda x: user in x.members, meetings))
         except Exception as e:
             return render_template('meetings.home', meetings=[])
+
+    # filter the meetings to only contain meetings created through desired group
+    for g in groups:
+        try:
+            group = Group.objects.get(name=g[1:])
+            meetings = [val for val in group.meetings if val in meetings]
+        except Exception as e:
+            return render_template('meetings.home', meetings[])
 
     # filter the meetings to only contain meetings with the desired text
     for c in search:
@@ -334,6 +345,7 @@ def get_tags(meeting_id):
     meeting.tags = return_data
     meeting.save()
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
+
 
 @meetings.route('/<meeting_id>/updateTranscript', methods=['POST'])
 def update_transcript(meeting_id):
