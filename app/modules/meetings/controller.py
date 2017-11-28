@@ -313,12 +313,15 @@ def meeting_info(meeting_id):
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
-@meetings.route('/<meeting_id>/tags', methods=['GET'])
+@meetings.route('/<meeting_id>/topics', methods=['GET'])
 @login_required
-def get_tags(meeting_id):
+def get_topics(meeting_id):
     """ generates topics for the meeting with the given id """
     meeting = Meeting.objects.with_id(meeting_id)
-    string = meeting.transcriptText.replace("\n", " ")
+    string = ""
+    for transcript in meeting.transcript:
+        string += transcript.transcription + " "
+    print(string)
     r = Rake()  # initializes Rake with English (all punc) as default lang
     r.extract_keywords_from_text(string)
 
@@ -334,7 +337,6 @@ def get_tags(meeting_id):
 
     return_data = " ".join(data).split(" ")
     meeting.topics = return_data
-    # meeting.tags = return_data
     meeting.save()
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
 
@@ -358,7 +360,7 @@ def update_tags(meeting_id):
         print('Form is invalid')
 
     tags = request.form['tags']
-
+    print(tags)
     if tags is None:
         return json.dumps({'error': 'invalid tags'})
 
