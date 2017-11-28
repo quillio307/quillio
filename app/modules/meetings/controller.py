@@ -268,7 +268,7 @@ def search_meetings(query):
         try:
             t = t.lower()
             meetings = list(filter(lambda x: t[1:] in
-                                   " ".join(x.tags).split(" "), meetings))
+                                   x.tags or t[1:] in x.topics, meetings))
 
         except Exception as e:
             return render_template('meetings.home', meetings=[])
