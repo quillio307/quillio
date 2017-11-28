@@ -10,11 +10,6 @@
                     </h3>
                 </div>
                 <div class="col-md-1">
-                    <a class="btn-floating btn-md quillioButton" onclick="editTranscript()">
-                        <i class="fa fa-edit"></i>
-                    </a>
-                </div>
-                <div class="col-md-1">
                     <a id="saveTrans" class="btn-floating btn-md quillioButton" onclick="saveTranscript()">
                         <i class="fa fa-save"></i>
                     </a>
@@ -76,14 +71,14 @@
                     <div class="card-header quillioColor" role="tab" id="headingThree">
                         <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                             <h5 class="white-text">
-                                Tags
+                                Topics
                                 <i class="fa fa-angle-down rotate-icon"></i>
                             </h5>
                         </a>
                     </div>
                     <div id="collapseThree" class="collapse show" role="tabpanel" aria-labelledby="headingThree">
                         <div id="reloadTags" class="card-body">
-                            <textarea style="height:auto" class="form-control" id="newTags" rows="8">{% for topic in meeting.topics %}{{ topic }} {% endfor %}</textarea>
+                            <textarea readonly style="height:auto" class="form-control" id="currTopics" rows="8">{% for topic in meeting.topics %}{{ topic }} {% endfor %}</textarea>
                         </div>
                     </div>
                 </div>
@@ -233,10 +228,19 @@
         }
     });
 
-    let editMode = false;
-
-    function editTranscript() {
-        editMode = true;
+    function saveTags() {
+        var tags = $('#newTags').val();
+        console.log(tags);
+        var id = `{{ meeting.id }}`
+        const params = new URLSearchParams()
+        params.append('tags', tags)
+        fetch('/meetings/{{ meeting.id }}/updateTags', {
+                method: 'POST',
+                body: params
+            })
+            .then(function(res) {
+                console.log(JSON.stringify(res, undefined, 2))
+            })
     }
 
     function saveTranscript() {
@@ -251,7 +255,6 @@
             }
         });
         console.log(payload);
-        editMode = false;
 
         $.ajax({
             type: "POST",
@@ -259,28 +262,17 @@
             data: JSON.stringify(payload),
             success: function(data) {
                 console.log(data);
+
             },
             contentType: "application/json"
-        });
-    }
-</script>
-<script>
-    function saveTags() {
-        var tags = $('#newTags').val();
-        var id = `{{ meeting.id }}`
-        const params = new URLSearchParams()
-        params.append('tags', tags)
+        })
+        .then(function() {
+                window.location.href = "/meetings/{{ meeting.id }}/topics"
+        })
 
-        fetch('/meetings/{{ meeting.id }}/updateTags', {
-                method: 'POST',
-                body: params
-            })
-            .then(function(res) {
-                console.log(JSON.stringify(res, undefined, 2))
-            })
-    }
+  }
 </script>
-<!-- \script for quill.js configuration -->
+
 <!-- script for sidenav collapse -->
 <script>
     $(".button-collapse").sideNav();
