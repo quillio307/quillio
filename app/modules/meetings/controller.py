@@ -10,6 +10,7 @@ from app.modules.groups.model import Group
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
 from flask_security import current_user, login_required
+from bson import json_util
 
 meetings = Blueprint('meetings', __name__)
 
@@ -316,26 +317,22 @@ def meeting_info(meeting_id):
 @login_required
 def get_tags(meeting_id):
     """ generates topics for the meeting with the given id """
-
     meeting = Meeting.objects.with_id(meeting_id)
-
     string = meeting.transcriptText.replace("\n", " ")
-
     r = Rake()  # initializes Rake with English (all punc) as default lang
     r.extract_keywords_from_text(string)
 
     topic_data = r.get_ranked_phrases_with_scores()
-
     count = 0
-    return_data = []
-
+    data = []
     for topic in topic_data:
         if topic[0] < 5 or count == 10:
             break
         else:
-            return_data.append(str(topic[1]))
+            data.append(str(topic[1]))
             count = count + 1
 
+    return_data = " ".join(data).split(" ")
     meeting.topics = return_data
     meeting.tags = return_data
     meeting.save()
@@ -344,16 +341,12 @@ def get_tags(meeting_id):
 
 @meetings.route('/<meeting_id>/updateTranscript', methods=['POST'])
 def update_transcript(meeting_id):
-    if request.form is None:
-        print('Form is invalid')
-
-    transcript = request.form['transcript']
-
-    if transcript is None:
-        return json.dumps({'error': 'invalid transcript'})
+    payload = request.get_json()
 
     meeting = Meeting.objects.get(id=meeting_id)
-    meeting.transcriptText = transcript
+    meeting.transcript = []
+    for chunk in payload:
+        meeting.add_transcription(chunk['user'], chunk['transcription'])
     meeting.save()
 
     return json.dumps({'status': 'success'})
@@ -374,3 +367,20 @@ def update_tags(meeting_id):
     meeting.save()
 
     return json.dumps({'status': 'success'})
+
+
+@meetings.route('/<meeting_id>/getTranscript', methods=['GET'])
+@login_required
+def get_transcription(meeting_id):
+    """ gets transcript of a given meeting """
+
+    meeting = Meeting.objects.get(id=meeting_id)
+    meeting_dict = json.loads(meeting.to_json())
+    payload = {'members': [], 'transcript': meeting_dict['transcript']}
+
+    for member in meeting.members:
+        payload['members'].append({'name': member.name, 'id': str(member.id)})
+    for chunk in payload['transcript']:
+        chunk['user'] = chunk['user']['$oid']
+
+    return json.dumps(payload)
