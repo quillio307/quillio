@@ -40,17 +40,18 @@ def signup():
 
         # generate activation token
         activation_token = secrets.token_urlsafe(32)
-
+        print("Activation token generated")
         mail = SendGrid(app)
-
+        print("Send grid created")
         # send registration email
-        mail.send_email(
-            from_email=app.config['SENDGRID_DEFAULT_FROM'],
-            to_email=email,
-            subject='Welcome to Quillio',
-            html=activate_html(name, activation_token,
-                               email)
-        )
+        # mail.send_email(
+        #     from_email=app.config['SENDGRID_DEFAULT_FROM'],
+        #     to_email=email,
+        #     subject='Welcome to Quillio',
+        #     html=activate_html(name, activation_token,
+        #                        email)
+        # )
+        print("Email sent")
 
         # add user to the database
         user_datastore.create_user(

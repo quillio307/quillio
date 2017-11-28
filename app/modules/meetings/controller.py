@@ -10,6 +10,7 @@ from app.modules.meetings.model import Meeting, MeetingCreateForm, \
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
 from flask_security import current_user, login_required
+from bson import json_util
 
 meetings = Blueprint('meetings', __name__)
 
@@ -335,18 +336,15 @@ def get_tags(meeting_id):
     meeting.save()
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
 
+
 @meetings.route('/<meeting_id>/updateTranscript', methods=['POST'])
 def update_transcript(meeting_id):
-    if request.form is None:
-        print('Form is invalid')
-
-    transcript = request.form['transcript']
-
-    if transcript is None:
-        return json.dumps({'error': 'invalid transcript'})
+    payload = request.get_json()
 
     meeting = Meeting.objects.get(id=meeting_id)
-    meeting.transcriptText = transcript
+    meeting.transcript = []
+    for chunk in payload:
+        meeting.add_transcription(chunk['user'], chunk['transcription'])
     meeting.save()
 
     return json.dumps({'status': 'success'})
@@ -367,3 +365,20 @@ def update_tags(meeting_id):
     meeting.save()
 
     return json.dumps({'status': 'success'})
+
+
+@meetings.route('/<meeting_id>/getTranscript', methods=['GET'])
+@login_required
+def get_transcription(meeting_id):
+    """ gets transcript of a given meeting """
+
+    meeting = Meeting.objects.get(id=meeting_id)
+    meeting_dict = json.loads(meeting.to_json())
+    payload = {'members': [], 'transcript': meeting_dict['transcript']}
+
+    for member in meeting.members:
+        payload['members'].append({'name': member.name, 'id': str(member.id)})
+    for chunk in payload['transcript']:
+        chunk['user'] = chunk['user']['$oid']
+
+    return json.dumps(payload)
