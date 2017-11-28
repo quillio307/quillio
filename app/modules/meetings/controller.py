@@ -35,9 +35,11 @@ def home():
     """ Displays All of the Current Users Meetings on the Meeting Dashboard """
     if request.method == 'POST':
         return filter_form(request.form)
-
+    form = MeetingCreateForm()
     user = current_user._get_current_object()
-    return render_template('meeting/dashboard.html', meetings=current_user.meetings)
+    
+    return render_template('meeting/dashboard.html', meetings=user.meetings, form=form)
+
 
 
 @meetings.route('/create', methods=['POST'])
@@ -74,8 +76,12 @@ def create_meeting(form=None):
             return redirect(url_for('meetings.home'))
 
         # validate and create the meeting
-        m = Meeting(name=create_form.name.data,
-                    members=query, owner=user, active=False).save()
+        if create_form.nature.data == 'other':
+            m = Meeting(name=create_form.name.data,
+                        members=query, owner=user, meeting_nature="", active=False).save()
+        else:
+            m = Meeting(name=create_form.name.data, members=query,
+                        owner=user, meeting_nature=create_form.nature.data, active=False).save()
 
         # insert the meeting in each user's list of meetings
         for u in query:

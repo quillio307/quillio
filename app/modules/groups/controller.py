@@ -362,10 +362,10 @@ def get_group_by_id(group_id, form=None):
     try:
         user = current_user._get_current_object()
         group = Group.objects.get(id=group_id)
-
         if user not in group.members:
             flash('error You Are Not A Member Of This Group.')
             return redirect(request.args.get('next') or url_for('groups.home'))
+
         emails = []
         for u in group.members:
             if u.email != user.email:

@@ -3,7 +3,7 @@ from datetime import datetime as dt
 
 from app.modules.auth.model import User
 
-from wtforms import Form, validators, StringField
+from wtforms import Form, validators, StringField, RadioField
 
 
 class Transcription(db.EmbeddedDocument):
@@ -24,6 +24,7 @@ class Meeting(db.Document):
     summary = db.StringField()
     recording = db.StringField()
     transcriptText = db.StringField()
+    meeting_nature = db.StringField(default="", required=False)
     meta = {'strict': False}
 
     def is_in_meeting(self, user):
@@ -61,6 +62,8 @@ class MeetingCreateForm(Form):
     name = StringField('Meeting Name', [validators.Length(min=3, max=100),
                                         validators.DataRequired()])
     emails = StringField('Emails', [validators.DataRequired()])
+    nature = RadioField('Meeting Nature', choices=[
+        ('academic', 'Academic'), ('professional', 'Professional'), ('other', "Other/NA")])
 
 
 class MeetingUpdateForm(Form):

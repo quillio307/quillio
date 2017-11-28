@@ -96,8 +96,13 @@
                     <div class="md-form form-sm">
                         <input type="text" id="emails" name="emails" value="{{ request.form.emails }}" class="form-control" required>
                         <label for="emails"> Member Emails </label>
+                    </div> 
+                    <legend> Set nature of meeting: </legend>
+                    {% for subfield in form.nature %}
+                    <div class="form-group">
+                        {{ subfield }} {{ subfield.label }}
                     </div>
-
+                    {% endfor %}
                     <div class="text-center mt-1-half">
                         <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="create" formmethod="post">
                             Create
