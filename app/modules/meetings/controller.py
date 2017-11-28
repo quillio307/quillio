@@ -6,10 +6,11 @@ from rake_nltk import Rake
 from app.modules.auth.model import User
 from app.modules.meetings.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm, MeetingDeleteForm
-
+from app.modules.groups.model import Group
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
 from flask_security import current_user, login_required
+from bson import json_util
 
 meetings = Blueprint('meetings', __name__)
 
@@ -36,7 +37,9 @@ def home():
         return filter_form(request.form)
     form = MeetingCreateForm()
     user = current_user._get_current_object()
+    
     return render_template('meeting/dashboard.html', meetings=user.meetings, form=form)
+
 
 
 @meetings.route('/create', methods=['POST'])
@@ -181,6 +184,7 @@ def delete_meeting(form=None):
     try:
         user = current_user._get_current_object()
         meeting = Meeting.objects.get(id=delete_form.meeting_id.data)
+        groups = Group.objects(meetings__contains=meeting)
 
         members = meeting.members
         owner = meeting.owner
@@ -202,6 +206,7 @@ def delete_meeting(form=None):
             owner.meetings.remove(meeting)
             owner.save()
 
+        # remove meeting from owner's list of groups
         for group in user.groups:
             if meeting in group.meetings:
                 group.meetings.remove(meeting)
@@ -261,8 +266,11 @@ def search_meetings(query):
     # get the list of tags to search for
     tags = list(filter(lambda x: "#" in x, search))
 
+    # get the list of groups to search for
+    groups = list(filter(lambda x: "$" in x, search))
+
     # get the other search criteria
-    search = list(set(search) - set(users) - set(tags))
+    search = list(set(search) - set(users) - set(tags) - set(groups))
 
     # filter the meetings to only contain meetings with desired tags
     for t in tags:
@@ -272,7 +280,7 @@ def search_meetings(query):
                                    " ".join(x.tags).split(" "), meetings))
 
         except Exception as e:
-            return render_template('meetings.home', meetings=[])
+            return render_template('meeting/dashboard.html', meetings=[])
 
     # filter the meetings to only contain meetings with desired members
     for u in users:
@@ -280,7 +288,15 @@ def search_meetings(query):
             user = User.objects.get(email=u[1:])
             meetings = list(filter(lambda x: user in x.members, meetings))
         except Exception as e:
-            return render_template('meetings.home', meetings=[])
+            return render_template('meeting/dashboard.html', meetings=[])
+
+    # filter the meetings to only contain meetings created through desired group
+    for g in groups:
+        try:
+            group = Group.objects.get(name=g[1:])
+            meetings = [val for val in group.meetings if val in meetings]
+        except Exception as e:
+            return render_template('meeting/dashboard.html', meetings=[])
 
     # filter the meetings to only contain meetings with the desired text
     for c in search:
@@ -342,16 +358,12 @@ def get_tags(meeting_id):
 
 @meetings.route('/<meeting_id>/updateTranscript', methods=['POST'])
 def update_transcript(meeting_id):
-    if request.form is None:
-        print('Form is invalid')
-
-    transcript = request.form['transcript']
-
-    if transcript is None:
-        return json.dumps({'error': 'invalid transcript'})
+    payload = request.get_json()
 
     meeting = Meeting.objects.get(id=meeting_id)
-    meeting.transcriptText = transcript
+    meeting.transcript = []
+    for chunk in payload:
+        meeting.add_transcription(chunk['user'], chunk['transcription'])
     meeting.save()
 
     return json.dumps({'status': 'success'})
@@ -372,3 +384,20 @@ def update_tags(meeting_id):
     meeting.save()
 
     return json.dumps({'status': 'success'})
+
+
+@meetings.route('/<meeting_id>/getTranscript', methods=['GET'])
+@login_required
+def get_transcription(meeting_id):
+    """ gets transcript of a given meeting """
+
+    meeting = Meeting.objects.get(id=meeting_id)
+    meeting_dict = json.loads(meeting.to_json())
+    payload = {'members': [], 'transcript': meeting_dict['transcript']}
+
+    for member in meeting.members:
+        payload['members'].append({'name': member.name, 'id': str(member.id)})
+    for chunk in payload['transcript']:
+        chunk['user'] = chunk['user']['$oid']
+
+    return json.dumps(payload)

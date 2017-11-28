@@ -1,5 +1,5 @@
 {% extends"helpers/layout.html" %} {% block navbar %}
-<nav id="mainNav" class="navbar quillioColor fixed-top navbar-toggleable-md navbar-expand-lg scrolling-navbar double-nav">
+<nav class="navbar quillioColor fixed-top navbar-toggleable-md navbar-expand-lg scrolling-navbar double-nav">
     <div class="float-left">
         <a href="#" data-activates="slide-out" class="button-collapse">
             <i class="fa fa-bars"></i>
@@ -109,6 +109,13 @@
 
 {% endblock %} {% block content %}
 <main>
-    {% block main %} {% endblock %}
+  <div class="row">
+    <div class="col-md-8">
+      {% block landing_content %}{% endblock %}
+    </div>
+    <div class="col-md-4">
+      {% block sidebar_content %}{% endblock %}
+    </div>
+  </div>
 </main>
 {% endblock %}
