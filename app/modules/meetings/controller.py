@@ -11,10 +11,11 @@ from nltk.tokenize import RegexpTokenizer
 from app.modules.auth.model import User
 from app.modules.meetings.model import Meeting, MeetingCreateForm, \
     MeetingUpdateForm, MeetingDeleteForm
-
+from app.modules.groups.model import Group
 from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify
 from flask_security import current_user, login_required
+from bson import json_util
 
 meetings = Blueprint('meetings', __name__)
 
@@ -41,7 +42,7 @@ def home():
         return filter_form(request.form)
 
     user = current_user._get_current_object()
-    return render_template('meeting/dashboard.html', meetings=user.meetings)
+    return render_template('meeting/dashboard.html', meetings=current_user.meetings)
 
 
 @meetings.route('/create', methods=['POST'])
@@ -182,6 +183,7 @@ def delete_meeting(form=None):
     try:
         user = current_user._get_current_object()
         meeting = Meeting.objects.get(id=delete_form.meeting_id.data)
+        groups = Group.objects(meetings__contains=meeting)
 
         members = meeting.members
         owner = meeting.owner
@@ -203,10 +205,11 @@ def delete_meeting(form=None):
             owner.meetings.remove(meeting)
             owner.save()
 
+        # remove meeting from owner's list of groups
         for group in user.groups:
             if meeting in group.meetings:
                 group.meetings.remove(meeting)
-                group.save();
+                group.save()
 
         meeting.delete()
         flash('success Meeting Successfully Deleted.')
@@ -262,8 +265,11 @@ def search_meetings(query):
     # get the list of tags to search for
     tags = list(filter(lambda x: "#" in x, search))
 
+    # get the list of groups to search for
+    groups = list(filter(lambda x: "$" in x, search))
+
     # get the other search criteria
-    search = list(set(search) - set(users) - set(tags))
+    search = list(set(search) - set(users) - set(tags) - set(groups))
 
     # filter the meetings to only contain meetings with desired tags
     for t in tags:
@@ -273,7 +279,7 @@ def search_meetings(query):
                                    " ".join(x.tags).split(" "), meetings))
 
         except Exception as e:
-            return render_template('meetings.home', meetings=[])
+            return render_template('meeting/dashboard.html', meetings=[])
 
     # filter the meetings to only contain meetings with desired members
     for u in users:
@@ -281,7 +287,15 @@ def search_meetings(query):
             user = User.objects.get(email=u[1:])
             meetings = list(filter(lambda x: user in x.members, meetings))
         except Exception as e:
-            return render_template('meetings.home', meetings=[])
+            return render_template('meeting/dashboard.html', meetings=[])
+
+    # filter the meetings to only contain meetings created through desired group
+    for g in groups:
+        try:
+            group = Group.objects.get(name=g[1:])
+            meetings = [val for val in group.meetings if val in meetings]
+        except Exception as e:
+            return render_template('meeting/dashboard.html', meetings=[])
 
     # filter the meetings to only contain meetings with the desired text
     for c in search:
@@ -340,18 +354,15 @@ def get_tags(meeting_id):
     meeting.save()
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
 
+
 @meetings.route('/<meeting_id>/updateTranscript', methods=['POST'])
 def update_transcript(meeting_id):
-    if request.form is None:
-        print('Form is invalid')
-
-    transcript = request.form['transcript']
-
-    if transcript is None:
-        return json.dumps({'error': 'invalid transcript'})
+    payload = request.get_json()
 
     meeting = Meeting.objects.get(id=meeting_id)
-    meeting.transcriptText = transcript
+    meeting.transcript = []
+    for chunk in payload:
+        meeting.add_transcription(chunk['user'], chunk['transcription'])
     meeting.save()
 
     return json.dumps({'status': 'success'})
@@ -373,41 +384,19 @@ def update_tags(meeting_id):
 
     return json.dumps({'status': 'success'})
 
-@meetings.route('/<meeting_id>/updateTranscriptGrammar', methods=['GET'])
+
+@meetings.route('/<meeting_id>/getTranscript', methods=['GET'])
 @login_required
-def update_grammar(meeting_id):
-    meeting = Meeting.objects.with_id(meeting_id)
-    string = meeting.transcriptText.replace("\n", " ")
+def get_transcription(meeting_id):
+    """ gets transcript of a given meeting """
 
-    #punctuation = re.compile(r'[-,":;()\']')
-    #punctuation = ["'","’","!","?",".",",","—","\""]
-    #exclude = set(punctuation)
-    #tokens =word_tokenize(string)
-    #tokens = [w.lower() for w in tokens]
-    #print(tokens)
-    #tokens = "".join(ch+" " for ch in tokens if ch not in punctuation)
-    #retStr = ""
+    meeting = Meeting.objects.get(id=meeting_id)
+    meeting_dict = json.loads(meeting.to_json())
+    payload = {'members': [], 'transcript': meeting_dict['transcript']}
 
-    #for tok in tokens:
-    #        if tok not in punctuation: # != "’" || tok != "'":
-    #        retStr += (tok)
-    #        retStr += " "
-    #    else:
-    #        if tok == "'" or tok == "\"" or tok == "’":
-    #            #print(tok)
-    #            retStr = retStr[:-1]
+    for member in meeting.members:
+        payload['members'].append({'name': member.name, 'id': str(member.id)})
+    for chunk in payload['transcript']:
+        chunk['user'] = chunk['user']['$oid']
 
-    transcriptCounter = 0
-    transcripts = meeting.transcript
-    for transcript in transcripts:
-        r = requests.post('http://bark.phon.ioc.ee/punctuator',data={'text':transcript.transcription})
-        print(r.text)
-        meeting.transcript[transcriptCounter].transcription = r.text
-        transcriptCounter = transcriptCounter + 1
-    #r = requests.post('http://bark.phon.ioc.ee/punctuator',data={'text':string})
-    #print(string)
-
-    #meeting.transcriptText = r.text
-    meeting.save()
-
-    return redirect(url_for('meetings.edit_meeting', id=meeting_id))
+    return json.dumps(payload)

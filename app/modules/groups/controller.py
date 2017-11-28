@@ -3,7 +3,7 @@ import string
 from app.modules.auth.model import User
 from app.modules.groups.model import Group, GroupCreateForm, GroupUpdateForm, \
     GroupDeleteForm
-
+from app.modules.meetings.model import Meeting, MeetingCreateForm
 from flask import Blueprint, request, render_template, flash, redirect, \
     url_for, jsonify
 from flask_security import login_required, current_user
@@ -19,12 +19,69 @@ def filter_form(form):
         return create_group(form)
     elif form['submit'] == 'update':
         return update_group(form)
-
     elif form['submit'] == 'delete':
         return delete_group(form)
 
     flash('error Could not Fulfill Request. Please Try Again.')
     return redirect(url_for('meetings.home'))
+
+
+def group_filter_form(form):
+    """ Router for CRUD Forms Recevied in the Group Landing Page """
+
+    if form['submit'] == 'create':
+        return create_group_meeting(form)
+
+
+@groups.route('/create-meeting', methods=['POST'])
+@login_required
+def create_group_meeting(form=None):
+    """ Creates a new meeting from the group landing page """
+    if form is None:
+        flash("error Invalid Request to create meeting")
+        return redirect(request.args.get('next') or url_for('groups.home'))
+    create_form = MeetingCreateForm(form)
+
+    if not create_form.validate():
+        flash("error Could not create new meeting, please try again")
+        return redirect(request.args.get('next') or url_for('groups.home'))
+    try:
+        user = current_user._get_current_object()
+
+        emails = create_form.emails.data.split(" ")
+        emails.append(user.email)
+
+        # generate list of valid emails - should be valid unless a user is deleted
+        query = User.objects(email__in=emails)
+        valid_emails = [u.email for u in query]
+
+        # check if emails are complete, if not, display incorrect and cancel request
+        if len(valid_emails) != len(emails):
+            invalid_emails = list(set(emails) - set(valid_emails))
+            flash("error We were unable to find user(s): {}".format(invalid_emails))
+            return redirect(url_for('groups.home'))
+        # validate and create meeting
+        m = Meeting(name=create_form.name.data,
+                    members=query,
+                    owner=user,
+                    active=False).save()
+        # insert meeting into each user's list of meetings
+        for u in query:
+            u.meetings.append(m)
+            u.meeting_count = u.meeting_count + 1
+            u.save()
+
+        # insert meeting into this group
+        # query to find group associated
+        g = Group.objects.get(members=query)
+        g.meetings.append(m)
+        g.save()
+
+        flash("success Meeting successfully created with group {}".format(g.name))
+        return redirect(url_for('groups.get_group_by_id', group_id=g.id))
+    except Exception as e:
+        flash("error An error has occcured, please try again: {}".format(e))
+    return redirect(url_for('groups.home'))
 
 
 @groups.route('/', methods=['GET', 'POST'])
@@ -209,7 +266,7 @@ def delete_group(form=None):
 
         members = group.members
         admins = group.admins
-
+        meetings = group.meetings
         # validate that the user is an admin for the group
         if user not in admins:
             flash('error You do not have permission to delete this group.')
@@ -228,6 +285,20 @@ def delete_group(form=None):
                 admin.groups.remove(group)
                 admin.save()
 
+        # delete all meetings associated with group
+        for meeting in meetings:
+            # remove meeting from all member's list of meetings
+            for member in members:
+                member.meetings.remove(meeting)
+                member.save()
+
+            # remove meeting from each admin's list of meetings
+            for admin in admins:
+                admin.meetings.remove(meeting)
+                admin.save()
+
+            # now delete the entire meeting from the database
+            meeting.delete()
         group.delete()
 
         flash('success Group Successfully Deleted')
@@ -276,13 +347,17 @@ def search_groups(query):
     return render_template('group/dashboard.html', groups=groups)
 
 
-@groups.route('/<group_id>')
+@groups.route('/<group_id>', methods=['GET', 'POST'])
 @login_required
-def get_group_by_id(group_id):
+def get_group_by_id(group_id, form=None):
     # validate the given id
+    if request.method == 'POST':
+        # help
+        return group_filter_form(request.form)
+
     if len(group_id) != 24 or not all(c in string.hexdigits for c in group_id):
         flash('error Invalid Group ID')
-        return redirect(request.args.get('next') or url_for('groups.home'))
+        return redirect(request.args.get('next') or url_for('groups.get_group_by_id', group_id=group_id))
 
     try:
         user = current_user._get_current_object()
@@ -291,8 +366,12 @@ def get_group_by_id(group_id):
         if user not in group.members:
             flash('error You Are Not A Member Of This Group.')
             return redirect(request.args.get('next') or url_for('groups.home'))
-
-        return render_template('group/group.html', group = group)
+        emails = []
+        for u in group.members:
+            if u.email != user.email:
+                emails.append(u.email)
+        emails = " ".join(emails)
+        return render_template('group/group.html', group=group, emails=emails)
 
     except Exception as e:
         flash('error An Error Occured. {}'.format(str(e)))

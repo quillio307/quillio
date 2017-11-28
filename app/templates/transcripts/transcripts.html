@@ -3,9 +3,9 @@
 <div class="row">
     <!-- column to split editor from sidebar -->
     <div class="col-md-8">
-        <div class="container">
+        <div class="container" style="background:white;padding-top: 10px; padding-bottom: 10px">
             <div class="row">
-                <div class="col-md-10">
+                <div class="col-md-9">
                     <h3 class="flex-center"> {{ meeting.name }}
                     </h3>
                 </div>
@@ -19,9 +19,23 @@
                         <i class="fa fa-save"></i>
                     </a>
                 </div>
+                <div class="col-md-1">
+                    <a id="add" class="btn-floating btn-md quillioButton" onclick="addChunk()">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                </div>
             </div>
         </div>
-        <div id="editor">
+        <div class="card scrollbar-ripe-malinka">
+            <div class="card-body">
+
+
+        <div id="transcriptEditor" class="list-group">
+        </div>
+
+
+
+            </div>
         </div>
     </div>
     <!-- \column to split editor from sidebar -->
@@ -74,20 +88,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="card">
-                    <div class="card-header quillioColor" role="tab" id="headingFive">
-                        <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                            <h5 class="white-text">
-                                Topics
-                                <i class="fa fa-angle-down rotate-icon"></i>
-                            </h5>
-                        </a>
-                    </div>
-                    <div id="collapseFour" class="collapse show" role="tabpanel" aria-labelledby="headingFive">
-                        <div class="card-body">
-                        </div>
-                    </div>
-                </div> -->
             </div>
         </div>
     </div>
@@ -97,51 +97,156 @@
 
 {% endblock %} {% block js_import %}
 <!-- script for quill.js -->
+{#    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>#}
+<style>
+
+</style>
+
 <script src="https://cdn.quilljs.com/1.3.3/quill.js"></script>
+    <script src="//rubaxa.github.io/Sortable/Sortable.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <!-- \script for quill.js -->
 <!-- script for quill.js configuration -->
 <script>
-    var quill = new Quill('#editor', {
-        modules: {
-            toolbar: [
-                [{
-                    header: [1, 2, false]
-                }],
-                ['bold', 'italic', 'underline'],
-                ['image', 'code-block']
-            ]
-        },
-        placeholder: 'Compose an epic...',
-        theme: 'snow',
+    let memberToName = {};
+
+    let urltoks = window.location.href.split("/");
+    let meeting_id = "{{ meeting.id }}";
+
+
+
+    function addChunk(chnk) {
+        let option;
+        if (!chnk) {
+            option = `<select class="mdb-select"><option value="" disabled selected>Choose your speaker</option>`;
+        } else {
+            option = `<select class="mdb-select"><option value="" disabled>Choose your speaker</option>`;
+        }
+
+        for (let prop in memberToName) {
+            if (chnk && chnk.user === prop) {
+                option += `<option value="${prop}" selected>${memberToName[prop]}</option>`;
+            } else {
+                option += `<option value="${prop}">${memberToName[prop]}</option>`;
+            }
+        }
+        option += `</select>`;
+
+
+
+        let chunkElem;
+        if (chnk && chnk.user && chnk.transcription) {
+            chunkElem = `<div style="padding-top:20px"><div class="card card-body chunk">
+                            <i class="fa fa-arrows handle" aria-hidden="true"></i>
+                         ${option}
+
+                        <small class="activator text-muted remove"><i class="fa fa-times"></i></small>
+                        <textarea type="text" class="md-textarea">${chnk.transcription}</textarea>
+                    </div></div>`;
+        } else {
+            let prp;
+            for (var prop in memberToName) {
+                prp = prop;
+                break;
+            }
+            chunkElem = `<div style="padding-top:20px"><div class="card card-body chunk">
+                        <i class="fa fa-arrows handle" aria-hidden="true"></i>
+                         ${option}
+
+                        <small class="activator text-muted remove"><i class="fa fa-times"></i></small>
+                        <textarea type="text" class="md-textarea"></textarea>
+                    </div></div>`;
+        }
+
+        let chunkToInsert = $(chunkElem);
+        let activeChunk = $('.blue');
+        if (activeChunk.length > 0) {
+            activeChunk.after(chunkToInsert);
+        } else {
+            $('#transcriptEditor').append(chunkToInsert);
+        }
+        chunkToInsert.click(function(e) {
+
+            if ($('.chunk', this).hasClass("blue") === true) {
+                console.log("Has class blue");
+                $('.chunk').removeClass("blue");
+                $('textarea', $('#transcriptEditor')).attr("style", "");
+                $('i', $('#transcriptEditor')).attr("style", "");
+                $('input', $('#transcriptEditor')).attr("style", "");
+                $('.caret', $('#transcriptEditor')).attr("style", "");
+            } else {
+                console.log("Does not have class blue");
+                $('.chunk').removeClass("blue");
+                $('.chunk', this).addClass("blue");
+
+
+                $('textarea', $('#transcriptEditor')).attr("style", "");
+                $('i', $('#transcriptEditor')).attr("style", "");
+                $('input', $('#transcriptEditor')).attr("style", "");
+                $('.caret', $('#transcriptEditor')).attr("style", "");
+                $('textarea', this).attr("style", "color:white;");
+                $('i', this).attr("style", "color:white;");
+                $('input', this).attr("style", "color:white;");
+                $('.caret', this).attr("style", "color:white;");
+            }
+
+        });
+        $('.remove').click(function(e) {
+            $(this).closest(".chunk").remove();
+        });
+        $('.mdb-select').material_select('destroy');
+        $('.mdb-select').material_select();
+    }
+
+    $("#transcriptEditor").sortable({
+        handle: '.handle'
     });
-    quill.setText(`{{ meeting.transcriptText }}`);
-    quill.enable(false);
+    $("#transcriptEditor").disableSelection();
+
+    $.ajax({
+        type: 'GET',
+        url: `/meetings/${meeting_id}/getTranscript`,
+        dataType: 'json',
+        success: function(result) {
+            console.log(result);
+            for (let i = 0; i < result.members.length; i++) {
+                memberToName[result.members[i].id] = result.members[i].name;
+            }
+            for (let i = 0; i < result.transcript.length; i++) {
+                addChunk(result.transcript[i]);
+            }
+        }
+    });
+
+    let editMode = false;
 
     function editTranscript() {
-        quill.enable()
+        editMode = true;
     }
 
     function saveTranscript() {
-        var transcript = quill.getText(0, quill.getLength())
-        var id = `{{ meeting.id }}`
-        const params = new URLSearchParams()
-        params.append('transcript', transcript)
+        let payload = [];
+        $('#transcriptEditor .chunk').each(function(index) {
+            let usr = $('select', this).val();
+            if (usr != undefined) {
+                payload.push({
+                    user: usr,
+                    transcription: $('textarea', this).val()
+                });
+            }
+        });
+        console.log(payload);
+        editMode = false;
 
-        fetch('/meetings/{{ meeting.id }}/updateTranscript', {
-                method: 'POST',
-                body: params
-            })
-            .then(function(res) {
-                quill.enable(false)
-                console.log(JSON.stringify(res, undefined, 2))
-
-            })
-            .then(function() {
-                window.location.href = "/meetings/{{ meeting.id }}/tags"
-            })
-            /*.then(function() {
-                window.location.href = "/meetings/{{ meeting.id }}/updateTranscriptGrammar"
-            })*/
+        $.ajax({
+            type: "POST",
+            url: `/meetings/${meeting_id}/updateTranscript`,
+            data: JSON.stringify(payload),
+            success: function(data) {
+                console.log(data);
+            },
+            contentType: "application/json"
+        });
     }
 </script>
 <script>
