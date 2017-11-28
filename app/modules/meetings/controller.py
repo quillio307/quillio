@@ -271,7 +271,7 @@ def search_meetings(query):
                                    " ".join(x.tags).split(" "), meetings))
 
         except Exception as e:
-            return render_template('meetings.home', meetings=[])
+            return render_template('meeting/dashboard.html', meetings=[])
 
     # filter the meetings to only contain meetings with desired members
     for u in users:
@@ -279,7 +279,7 @@ def search_meetings(query):
             user = User.objects.get(email=u[1:])
             meetings = list(filter(lambda x: user in x.members, meetings))
         except Exception as e:
-            return render_template('meetings.home', meetings=[])
+            return render_template('meeting/dashboard.html', meetings=[])
 
     # filter the meetings to only contain meetings created through desired group
     for g in groups:
@@ -287,7 +287,7 @@ def search_meetings(query):
             group = Group.objects.get(name=g[1:])
             meetings = [val for val in group.meetings if val in meetings]
         except Exception as e:
-            return render_template('meetings.home', meetings=[])
+            return render_template('meeting/dashboard.html', meetings=[])
 
     # filter the meetings to only contain meetings with the desired text
     for c in search:
