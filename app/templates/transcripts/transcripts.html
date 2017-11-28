@@ -88,20 +88,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="card">
-                    <div class="card-header quillioColor" role="tab" id="headingFive">
-                        <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                            <h5 class="white-text">
-                                Topics
-                                <i class="fa fa-angle-down rotate-icon"></i>
-                            </h5>
-                        </a>
-                    </div>
-                    <div id="collapseFour" class="collapse show" role="tabpanel" aria-labelledby="headingFive">
-                        <div class="card-body">
-                        </div>
-                    </div>
-                </div> -->
             </div>
         </div>
     </div>
@@ -122,20 +108,6 @@
 <!-- \script for quill.js -->
 <!-- script for quill.js configuration -->
 <script>
-    /*
-    $(function () {
-        $(".sticky").sticky({
-            topSpacing: 90
-            , zIndex: 2
-
-        });
-         $(".sticky2").sticky({
-            topSpacing: 48
-            , zIndex: 2
-
-        });
-    });
-*/
     let memberToName = {};
 
     let urltoks = window.location.href.split("/");
@@ -145,16 +117,16 @@
 
     function addChunk(chnk) {
         let option;
-        if(!chnk){
+        if (!chnk) {
             option = `<select class="mdb-select"><option value="" disabled selected>Choose your speaker</option>`;
-        }else{
+        } else {
             option = `<select class="mdb-select"><option value="" disabled>Choose your speaker</option>`;
         }
 
-        for(let prop in memberToName){
-            if(chnk && chnk.user === prop){
+        for (let prop in memberToName) {
+            if (chnk && chnk.user === prop) {
                 option += `<option value="${prop}" selected>${memberToName[prop]}</option>`;
-            }else{
+            } else {
                 option += `<option value="${prop}">${memberToName[prop]}</option>`;
             }
         }
@@ -163,87 +135,88 @@
 
 
         let chunkElem;
-        if(chnk && chnk.user && chnk.transcription){
+        if (chnk && chnk.user && chnk.transcription) {
             chunkElem = `<div style="padding-top:20px"><div class="card card-body chunk">
-                        <i class="fa fa-arrows handle" aria-hidden="true"></i>
-                     ${option}
+                            <i class="fa fa-arrows handle" aria-hidden="true"></i>
+                         ${option}
 
-                    <small class="activator text-muted remove"><i class="fa fa-times"></i></small>
-                    <textarea type="text" class="md-textarea">${chnk.transcription}</textarea>
-                </div></div>`;
-        }else{
+                        <small class="activator text-muted remove"><i class="fa fa-times"></i></small>
+                        <textarea type="text" class="md-textarea">${chnk.transcription}</textarea>
+                    </div></div>`;
+        } else {
             let prp;
             for (var prop in memberToName) {
                 prp = prop;
                 break;
             }
             chunkElem = `<div style="padding-top:20px"><div class="card card-body chunk">
-                    <i class="fa fa-arrows handle" aria-hidden="true"></i>
-                     ${option}
+                        <i class="fa fa-arrows handle" aria-hidden="true"></i>
+                         ${option}
 
-                    <small class="activator text-muted remove"><i class="fa fa-times"></i></small>
-                    <textarea type="text" class="md-textarea"></textarea>
-                </div></div>`;
+                        <small class="activator text-muted remove"><i class="fa fa-times"></i></small>
+                        <textarea type="text" class="md-textarea"></textarea>
+                    </div></div>`;
         }
 
         let chunkToInsert = $(chunkElem);
         let activeChunk = $('.blue');
-        if(activeChunk.length > 0){
+        if (activeChunk.length > 0) {
             activeChunk.after(chunkToInsert);
-        }else{
+        } else {
             $('#transcriptEditor').append(chunkToInsert);
         }
-        chunkToInsert.click(function (e) {
+        chunkToInsert.click(function(e) {
 
-                if($('.chunk', this).hasClass("blue") === true){
-                    console.log("Has class blue");
-                    $('.chunk').removeClass("blue");
-                    $('textarea', $('#transcriptEditor')).attr("style", "");
-                    $('i', $('#transcriptEditor')).attr("style", "");
-                    $('input', $('#transcriptEditor')).attr("style", "");
-                    $('.caret', $('#transcriptEditor')).attr("style", "");
-                }else{
-                    console.log("Does not have class blue");
-                     $('.chunk').removeClass("blue");
-                    $('.chunk', this).addClass("blue");
+            if ($('.chunk', this).hasClass("blue") === true) {
+                console.log("Has class blue");
+                $('.chunk').removeClass("blue");
+                $('textarea', $('#transcriptEditor')).attr("style", "");
+                $('i', $('#transcriptEditor')).attr("style", "");
+                $('input', $('#transcriptEditor')).attr("style", "");
+                $('.caret', $('#transcriptEditor')).attr("style", "");
+            } else {
+                console.log("Does not have class blue");
+                $('.chunk').removeClass("blue");
+                $('.chunk', this).addClass("blue");
 
 
-                     $('textarea', $('#transcriptEditor')).attr("style", "");
-                    $('i', $('#transcriptEditor')).attr("style", "");
-                    $('input', $('#transcriptEditor')).attr("style", "");
-                    $('.caret', $('#transcriptEditor')).attr("style", "");
-                     $('textarea', this).attr("style", "color:white;");
-                    $('i', this).attr("style", "color:white;");
-                    $('input', this).attr("style", "color:white;");
-                    $('.caret', this).attr("style", "color:white;");
-                }
+                $('textarea', $('#transcriptEditor')).attr("style", "");
+                $('i', $('#transcriptEditor')).attr("style", "");
+                $('input', $('#transcriptEditor')).attr("style", "");
+                $('.caret', $('#transcriptEditor')).attr("style", "");
+                $('textarea', this).attr("style", "color:white;");
+                $('i', this).attr("style", "color:white;");
+                $('input', this).attr("style", "color:white;");
+                $('.caret', this).attr("style", "color:white;");
+            }
 
         });
-        $('.remove').click(function(e){
+        $('.remove').click(function(e) {
             $(this).closest(".chunk").remove();
         });
         $('.mdb-select').material_select('destroy');
         $('.mdb-select').material_select();
     }
 
-    //$('#transcriptEditor').sortable();
-    //$( "#transcriptEditor" ).disableSelection();
-     $( "#transcriptEditor" ).sortable({handle: '.handle'});
-   $( "#transcriptEditor" ).disableSelection();
+    $("#transcriptEditor").sortable({
+        handle: '.handle'
+    });
+    $("#transcriptEditor").disableSelection();
 
     $.ajax({
         type: 'GET',
-        url:`/meetings/${meeting_id}/getTranscript`,
+        url: `/meetings/${meeting_id}/getTranscript`,
         dataType: 'json',
-        success: function(result){
+        success: function(result) {
             console.log(result);
-            for(let i = 0; i < result.members.length; i++){
+            for (let i = 0; i < result.members.length; i++) {
                 memberToName[result.members[i].id] = result.members[i].name;
             }
-            for(let i = 0; i < result.transcript.length; i++){
+            for (let i = 0; i < result.transcript.length; i++) {
                 addChunk(result.transcript[i]);
             }
-    }});
+        }
+    });
 
     let editMode = false;
 
@@ -253,9 +226,9 @@
 
     function saveTranscript() {
         let payload = [];
-        $('#transcriptEditor .chunk').each(function( index ) {
+        $('#transcriptEditor .chunk').each(function(index) {
             let usr = $('select', this).val();
-            if(usr != undefined){
+            if (usr != undefined) {
                 payload.push({
                     user: usr,
                     transcription: $('textarea', this).val()
@@ -266,13 +239,13 @@
         editMode = false;
 
         $.ajax({
-          type: "POST",
-          url: `/meetings/${meeting_id}/updateTranscript`,
-          data: JSON.stringify(payload),
-          success: function (data) {
-              console.log(data);
-          },
-          contentType:"application/json"
+            type: "POST",
+            url: `/meetings/${meeting_id}/updateTranscript`,
+            data: JSON.stringify(payload),
+            success: function(data) {
+                console.log(data);
+            },
+            contentType: "application/json"
         });
     }
 </script>
