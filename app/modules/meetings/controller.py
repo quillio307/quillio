@@ -380,27 +380,34 @@ def update_grammar(meeting_id):
     string = meeting.transcriptText.replace("\n", " ")
 
     #punctuation = re.compile(r'[-,":;()\']')
-    punctuation = ["'","’","!","?",".",",","—","\""]
-    exclude = set(punctuation)
-    tokens =word_tokenize(string)
-    tokens = [w.lower() for w in tokens]
+    #punctuation = ["'","’","!","?",".",",","—","\""]
+    #exclude = set(punctuation)
+    #tokens =word_tokenize(string)
+    #tokens = [w.lower() for w in tokens]
     #print(tokens)
     #tokens = "".join(ch+" " for ch in tokens if ch not in punctuation)
-    retStr = ""
+    #retStr = ""
 
-    for tok in tokens:
-        if tok not in punctuation: # != "’" || tok != "'":
-            retStr += (tok)
-            retStr += " "
-        else:
-            if tok == "'" or tok == "\"" or tok == "’":
-                #print(tok)
-                retStr = retStr[:-1]
+    #for tok in tokens:
+    #        if tok not in punctuation: # != "’" || tok != "'":
+    #        retStr += (tok)
+    #        retStr += " "
+    #    else:
+    #        if tok == "'" or tok == "\"" or tok == "’":
+    #            #print(tok)
+    #            retStr = retStr[:-1]
 
-    r = requests.post('http://bark.phon.ioc.ee/punctuator',data={'text':string})
-    print(string)
+    transcriptCounter = 0
+    transcripts = meeting.transcript
+    for transcript in transcripts:
+        r = requests.post('http://bark.phon.ioc.ee/punctuator',data={'text':transcript.transcription})
+        print(r.text)
+        meeting.transcript[transcriptCounter].transcription = r.text
+        transcriptCounter = transcriptCounter + 1
+    #r = requests.post('http://bark.phon.ioc.ee/punctuator',data={'text':string})
+    #print(string)
 
-    meeting.transcriptText = r.text
+    #meeting.transcriptText = r.text
     meeting.save()
 
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
