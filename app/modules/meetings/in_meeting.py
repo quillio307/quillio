@@ -65,6 +65,19 @@ def start_meeting(data):
     meeting.save()
     emit('startMeeting', room=data['room_id'])
 
+def update_grammar(meeting_id):
+    meeting = Meeting.objects.with_id(meeting_id)
+    string = meeting.transcriptText.replace("\n", " ")
+    transcriptCounter = 0
+    transcripts = meeting.transcript
+    for transcript in transcripts:
+        r = requests.post('http://bark.phon.ioc.ee/punctuator',data={'text':transcript.transcription})
+        print(r.text)
+        meeting.transcript[transcriptCounter].transcription = r.text
+        transcriptCounter = transcriptCounter + 1
+    meeting.save()
+    return
+
 
 @socketio.on('end', namespace='/meeting')
 @authenticated_only
@@ -73,6 +86,8 @@ def start_meeting(data):
     meeting.active = False
     meeting.save()
     emit('endMeeting', room=data['room_id'])
+    # TODO:Fix grammar
+    update_grammar(data['room_id'])
     pt = ""
     for ts in meeting.transcript:
         pt += '{0}: {1}\\n'.format(ts.user.name, ts.transcription)
