@@ -334,7 +334,7 @@ def get_tags(meeting_id):
 
     return_data = " ".join(data).split(" ")
     meeting.topics = return_data
-    meeting.tags = return_data
+    # meeting.tags = return_data
     meeting.save()
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
 
