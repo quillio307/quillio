@@ -14,7 +14,7 @@
             </div>
 
             {% if meeting.status() == 2 %}
-            <a href="edit/{{ meeting.id }}" style="background-color:#696773" class="btn-floating btn-action">
+            <a href="/meetings/edit/{{ meeting.id }}" style="background-color:#696773" class="btn-floating btn-action">
                 <i class="fa fa-chevron-right"></i>
             </a>
             {% else %}
@@ -86,6 +86,12 @@
                         <label for="emails"> Member Emails </label>
                     </div>
 
+                    <legend> Set nature of meeting: </legend>
+                    {% for subfield in form.nature %}
+                    <div class="form-group">
+                      {{ subfield }} {{ subfield.label }}
+                    </div>
+                    {% endfor %}
                     <div class="text-center mt-1-half">
                         <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="create" formmethod="post">
                             Create
