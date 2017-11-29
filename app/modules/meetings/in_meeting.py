@@ -2,6 +2,7 @@ import json
 import string
 import time
 import functools
+import requests
 
 from datetime import datetime, timedelta
 
@@ -67,7 +68,6 @@ def start_meeting(data):
 
 def update_grammar(meeting_id):
     meeting = Meeting.objects.with_id(meeting_id)
-    string = meeting.transcriptText.replace("\n", " ")
     transcriptCounter = 0
     transcripts = meeting.transcript
     for transcript in transcripts:
@@ -87,7 +87,9 @@ def start_meeting(data):
     meeting.save()
     emit('endMeeting', room=data['room_id'])
     # TODO:Fix grammar
+    print("boutta update grammar")
     update_grammar(data['room_id'])
+    print("finished updating grammar")
     pt = ""
     for ts in meeting.transcript:
         pt += '{0}: {1}\\n'.format(ts.user.name, ts.transcription)
