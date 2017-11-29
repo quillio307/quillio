@@ -6,7 +6,7 @@ $(document).ready(function() {
     $('#keywordAddButton').click(function() {
         keywords = $('#keywords').val();
         keywords = keywords.replace(" ", "+");
-        objectives = $('#objectives').val();
+        console.log("in keyword add");
         $('#insertKeywords').modal('hide');
         $.ajax({
             url: '/auth/getUser',
@@ -16,19 +16,18 @@ $(document).ready(function() {
             }
         });
         objectives = $('#objectives').val();
+        objectives = objectives.replace(" ", "+");
         console.log(objectives);
         var id = `{{ meeting.id }}`
         const params = new URLSearchParams()
         params.append('objectives', objectives)
-        fetch('/meetings/{{ meeting.id }}/updateObjectives', {
+        fetch(`/meetings/${id}/updateObjectives`, {
                 method: 'POST',
                 body: params
             })
             .then(function(res) {
                 console.log(JSON.stringify(res, undefined, 2))
-            })
-        }
-
+          })
     });
 });
 

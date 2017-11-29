@@ -378,7 +378,7 @@ def update_objectives(meeting_id):
     objectives = request.form['objectives']
     print(objectives)
     if objectives is None:
-        return json.dumps({'error': 'invalid tags'})
+        return json.dumps({'error': 'invalid objective'})
 
     meeting = Meeting.objects.get(id=meeting_id)
     meeting.objectives = objectives.split(" ")
