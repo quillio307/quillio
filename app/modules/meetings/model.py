@@ -18,6 +18,7 @@ class Meeting(db.Document):
     active = db.BooleanField(default=False)
     tags = db.ListField(db.StringField(min_length=0, max_length=1000))
     topics = db.ListField(db.StringField(min_length=1, max_length=1000))
+    objectives = db.ListField(db.StringField(min_length=1, max_length=1000))
     created_at = db.DateTimeField(default=dt.now())
     created_at_str = db.StringField(default=dt.now().strftime('%m-%d-%Y'))
     transcript = db.ListField(db.EmbeddedDocumentField(Transcription))
@@ -77,3 +78,4 @@ class MeetingDeleteForm(Form):
 
 class KeywordsForm(Form):
     keywords = StringField('Keywords', [validators.Required()])
+    objectives = StringField('Objectives', [validators.Required()])

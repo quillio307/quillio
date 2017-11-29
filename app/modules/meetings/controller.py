@@ -370,6 +370,21 @@ def update_tags(meeting_id):
 
     return json.dumps({'status': 'success'})
 
+@meetings.route('/<meeting_id>/updateObjectives', methods=['POST'])
+def update_objectives(meeting_id):
+    if request.form is None:
+        print('Form is invalid')
+
+    objectives = request.form['objectives']
+    print(objectives)
+    if objectives is None:
+        return json.dumps({'error': 'invalid tags'})
+
+    meeting = Meeting.objects.get(id=meeting_id)
+    meeting.objectives = objectives.split(" ")
+    meeting.save()
+
+    return json.dumps({'status': 'success'})
 
 @meetings.route('/<meeting_id>/getTranscript', methods=['GET'])
 @login_required
