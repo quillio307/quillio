@@ -51,7 +51,6 @@
     function getID()  {
     var objectives = $('#objectives').val();
     var id = `{{meeting.id}}`
-    objectives = objectives.replace(" ", "+");
     console.log(objectives);
     const params = new URLSearchParams()
     params.append('objectives', objectives)

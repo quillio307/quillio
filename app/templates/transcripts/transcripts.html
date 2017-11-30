@@ -98,6 +98,36 @@
                         </div>
                     </div>
                 </div>
+                <div class="card">
+                    <div class="card-header quillioColor" role="tab" id="headingFive">
+                        <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                            <h5 class="white-text">
+                                Objectives
+                                <i class="fa fa-angle-down rotate-icon"></i>
+                            </h5>
+                        </a>
+                    </div>
+                    <div id="collapseFive" class="collapse show" role="tabpanel" aria-labelledby="headingFive">
+                        <div id="meetingObjs" class="card-body">
+                          {% set count = 0 %}
+                          {% for obj in meeting.objectives %}
+                            {% if obj.lower() in meeting.topics %}
+                            <div class="form-group">
+                                <input type="checkbox" id="checkbox{{count}}" checked="checked" disabled>
+                                <label for="checkbox{{count}}">{{ obj }}</label>
+                            </div>
+                            {% else %}
+                            <div class="form-group">
+                                <input type="checkbox" id="checkbox{{count}}" disabled>
+                                <label for="checkbox{{count}}">{{ obj }}</label>
+                            </div>
+                            {% endif %}
+                            {% set count = count + 1 %}
+                          {% endfor %}
+                        </div>
+                            <!-- <button onclick="saveTags()" id="updateTags" class="btn quillioColor flex-center">Update</button> -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
