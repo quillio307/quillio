@@ -42,9 +42,8 @@ def home():
         return filter_form(request.form)
     form = MeetingCreateForm()
     user = current_user._get_current_object()
-    
-    return render_template('meeting/dashboard.html', meetings=user.meetings, form=form)
 
+    return render_template('meeting/dashboard.html', meetings=user.meetings, form=form)
 
 
 @meetings.route('/create', methods=['POST'])
@@ -209,6 +208,7 @@ def delete_meeting(form=None):
         # remove meeting from owner's list of meetings
         if meeting in owner.meetings:
             owner.meetings.remove(meeting)
+            owner.meeting_count = owner.meeting_count - 1
             owner.save()
 
         # remove meeting from owner's list of groups
@@ -248,11 +248,12 @@ def edit_meeting(id):
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
-@meetings.route('/search=<string:query>', methods=['GET', 'POST'])
+@meetings.route('/search=<query>', methods=['GET', 'POST'])
 @login_required
 def search_meetings(query):
     """ Displays the Meetings to the User's Dashboard that match the given
         criteria """
+    form = MeetingCreateForm()
 
     if request.method == 'POST':
         return filter_form(request.form)
@@ -309,7 +310,7 @@ def search_meetings(query):
             lambda x: c.lower() in x.name.lower(), meetings))
 
     # reset the page and only show the desired meetings
-    return render_template('meeting/dashboard.html', meetings=meetings)
+    return render_template('meeting/dashboard.html', meetings=meetings, form=form)
 
 
 @meetings.route('/info/<string:meeting_id>', methods=['GET'])

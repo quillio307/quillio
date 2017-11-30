@@ -3,7 +3,7 @@ import string
 from app.modules.auth.model import User
 from app.modules.groups.model import Group, GroupCreateForm, GroupUpdateForm, \
     GroupDeleteForm
-from app.modules.meetings.model import Meeting, MeetingCreateForm
+from app.modules.meetings.model import Meeting, MeetingCreateForm, MeetingUpdateForm, MeetingDeleteForm
 from flask import Blueprint, request, render_template, flash, redirect, \
     url_for, jsonify
 from flask_security import login_required, current_user
@@ -31,6 +31,131 @@ def group_filter_form(form):
 
     if form['submit'] == 'create':
         return create_group_meeting(form)
+    elif form['submit'] == 'update':
+        return update_group_meeting(form)
+    elif form['submit'] == 'delete':
+        return delete_group_meeting(form)
+
+    flash('error Could not fullfill request. Please try again')
+    return redirect(url_form('groups.home'))
+
+
+@groups.route('/delete-meeting', methods=['POST'])
+@login_required
+def delete_group_meeting(form=None):
+    """ Delete and existing group meeting """
+
+    if form is None:
+        flash('error Invalid Request to delete meeting.')
+        return redirect(request.args.get('next') or url_for('groups.home'))
+
+    delete_form = MeetingDeleteForm(form)
+
+    if not delete_form.validate():
+        flash('error You do not have permission to delete this meeting.')
+        return redirect(url_form('groups.home'))
+
+    try:
+        user = current_user._get_current_object()
+        meeting = Meeting.objects.get(id=delete_form.meeting_id.data)
+        groups = Group.objects(meetings__contains=meeting)
+
+        members = meeting.members
+        owner = meeting.owner
+
+        # user is not the owner of group and cannot delete
+        if user != owner:
+            flash('error You do not have permission to delete this meeting.')
+            return redirect(url_for('groups.home'))
+
+        # remove the meeting from each member's list of meeting
+        for member in members:
+            if meeting in member.meetings:
+                member.meetings.remove(meeting)
+                member.meeting_count = member.meeting_count - 1
+                member.save()
+
+        # remove meeting from owner's list of meetings
+        if meeting in owner.meetings:
+            owner.meetings.remove(meeting)
+            owner.meeting_count = member.meeting_count - 1
+            owner.save()
+
+        # remove meeting from owner's list of groups
+        for group in user.groups:
+            if meeting in group.meetings:
+                group.meetings.remove(meeting)
+                group.save()
+        meeting.delete()
+        flash('success Meeting successfully deleted')
+
+    except Exception as e:
+        flash('error An error has occured, please try again {}'.format(str(e)))
+    return redirect(request.args.get('next') or url_for('groups.home'))
+
+
+@groups.route('/update-meeting', methods=['POST'])
+@login_required
+def update_group_meeting(form=None):
+    """ Update and existing meeting from the group landing page"""
+    if form is None:
+        flash("error Invalid Request to update meeting")
+        return redirect(request.args.get('next') or url_for('groups.home'))
+    update_form = MeetingUpdateForm(form)
+
+    if not update_form.validate():
+        flash("error Could not update meeting, please try again")
+        return redirect(request.args.get('next') or url_for('groups.home'))
+    try:
+        # extract form data
+        name = update_form.name.data
+        emails_to_add_str = update_form.emails_to_add.data
+        emails_to_remove = update_form.emails_to_remove.data
+
+        # search for the meeting
+        meeting = Meeting.objects.get(id=update_form.meeting_id.data)
+
+        members = meeting.members
+
+        # remove the undesired members
+        if len(emails_to_remove_str) != 0:
+            emails_to_remove = emails_to_remove_str.split("")
+            members_to_remove = User.objects(email__in=emails_to_remove)
+
+            # remove the meeting from each members list of meetings
+            for member in members_to_remove:
+                if meeting in member.meetings:
+                    member.meeting_count = member.meeting_count - 1
+                    member.meetings.remove(meeting)
+                    member.save()
+            # remove members from the list
+            members = list(filter(
+                lambda x: x not in members_to_remove, members))
+
+        # add new members
+        if len(emails_to_add_str) != 0:
+            emails_to_add = emails_to_add_str.split(" ")
+            members_to_add = User.objects(email__in=emails_to_add)
+
+            for member in members_to_add:
+                # add member to the meeting's list of members
+                if member not in members:
+                    members.append(member)
+
+                # add meeting to the member's list of meetings
+                if meeting not in member.meetings:
+                    member.meetings.append(meeting)
+                    member.save()
+        # save all the changes
+        meeting.name = name
+        meeting.members = members
+        meeting.save()
+
+        flash('success Meeting has been successfully updated.')
+    except Exception as e:
+        flash("error An error has occcured, please try again: {}".format(e))
+
+    return redirect(url_for('groups.home'))
 
 
 @groups.route('/create-meeting', methods=['POST'])
