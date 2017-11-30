@@ -41,7 +41,7 @@ def meeting_page(meeting_id):
     if meeting.status() is 2:
         abort(400)
         return
-    return render_template('meeting/in_meeting.html', meeting={'title': meeting.name})
+    return render_template('meeting/in_meeting.html', meeting={'title': meeting.name, 'id': meeting_id})
 
 
 @socketio.on('join', namespace='/meeting')

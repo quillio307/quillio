@@ -359,7 +359,11 @@ def get_topics(meeting_id):
             count = count + 1
 
     return_data = " ".join(data).split(" ")
-    meeting.topics = return_data
+    no_reps = []
+    for d in return_data:
+        if d not in no_reps:
+            no_reps.append(d)
+    meeting.topics = no_reps
     meeting.save()
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
 
@@ -393,6 +397,23 @@ def update_tags(meeting_id):
 
     return json.dumps({'status': 'success'})
 
+@meetings.route('/<meeting_id>/updateObjectives', methods=['POST'])
+def update_objectives(meeting_id):
+    if request.form is None:
+        print('Form is invalid')
+
+    objectives = request.form['objectives']
+    print(objectives)
+    if objectives is None:
+        return json.dumps({'error': 'invalid objective'})
+
+    meeting = Meeting.objects.get(id=meeting_id)
+    objectives = objectives.split(",")
+    objectives = [s.strip() for s in objectives]
+    meeting.objectives = objectives
+    meeting.save()
+
+    return json.dumps({'status': 'success'})
 
 @meetings.route('/<meeting_id>/getTranscript', methods=['GET'])
 @login_required
