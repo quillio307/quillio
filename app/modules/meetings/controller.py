@@ -85,7 +85,7 @@ def create_meeting(form=None):
             m = Meeting(name=create_form.name.data, members=query,
                         owner=user, meeting_nature=create_form.nature.data, active=False).save()
 
-            # insert the meeting in each user's list of meetings
+        # insert the meeting in each user's list of meetings
         for u in query:
             u.meetings.append(m)
             u.meeting_count = u.meeting_count + 1
@@ -141,7 +141,7 @@ def update_meeting(form=None):
             members = list(filter(
                 lambda x: x not in members_to_remove, members))
 
-            # add the new members
+        # add the new members
         if len(emails_to_add_str) != 0:
             emails_to_add = emails_to_add_str.split(" ")
             members_to_add = User.objects(email__in=emails_to_add)
@@ -221,7 +221,7 @@ def delete_meeting(form=None):
         flash('error An Error has Occured, Please Try Again.'
               '{}'.format(str(e)))
 
-        return redirect(request.args.get('next') or url_for('meetings.home'))
+    return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
 @meetings.route('/edit/<id>', methods=['GET', 'POST'])
@@ -263,8 +263,6 @@ def search_meetings(query):
         flash('error Could not fulfill search request.')
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
-    # get the other search criteria
-
     # get the list of groups to search for
     for x in search:
         if "$" in x and "(" in x:
@@ -280,6 +278,7 @@ def search_meetings(query):
     # get the list of tags to search for
     tags = list(filter(lambda x: "#" in x, search))
 
+    # get the other search criteria
     search = list(set(search) - set(users) - set(tags))
 
     # filter the meetings to only contain meetings with desired tags
@@ -314,7 +313,7 @@ def search_meetings(query):
         meetings = list(filter(
             lambda x: c.lower() in x.name.lower(), meetings))
 
-        # reset the page and only show the desired meetings
+    # reset the page and only show the desired meetings
     return render_template('meeting/dashboard.html', meetings=meetings, form=form)
 
 
