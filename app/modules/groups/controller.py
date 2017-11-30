@@ -476,14 +476,13 @@ def search_groups(query):
 @groups.route('/<group_id>', methods=['GET', 'POST'])
 @login_required
 def get_group_by_id(group_id, form=None):
-    # validate the given id
     if request.method == 'POST':
-        # help
         return group_filter_form(request.form)
 
+    # validate the given id
     if len(group_id) != 24 or not all(c in string.hexdigits for c in group_id):
         flash('error Invalid Group ID')
-        return redirect(request.args.get('next') or url_for('groups.get_group_by_id', group_id=group_id))
+        return redirect(request.args.get('next') or url_for('groups.home'))
 
     try:
         user = current_user._get_current_object()
@@ -498,8 +497,53 @@ def get_group_by_id(group_id, form=None):
                 emails.append(u.email)
         emails = " ".join(emails)
         form = MeetingCreateForm()
-        return render_template('group/group.html', group=group, emails=emails, form=form)
+        return render_template('group/group.html', group=group, stats=group_stats(group_id), emails=emails, form=form)
 
     except Exception as e:
         flash('error An Error Occured. {}'.format(str(e)))
         return redirect(request.args.get('next') or url_for('groups.home'))
+
+
+@login_required
+def group_stats(group_id):
+    if len(group_id) != 24 or not all(c in string.hexdigits for c in group_id):
+        flash('error Invalid Group ID')
+        return redirect(request.args.get('next') or url_for('groups.home'))
+
+    response = dict()
+
+    try:
+        user = current_user._get_current_object()
+        groups = current_user._get_current_object().groups
+        group = Group.objects.get(id=group_id)
+
+        if user not in group.members:
+            return {'status': 'invalid permission'}
+
+        contributions = group.get_member_contributions()
+        sorted_contributors = sorted(contributions, key=contributions.get, reverse=True)
+        sorted_contributors = sorted_contributors[:3]
+        del(sorted_contributors[3:])
+
+        tags = group.get_frequent_tags()
+        sorted_tags = sorted(tags, key=tags.get, reverse=True)
+        del(sorted_tags[3:])
+
+
+        topics = group.get_frequent_topics()
+        sorted_topics = sorted(topics, key=topics.get, reverse=True)
+        del(sorted_topics[3:])
+
+        # response['contribution'] = group.update_contr()
+        response['contributors'] = sorted_contributors
+        response['tags'] = sorted_tags
+        response['topics'] = sorted_topics
+
+        return response
+    except Exception as e:
+        response['error'] = str(e)
+
+    response['status'] = 'failure'
+    return response
+
+    
