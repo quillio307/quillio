@@ -208,6 +208,7 @@ def delete_meeting(form=None):
         # remove meeting from owner's list of meetings
         if meeting in owner.meetings:
             owner.meetings.remove(meeting)
+            owner.meeting_count = owner.meeting_count - 1
             owner.save()
 
         # remove meeting from owner's list of groups

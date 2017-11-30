@@ -45,17 +45,10 @@ class Meeting(db.Document):
         self.transcript.append(Transcription(user, transcription))
 
     def get_contr(self):
-        try:
-            word_count = {}
-            for t in self.transcript:
-                if t.user.name in word_count:
-                    word_count[t.user.name] = word_count[t.user.name] + len(t.transcript.split(" "))
-                else:
-                    word_count[t.user.name] = len(t.transcript.split(" "))
-            return word_count
-        except Exception as e:
-            flash('error An Error Occured')
-            return
+        word_count = dict()
+        for t in self.transcript:
+            word_count[t.user.name] = word_count.get(t.user.name, 0) + len(t.transcription.split(" "))
+        return word_count
 
 
 class MeetingCreateForm(Form):

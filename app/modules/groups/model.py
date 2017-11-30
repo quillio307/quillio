@@ -13,9 +13,6 @@ class Group(db.Document):
     members = db.ListField(field=db.ReferenceField(User), default=[])
     admins = db.ListField(field=db.ReferenceField(User), default=[])
     meetings = db.ListField(db.ReferenceField(Meeting))
-    contr = db.DictField()
-    freq_tags = db.DictField()
-    freq_topics = db.DictField()
     meta = {'strict': False}
 
     def user_is_admin(self, user):
@@ -24,30 +21,26 @@ class Group(db.Document):
             return True
         return False
 
-    def update_contr(self):
+    def get_member_contributions(self):
+        contribution = dict()
         for m in self.meetings:
-            mdict = m.get_contr
-            self.contr = dict(self.contr.items() + mdict.items() + [(k, self.contr[k] + mdict[k])
-                              for k in set(self.contr) & set(mdict)])
-        self.save()
-        return self.contr
+            mContr = m.get_contr()
+            contribution = {k: contribution.get(k, 0) + mContr.get(k, 0)
+                            for k in set(contribution) | set(mContr)}
+        return contribution
 
-    def update_freq_tags(self):
+    def get_frequent_tags(self):
         tag_dict = dict()
         for m in self.meetings:
             for t in m.tags:
                 tag_dict[t] = tag_dict.get(t, 0) + 1
-        self.freq_tags = tag_dict
-        self.save()
         return tag_dict
 
-    def update_freq_topics(self):
+    def get_frequent_topics(self):
         topic_dict = dict()
         for m in self.meetings:
             for t in m.topics:
                 topic_dict[t] = topic_dict.get(t, 0) + 1
-        self.freq_topics = topic_dict
-        self.save()
         return topic_dict
 
 
