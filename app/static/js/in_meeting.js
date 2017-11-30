@@ -15,19 +15,6 @@ $(document).ready(function() {
                 init();
             }
         });
-        objectives = $('#objectives').val();
-        objectives = objectives.replace(" ", "+");
-        console.log(objectives);
-        var id = `{{ meeting.id }}`
-        const params = new URLSearchParams()
-        params.append('objectives', objectives)
-        fetch(`/meetings/${id}/updateObjectives`, {
-                method: 'POST',
-                body: params
-            })
-            .then(function(res) {
-                console.log(JSON.stringify(res, undefined, 2))
-          })
     });
 });
 
