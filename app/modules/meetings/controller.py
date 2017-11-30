@@ -9,11 +9,9 @@ from nltk.tokenize import RegexpTokenizer
 
 
 from app.modules.auth.model import User
-from app.modules.meetings.model import Meeting, MeetingCreateForm, \
-    MeetingUpdateForm, MeetingDeleteForm
+from app.modules.meetings.model import Meeting, MeetingCreateForm, MeetingUpdateForm, MeetingDeleteForm
 from app.modules.groups.model import Group
-from flask import Blueprint, render_template, flash, request, redirect, \
-    url_for, jsonify
+from flask import Blueprint, render_template, flash, request, redirect, url_for, jsonify
 from flask_security import current_user, login_required
 from bson import json_util
 
@@ -266,24 +264,30 @@ def search_meetings(query):
         flash('error Could not fulfill search request.')
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
+    # get the list of groups to search for
+    for x in search:
+        if "$" in x and "(" in x:
+            group = x
+        elif ")" not in group:
+            group = group + " " + x
+    for r in group.split(" "):
+        search.remove(r)
+
     # get the list of users to search for
     users = list(filter(lambda x: "@" in x, search))
 
     # get the list of tags to search for
     tags = list(filter(lambda x: "#" in x, search))
 
-    # get the list of groups to search for
-    groups = list(filter(lambda x: "$" in x, search))
-
     # get the other search criteria
-    search = list(set(search) - set(users) - set(tags) - set(groups))
+    search = list(set(search) - set(users) - set(tags))
 
     # filter the meetings to only contain meetings with desired tags
     for t in tags:
         try:
             t = t.lower()
             meetings = list(filter(lambda x: t[1:] in
-                                   x.tags or t[1:] in x.topics, meetings))
+                            x.tags or t[1:] in x.topics, meetings))
 
         except Exception as e:
             return render_template('meeting/dashboard.html', meetings=[])
@@ -297,9 +301,10 @@ def search_meetings(query):
             return render_template('meeting/dashboard.html', meetings=[])
 
     # filter the meetings to only contain meetings created through desired group
-    for g in groups:
+    # for g in groups:
+    if group is not None:
         try:
-            group = Group.objects.get(name=g[1:])
+            group = Group.objects.get(name=group[2:-1])
             meetings = [val for val in group.meetings if val in meetings]
         except Exception as e:
             return render_template('meeting/dashboard.html', meetings=[])
@@ -316,8 +321,7 @@ def search_meetings(query):
 @meetings.route('/info/<string:meeting_id>', methods=['GET'])
 @login_required
 def meeting_info(meeting_id):
-    if len(meeting_id) != 24 or \
-       not all(c in string.hexdigits for c in meeting_id):
+    if len(meeting_id) != 24 or not all(c in string.hexdigits for c in meeting_id):
         flash('error Invalid Meeting Id.')
         return redirect(request.args.get('next') or
                         url_for('meeting.meetings_page'))
