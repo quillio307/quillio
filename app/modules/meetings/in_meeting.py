@@ -86,10 +86,7 @@ def start_meeting(data):
     meeting.active = False
     meeting.save()
     emit('endMeeting', room=data['room_id'])
-    # TODO:Fix grammar
-    print("boutta update grammar")
     update_grammar(data['room_id'])
-    print("finished updating grammar")
     pt = ""
     for ts in meeting.transcript:
         pt += '{0}: {1}\\n'.format(ts.user.name, ts.transcription)
