@@ -9,11 +9,9 @@ from nltk.tokenize import RegexpTokenizer
 
 
 from app.modules.auth.model import User
-from app.modules.meetings.model import Meeting, MeetingCreateForm, \
-    MeetingUpdateForm, MeetingDeleteForm
+from app.modules.meetings.model import Meeting, MeetingCreateForm, MeetingUpdateForm, MeetingDeleteForm
 from app.modules.groups.model import Group
-from flask import Blueprint, render_template, flash, request, redirect, \
-    url_for, jsonify
+from flask import Blueprint, render_template, flash, request, redirect, url_for, jsonify
 from flask_security import current_user, login_required
 from bson import json_util
 
@@ -87,7 +85,7 @@ def create_meeting(form=None):
             m = Meeting(name=create_form.name.data, members=query,
                         owner=user, meeting_nature=create_form.nature.data, active=False).save()
 
-        # insert the meeting in each user's list of meetings
+            # insert the meeting in each user's list of meetings
         for u in query:
             u.meetings.append(m)
             u.meeting_count = u.meeting_count + 1
@@ -143,7 +141,7 @@ def update_meeting(form=None):
             members = list(filter(
                 lambda x: x not in members_to_remove, members))
 
-        # add the new members
+            # add the new members
         if len(emails_to_add_str) != 0:
             emails_to_add = emails_to_add_str.split(" ")
             members_to_add = User.objects(email__in=emails_to_add)
@@ -223,7 +221,7 @@ def delete_meeting(form=None):
         flash('error An Error has Occured, Please Try Again.'
               '{}'.format(str(e)))
 
-    return redirect(request.args.get('next') or url_for('meetings.home'))
+        return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
 @meetings.route('/edit/<id>', methods=['GET', 'POST'])
@@ -265,24 +263,31 @@ def search_meetings(query):
         flash('error Could not fulfill search request.')
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
+    # get the other search criteria
+
+    # get the list of groups to search for
+    for x in search:
+        if "$" in x and "(" in x:
+            group = x
+        elif ")" not in group:
+            group = group + " " + x
+    for r in group.split(" "):
+        search.remove(r)
+
     # get the list of users to search for
     users = list(filter(lambda x: "@" in x, search))
 
     # get the list of tags to search for
     tags = list(filter(lambda x: "#" in x, search))
 
-    # get the list of groups to search for
-    groups = list(filter(lambda x: "$" in x, search))
-
-    # get the other search criteria
-    search = list(set(search) - set(users) - set(tags) - set(groups))
+    search = list(set(search) - set(users) - set(tags))
 
     # filter the meetings to only contain meetings with desired tags
     for t in tags:
         try:
             t = t.lower()
             meetings = list(filter(lambda x: t[1:] in
-                                   x.tags or t[1:] in x.topics, meetings))
+                            x.tags or t[1:] in x.topics, meetings))
 
         except Exception as e:
             return render_template('meeting/dashboard.html', meetings=[])
@@ -296,9 +301,10 @@ def search_meetings(query):
             return render_template('meeting/dashboard.html', meetings=[])
 
     # filter the meetings to only contain meetings created through desired group
-    for g in groups:
+    # for g in groups:
+    if group is not None:
         try:
-            group = Group.objects.get(name=g[1:])
+            group = Group.objects.get(name=group[2:-1])
             meetings = [val for val in group.meetings if val in meetings]
         except Exception as e:
             return render_template('meeting/dashboard.html', meetings=[])
@@ -308,15 +314,14 @@ def search_meetings(query):
         meetings = list(filter(
             lambda x: c.lower() in x.name.lower(), meetings))
 
-    # reset the page and only show the desired meetings
+        # reset the page and only show the desired meetings
     return render_template('meeting/dashboard.html', meetings=meetings, form=form)
 
 
 @meetings.route('/info/<string:meeting_id>', methods=['GET'])
 @login_required
 def meeting_info(meeting_id):
-    if len(meeting_id) != 24 or \
-       not all(c in string.hexdigits for c in meeting_id):
+    if len(meeting_id) != 24 or not all(c in string.hexdigits for c in meeting_id):
         flash('error Invalid Meeting Id.')
         return redirect(request.args.get('next') or
                         url_for('meeting.meetings_page'))
