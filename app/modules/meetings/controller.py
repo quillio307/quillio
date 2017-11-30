@@ -2,6 +2,7 @@ import json
 import string
 import re
 import requests
+import language_check
 
 from rake_nltk import Rake
 from nltk.tokenize import word_tokenize
@@ -42,7 +43,7 @@ def home():
         return filter_form(request.form)
     form = MeetingCreateForm()
     user = current_user._get_current_object()
-    
+
     return render_template('meeting/dashboard.html', meetings=user.meetings, form=form)
 
 
@@ -391,6 +392,20 @@ def update_tags(meeting_id):
     meeting.save()
 
     return json.dumps({'status': 'success'})
+
+@meetings.route('/<meeting_id>/updateGrammarSuggestions', methods=['GET'])
+def update_grammar(meeting_id):
+    if request.form is None:
+        print('Form is invalid')
+    print('UPDATE GRAMMAR SUGGESTIONS')
+    tool = language_check.LanguageTool('en-US')
+    meeting = Meeting.objects.get(id=meeting_id)
+    transcripts = Meeting.transcript
+    for transcript in transcripts:
+        transString = transcript.transcription
+        matches = tool.check(transString)
+        print(matches)
+    return redirect(url_for('meetings.edit_meeting', id=meeting_id))
 
 
 @meetings.route('/<meeting_id>/getTranscript', methods=['GET'])
