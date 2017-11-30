@@ -11,6 +11,7 @@ class Transcription(db.EmbeddedDocument):
     transcription = db.StringField()
     grammarErrors = db.BooleanField(default=False)
     grammarSuggestions = db.ListField(db.StringField(min_length=0, max_length=1000))
+    meta = {'strict': False}
 
 
 class Meeting(db.Document):
