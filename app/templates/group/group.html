@@ -1,5 +1,5 @@
-{% extends"helpers/landing_page.html" %} {% block title %} {{ group.name }}{% endblock %} {% block landing_content %} {%
-for meeting_row in group.meetings | batch(3) %}
+{% extends"helpers/landing_page.html" %} {% block title %} {{ group.name }}{% endblock %} {% block landing_content %} 
+{%for meeting_row in group.meetings | batch(3) %}
 <div class="container">
   <br>
   <div class="row">
@@ -73,9 +73,6 @@ for meeting_row in group.meetings | batch(3) %}
                 </ul>
             </div>
         </div>
-        {% endfor %}
-
-    </div>
     {% endfor %}
   </div>
 </div>
@@ -306,3 +303,4 @@ $(".button-collapse").sideNav();
 </script>
 <!-- \script for sidenav collapse -->
 {% endblock %}
+
