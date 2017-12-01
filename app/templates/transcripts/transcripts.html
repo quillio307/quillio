@@ -109,8 +109,8 @@
     <!-- \column for sidebar -->
 </div>
 <!-- \Row -->
-<div class="modal fade left" id="summaryModal" tabindex="-1" role="dialog" aria-labelledby="summaryModal" aria-hidden="true">
-    <div class="modal-dialog modal-side modal-top-left" role="document">
+<div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-labelledby="summaryModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
         <!--Content-->
         <div class="modal-content">
             <!--Header-->
@@ -122,7 +122,8 @@
             </div>
             <!--Body-->
             <div class="modal-body">
-                <ul id="summaryList"></ul>
+                <ul id="summaryList" class="list-group">
+                </ul>
             </div>
             
         </div>
@@ -305,7 +306,7 @@
         dataType: 'json',
         success: function(result) {
             for(let i = 0; i < result.length; i++){
-                $('#summaryList').append(`<li>${result[i]}</li>`);
+                $('#summaryList').append(`<li class="list-group-item">${result[i]}</li>`);
             }
         }
         });
