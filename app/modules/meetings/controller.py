@@ -288,12 +288,13 @@ def search_meetings(query):
 
     # filter the meetings to only contain meetings with desired nature
     for n in natures:
-        if n.lower() == "professional":
-            meetings = list(filter(lambda x: x.meeting_nature == "professional", meetings))
-        elif n.lower() == "academic":
-            meetings = list(filter(lambda x: x.meeting_nature == "academic", meetings))
+        print(n)
+        if n.lower() == "!professional":
+            meetings = list(filter(lambda x: x.meeting_nature == 'professional', meetings))
+        elif n.lower() == "!academic":
+            meetings = list(filter(lambda x: x.meeting_nature == 'academic', meetings))
         else:
-            meetings = list(filter(lambda x: x.meeting_nature == "other", meetings))
+            meetings = list(filter(lambda x: x.meeting_nature == 'other', meetings))
 
     # filter the meetings to only contain meetings with desired tags
     for t in tags:
@@ -315,7 +316,7 @@ def search_meetings(query):
 
     # filter the meetings to only contain meetings created through desired group
     # for g in groups:
-    if group is not None:
+    if group is not "":
         try:
             group = Group.objects.get(name=group[2:-1])
             meetings = [val for val in group.meetings if val in meetings]
