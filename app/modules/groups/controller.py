@@ -321,7 +321,7 @@ def update_group(form=None):
         # add the new members
         if len(emails_to_add_str) != 0:
             emails_to_add = emails_to_add_str.split(" ")
-            members_to_add = User.object(email__in=emails_to_add)
+            members_to_add = User.objects(email__in=emails_to_add)
 
             for member in members_to_add:
                 # add member to the group's list of members
