@@ -10,6 +10,7 @@ from rake_nltk import Rake
 class Transcription(db.EmbeddedDocument):
     user = db.ReferenceField(User)
     transcription = db.StringField()
+    meta = {'strict': False}
 
 
 class Meeting(db.Document):
