@@ -44,34 +44,6 @@
             </a>
 
             {% endif %}
-
-            <div class="card-body">
-                <h4 class="card-title"> {{ meeting.name }} </h4>
-                <hr>
-                <p class="card-text"> {{ meeting.description }} </p>
-            </div>
-
-            <div class="card-data flex-center">
-                <ul>
-                    <li>
-                        <i class="fa fa-clock-o"></i> {{ meeting.created_at_str }}
-                    </li>
-
-                    <li>
-                        <i class="fa fa-users"></i> {{ meeting.members|length }}
-                    </li>
-
-                    <!-- Add Edit Meeting Option if Current user is the owner of the Meeting -->
-                    {% if current_user.id == meeting.owner.id %}
-                    <li>
-                        <a data-toggle="modal" data-target="#editMeetingForm" id="{{ meeting.id }}" onclick="setMeeting('{{ meeting.id }}', '{{ meeting.name }}')">
-                            Edit
-                        </a>
-                    </li>
-                    {% endif %}
-
-                </ul>
-            </div>
         </div>
     {% endfor %}
   </div>
@@ -90,14 +62,14 @@
     data-target="#modalGroupStats">
     <i class="fa fa-bar-chart" aria-hidden="true"></i>
 </a>
-
+<!-- Group Stats Modal -->
 <div class="modal fade show" id="modalGroupStats" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
     data-backdrop="false">
     <div class="modal-dialog modal-notify modal-info" role="document">
         <!--Content-->
         <div class="modal-content">
             <!--Header-->
-            <div class="modal-header">
+            <div class="modal-header darken-3 white-text" style="background-color: #45526E">
                 <p class="heading">
                     Group Statistics
                 </p>
@@ -215,22 +187,7 @@
         <div class="card-body">
           random date
         </div>
-        <div class="card">
-            <div class="card-header quillioColor" role="tab" id="headingThree">
-                <a data-toggle="collapse" data-parent="#accordianEx" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                    <h5 class="white-text">
-                        Analytics
-                        <i class="fa fa-angle-down rotate-icon"></i>
-                    </h5>
-                </a>
-            </div>
-            <div id="collapseThree" class="collapse show" role="tabpanel" arira-labelledby="headingThree">
-                <div class="card-body">
-                    this will be a modal later
-                </div>
-            </div>
-        </div>
-    </div>
+     </div>
   </div>
 </div>
 
@@ -288,19 +245,15 @@
 {% block js_import %}
 <!-- script for sidenav collapse -->
 <script type="text/javascript">
-
 /**
 * initialize edit meeting form for the meeting that was clicked
 */
-
 function setMeeting(id, name){
   document.getElementById('updateMeetingId').value = id
   document.getElementById('updateName').value = name
   console.log(name)
 }
-
 $(".button-collapse").sideNav();
 </script>
 <!-- \script for sidenav collapse -->
 {% endblock %}
-
