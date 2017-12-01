@@ -21,6 +21,7 @@ class Meeting(db.Document):
     active = db.BooleanField(default=False)
     tags = db.ListField(db.StringField(min_length=0, max_length=1000))
     topics = db.ListField(db.StringField(min_length=1, max_length=1000))
+    objectives = db.ListField(db.StringField(min_length=1, max_length=1000))
     created_at = db.DateTimeField(default=dt.now())
     created_at_str = db.StringField(default=dt.now().strftime('%m-%d-%Y'))
     transcript = db.ListField(db.EmbeddedDocumentField(Transcription))
@@ -48,17 +49,10 @@ class Meeting(db.Document):
         self.transcript.append(Transcription(user, transcription))
 
     def get_contr(self):
-        try:
-            word_count = {}
-            for t in self.transcript:
-                if t.user.name in word_count:
-                    word_count[t.user.name] = word_count[t.user.name] + len(t.transcript.split(" "))
-                else:
-                    word_count[t.user.name] = len(t.transcript.split(" "))
-            return word_count
-        except Exception as e:
-            flash('error An Error Occured')
-            return
+        word_count = dict()
+        for t in self.transcript:
+            word_count[t.user.name] = word_count.get(t.user.name, 0) + len(t.transcription.split(" "))
+        return word_count
 
 
 class MeetingCreateForm(Form):
@@ -83,3 +77,4 @@ class MeetingDeleteForm(Form):
 
 class KeywordsForm(Form):
     keywords = StringField('Keywords', [validators.Required()])
+    objectives = StringField('Objectives', [validators.Required()])

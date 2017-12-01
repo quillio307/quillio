@@ -17,11 +17,9 @@ from gingerit.gingerit import GingerIt
 
 
 from app.modules.auth.model import User
-from app.modules.meetings.model import Meeting, MeetingCreateForm, \
-    MeetingUpdateForm, MeetingDeleteForm
+from app.modules.meetings.model import Meeting, MeetingCreateForm, MeetingUpdateForm, MeetingDeleteForm
 from app.modules.groups.model import Group
-from flask import Blueprint, render_template, flash, request, redirect, \
-    url_for, jsonify
+from flask import Blueprint, render_template, flash, request, redirect, url_for, jsonify
 from flask_security import current_user, login_required
 from bson import json_util
 
@@ -53,7 +51,6 @@ def home():
     user = current_user._get_current_object()
 
     return render_template('meeting/dashboard.html', meetings=user.meetings, form=form)
-
 
 
 @meetings.route('/create', methods=['POST'])
@@ -218,6 +215,7 @@ def delete_meeting(form=None):
         # remove meeting from owner's list of meetings
         if meeting in owner.meetings:
             owner.meetings.remove(meeting)
+            owner.meeting_count = owner.meeting_count - 1
             owner.save()
 
         # remove meeting from owner's list of groups
@@ -257,11 +255,12 @@ def edit_meeting(id):
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
 
-@meetings.route('/search=<string:query>', methods=['GET', 'POST'])
+@meetings.route('/search=<query>', methods=['GET', 'POST'])
 @login_required
 def search_meetings(query):
     """ Displays the Meetings to the User's Dashboard that match the given
         criteria """
+    form = MeetingCreateForm()
 
     if request.method == 'POST':
         return filter_form(request.form)
@@ -274,24 +273,30 @@ def search_meetings(query):
         flash('error Could not fulfill search request.')
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
+    # get the list of groups to search for
+    for x in search:
+        if "$" in x and "(" in x:
+            group = x
+        elif ")" not in group:
+            group = group + " " + x
+    for r in group.split(" "):
+        search.remove(r)
+
     # get the list of users to search for
     users = list(filter(lambda x: "@" in x, search))
 
     # get the list of tags to search for
     tags = list(filter(lambda x: "#" in x, search))
 
-    # get the list of groups to search for
-    groups = list(filter(lambda x: "$" in x, search))
-
     # get the other search criteria
-    search = list(set(search) - set(users) - set(tags) - set(groups))
+    search = list(set(search) - set(users) - set(tags))
 
     # filter the meetings to only contain meetings with desired tags
     for t in tags:
         try:
             t = t.lower()
             meetings = list(filter(lambda x: t[1:] in
-                                   x.tags or t[1:] in x.topics, meetings))
+                            x.tags or t[1:] in x.topics, meetings))
 
         except Exception as e:
             return render_template('meeting/dashboard.html', meetings=[])
@@ -305,9 +310,10 @@ def search_meetings(query):
             return render_template('meeting/dashboard.html', meetings=[])
 
     # filter the meetings to only contain meetings created through desired group
-    for g in groups:
+    # for g in groups:
+    if group is not None:
         try:
-            group = Group.objects.get(name=g[1:])
+            group = Group.objects.get(name=group[2:-1])
             meetings = [val for val in group.meetings if val in meetings]
         except Exception as e:
             return render_template('meeting/dashboard.html', meetings=[])
@@ -318,14 +324,13 @@ def search_meetings(query):
             lambda x: c.lower() in x.name.lower(), meetings))
 
     # reset the page and only show the desired meetings
-    return render_template('meeting/dashboard.html', meetings=meetings)
+    return render_template('meeting/dashboard.html', meetings=meetings, form=form)
 
 
 @meetings.route('/info/<string:meeting_id>', methods=['GET'])
 @login_required
 def meeting_info(meeting_id):
-    if len(meeting_id) != 24 or \
-       not all(c in string.hexdigits for c in meeting_id):
+    if len(meeting_id) != 24 or not all(c in string.hexdigits for c in meeting_id):
         flash('error Invalid Meeting Id.')
         return redirect(request.args.get('next') or
                         url_for('meeting.meetings_page'))
@@ -367,7 +372,11 @@ def get_topics(meeting_id):
             count = count + 1
 
     return_data = " ".join(data).split(" ")
-    meeting.topics = return_data
+    no_reps = []
+    for d in return_data:
+        if d not in no_reps:
+            no_reps.append(d)
+    meeting.topics = no_reps
     meeting.save()
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
 
@@ -401,6 +410,7 @@ def update_tags(meeting_id):
 
     return json.dumps({'status': 'success'})
 
+
 @meetings.route('/<meeting_id>/updateGrammarSuggestions', methods=['GET'])
 def update_grammar(meeting_id):
     if request.form is None:
@@ -418,6 +428,25 @@ def update_grammar(meeting_id):
         #retText = parser.parse(transString)
         #print(retText)
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
+
+
+@meetings.route('/<meeting_id>/updateObjectives', methods=['POST'])
+def update_objectives(meeting_id):
+    if request.form is None:
+        print('Form is invalid')
+
+    objectives = request.form['objectives']
+    print(objectives)
+    if objectives is None:
+        return json.dumps({'error': 'invalid objective'})
+
+    meeting = Meeting.objects.get(id=meeting_id)
+    objectives = objectives.split(",")
+    objectives = [s.strip() for s in objectives]
+    meeting.objectives = objectives
+    meeting.save()
+
+    return json.dumps({'status': 'success'})
 
 
 @meetings.route('/<meeting_id>/getTranscript', methods=['GET'])

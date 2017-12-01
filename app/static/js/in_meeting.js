@@ -6,6 +6,7 @@ $(document).ready(function() {
     $('#keywordAddButton').click(function() {
         keywords = $('#keywords').val();
         keywords = keywords.replace(" ", "+");
+        console.log("in keyword add");
         $('#insertKeywords').modal('hide');
         $.ajax({
             url: '/auth/getUser',
@@ -14,7 +15,6 @@ $(document).ready(function() {
                 init();
             }
         });
-
     });
 });
 
