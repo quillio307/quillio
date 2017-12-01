@@ -1,15 +1,19 @@
+#import ginger
 import json
 import string
 import re
 import requests
-import language_check
+#import language_check
+import subprocess
 
 from rake_nltk import Rake
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import RegexpTokenizer
 #import gevent.monkey, gevent.socket
 #gevent.monkey.patch_all(thread=False)
-from gingerit.gingerit import GingerIt
+#from gingerit.gingerit import GingerIt
+#import language_check
+
 
 #monkey.patch_all()
 
@@ -415,24 +419,23 @@ def update_tags(meeting_id):
 def update_grammar(meeting_id):
     if request.form is None:
         print('Form is invalid')
-    print('UPDATE GRAMMAR SUGGESTIONS')
 
-    parser = GingerIt()
     meeting = Meeting.objects.get(id=meeting_id)
     transcripts = meeting.transcript
-    text = 'This are a sentence.'
-    parser.parse(text)
+
     print(transcripts)
     for transcript in transcripts:
         transString = transcript.transcription
-        #parseObj = parser.parse(transString)
-        if len(parseObj['corrections']) == 0:
-            transcript.grammarErrors = False
-        else:
+        parseObj = subprocess.getoutput("python ginger.py "+ transString)
+        if parseObj == "Good English :)":
             transcript.grammarErrors = True
-            transcript.grammarSuggestions[len(transcript.grammarSuggestions-1)] = parseObj['result']
+        else:
+            transcript.grammarErrors = False
+
+        print(transcript.grammarErrors)
 
         #print(retText)
+    meeting.save()
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
 
 

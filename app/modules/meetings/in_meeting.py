@@ -3,7 +3,6 @@ import string
 import time
 import functools
 import requests
-import language_check
 
 from datetime import datetime, timedelta
 
