@@ -98,7 +98,7 @@
                         <label for="emails"> Member Emails </label>
                     </div> 
                     <legend> Set nature of meeting: </legend>
-                    {% for subfield in request.form.nature %}
+                    {% for subfield in form.nature %}
                     <div class="form-group">
                         {{ subfield }} {{ subfield.label }}
                     </div>
