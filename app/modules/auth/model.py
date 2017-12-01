@@ -81,14 +81,16 @@ class User(db.Document, UserMixin):
         best_friends = []
         favorite_topics = []
         for i in range(0, 3):
-            best_friends.append({
-                "name": sorted_friends[i],
-                "count": friends[sorted_friends[i]]
-            })
-            favorite_topics.append({
-                "name": sorted_topics[i],
-                "count": topics[sorted_topics[i]]
-            })
+            if len(sorted_friends) > i:
+                best_friends.append({
+                    "name": sorted_friends[i],
+                    "count": friends[sorted_friends[i]]
+                })
+            if len(sorted_topics) > i:
+                favorite_topics.append({
+                    "name": sorted_topics[i],
+                    "count": topics[sorted_topics[i]]
+                })
         
         result = dict()
         result['members'] = best_friends 
