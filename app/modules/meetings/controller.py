@@ -426,6 +426,7 @@ def update_grammar(meeting_id):
     print(transcripts)
     for transcript in transcripts:
         transString = transcript.transcription
+        #   used from https://github.com/zoncoen/python-ginger
         parseObj = subprocess.getoutput("python ginger.py "+ transString)
         if parseObj == "Good English :)":
             transcript.grammarErrors = True
