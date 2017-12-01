@@ -405,16 +405,22 @@ def update_tags(meeting_id):
 def update_objectives(meeting_id):
     if request.form is None:
         print('Form is invalid')
-
+    meeting = Meeting.objects.get(id=meeting_id)
+    currObjs = meeting.objectives
     objectives = request.form['objectives']
     print(objectives)
     if objectives is None:
         return json.dumps({'error': 'invalid objective'})
 
-    meeting = Meeting.objects.get(id=meeting_id)
+
     objectives = objectives.split(",")
     objectives = [s.strip() for s in objectives]
-    meeting.objectives = objectives
+
+    for x in objectives:
+        if x not in currObjs:
+            currObjs.append(x)
+
+    meeting.objectives = currObjs
     meeting.save()
 
     return json.dumps({'status': 'success'})
