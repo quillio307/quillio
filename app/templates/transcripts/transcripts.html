@@ -187,6 +187,8 @@
     let urltoks = window.location.href.split("/");
     let meeting_id = "{{ meeting.id }}";
 
+
+
     function loadObj() {
       var listObj = "{% for x in meeting.objectives %}{{ x }}, {% endfor %}"
       if(listObj.substr(-2) == ', '){
