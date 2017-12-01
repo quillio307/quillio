@@ -40,13 +40,11 @@ def signup():
 
         # generate activation token
         activation_token = secrets.token_urlsafe(32)
-        print("Activation token generated")
         mail = SendGrid(app)
-        print("Send grid created")
+
         # send registration email
         mail.send_email(from_email=app.config['SENDGRID_DEFAULT_FROM'], to_email=email,
                         subject='Welcome to Quillio', html=activate_html(name, activation_token, email))
-        print("Email sent")
 
         # add user to the database
         user_datastore.create_user(
@@ -96,11 +94,6 @@ def login():
     if request.method == 'GET':
         return render_template('auth/login.html', form=LoginForm())
 
-    # if not request.form:
-    #     data = request.get_json()
-    #     email = data['email']
-    #     password = data['password']
-    # else:
     form = LoginForm(request.form)
     if not form.validate():
         flash('error Invalid Email or Password.')

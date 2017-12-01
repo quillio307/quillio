@@ -63,10 +63,9 @@ def create_meeting(form=None):
     """ Creates a new Meeting. """
 
     if form is None:
-        flash('error Invalid Request to Create Meeting.')
-        return redirect(request.args.get('next') or url_for('meetings.home'))
-
-    create_form = MeetingCreateForm(form)
+        create_form = MeetingCreateForm(request.form)
+    else:
+        create_form = MeetingCreateForm(form)
 
     if not create_form.validate():
         flash('error Could not Create New Meeting, Please Try Again.')

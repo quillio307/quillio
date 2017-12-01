@@ -228,10 +228,9 @@ def create_group(form=None):
     """ Creates a new Group. """
 
     if form is None:
-        flash('error Invalid Request to Create New Group.')
-        return redirect(url_for('groups.home'))
-
-    create_form = GroupCreateForm(form)
+        create_form = GroupCreateForm(request.form)
+    else:
+        create_form = GroupCreateForm(form)
 
     if not create_form.validate():
         flash('error Could not Create New Group, Please Try Again.')
@@ -280,15 +279,13 @@ def update_group(form=None):
     """ Updates an Existing Group """
 
     if form is None:
-        flash('error Invalid Request to Update Group.')
-        return redirect(url_for('groups.home'))
-
-    update_form = GroupUpdateForm(form)
+        update_form = GroupUpdateForm(request.form)
+    else:
+        update_form = GroupUpdateForm(form)
 
     if not update_form.validate():
         flash('error Could Not Update Group, Please Try Again.')
         return redirect(request.args.get('next') or url_for('groups.home'))
-
     try:
         # extract the form data
         name = update_form.name.data

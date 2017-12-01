@@ -1,10 +1,14 @@
+import sys 
 from flask import Flask
 from flask_mongoengine import MongoEngine
 from flask_socketio import SocketIO
 
 # Initialize the app
 app = Flask(__name__)
-app.config.from_object('config')
+if len(sys.argv) > 1 and sys.argv[1] == 'test':
+    app.config.from_object('config_test')
+else:
+    app.config.from_object('config')
 socketio = SocketIO(app, logger=True)
 
 # Define the database
