@@ -70,6 +70,11 @@ def update_grammar(meeting_id):
     meeting = Meeting.objects.with_id(meeting_id)
     transcriptCounter = 0
     transcripts = meeting.transcript
+    print("holy SHIT fuck shit fuck")
+    #text = "holy SHIT fuck shit fuck"
+    #tool = language_check.LanguageTool('en-US')
+    #matches = tool.check(text)
+    #print(language_check.correct(text, matches)+" !!!!!!!!????!?!!?!?!?!??!!!!??!?!??!?!")
     for transcript in transcripts:
         r = requests.post('http://bark.phon.ioc.ee/punctuator',data={'text':transcript.transcription})
         print(r.text)
