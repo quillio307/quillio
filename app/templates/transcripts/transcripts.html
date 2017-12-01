@@ -101,10 +101,13 @@
                 <div class="card">
                     <div class="card-header quillioColor" role="tab" id="headingFive">
                         <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-                            <h5 class="white-text">
-                                Objectives
-                                <i class="fa fa-angle-down rotate-icon"></i>
-                            </h5>
+                          <h5 class="white-text">
+                              Objectives
+                              {% if user.id == meeting.owner.id %}
+                                <i onclick="loadObj()" class="fa fa-edit" data-toggle="modal" data-target="#editObjectiveForm"></i>
+                              {% endif %}
+                              <i class="fa fa-angle-down rotate-icon"></i>
+                          </h5>
                         </a>
                     </div>
                     <div id="collapseFive" class="collapse show" role="tabpanel" aria-labelledby="headingFive">
@@ -125,13 +128,44 @@
                             {% set count = count + 1 %}
                           {% endfor %}
                         </div>
-                            <!-- <button onclick="saveTags()" id="updateTags" class="btn quillioColor flex-center">Update</button> -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <!-- \column for sidebar -->
+    <!-- Edit Objectives Modal -->
+    <div class="modal fade" id="editObjectiveForm" tabindex="-1" role="dialog" aria-labelledby="editObjectiveForm" aria-hidden="true">
+        <div class="modal-dialog cascading-modal" role="document">
+            <div class="modal-content">
+                <div class="modal-header darken-3 white-text" style="background-color: #45526E">
+                    <h4 class=" title">
+                        <i class="fa fa-pencil"></i> Edit Objectives
+                    </h4>
+                    <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form>
+                    <div class="modal-body mb-0">
+                        <div class="md-form form-sm">
+                            <input type="text" id="newObjectives" class="form-control" required>
+                            <label for="name"></label>
+                        </div>
+                        <div class="text-center mt-1-half">
+                            <button onclick="saveObjs()" id="saveMeetingObjectives" class="btn btn-mdb mdb-2">
+                                Save Objectives
+                                <i class="fa fa-send ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- \Edit Objectives Modal -->
+
 </div>
 <!-- \Row -->
 
@@ -153,7 +187,28 @@
     let urltoks = window.location.href.split("/");
     let meeting_id = "{{ meeting.id }}";
 
+    function loadObj() {
+      var listObj = "{% for x in meeting.objectives %}{{ x }}, {% endfor %}"
+      if(listObj.substr(-2) == ', '){
+        listObj = listObj.substring(0, listObj.length-2);
+      }
+      document.getElementById("newObjectives").value = listObj;
+    }
 
+    function saveObjs()  {
+      var objectives = $('#newObjectives').val();
+      var id = `{{meeting.id}}`
+      console.log(objectives);
+      const params = new URLSearchParams()
+      params.append('objectives', objectives)
+      fetch(`/meetings/${id}/adminUpdateObjectives`, {
+              method: 'POST',
+              body: params
+          })
+          .then(function(res) {
+              console.log(JSON.stringify(res, undefined, 2))
+        })
+  }
 
     function addChunk(chnk) {
         let option;
