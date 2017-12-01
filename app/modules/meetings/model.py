@@ -4,6 +4,7 @@ from datetime import datetime as dt
 from app.modules.auth.model import User
 
 from wtforms import Form, validators, StringField, RadioField
+from rake_nltk import Rake
 
 
 class Transcription(db.EmbeddedDocument):
@@ -52,6 +53,31 @@ class Meeting(db.Document):
         for t in self.transcript:
             word_count[t.user.name] = word_count.get(t.user.name, 0) + len(t.transcription.split(" "))
         return word_count
+
+    def get_summary(self):
+        rk = Rake()
+        text = ""
+        cmp = []
+        for t in self.transcript:
+            text += "{0}: {1}\n".format(t.user.name, t.transcription)
+            cmp.append({'score': 0, 'transcription': t.transcription})
+
+        rk.extract_keywords_from_text(text)
+        topic_data = rk.get_ranked_phrases_with_scores()
+
+        for topic in topic_data:
+            for t in cmp:
+                if topic[0] > 5 and topic[1] in t['transcription']:
+                    t['score'] += topic[0]
+
+        arr = sorted(cmp, key=lambda k: k['score'])
+        if len(arr) > 3:
+            return [arr[-1]['transcription'], arr[-2]['transcription'], arr[-3]['transcription']]
+        else:
+            narr = []
+            for t in arr:
+                narr.append(t['transcription'])
+            return narr
 
 
 class MeetingCreateForm(Form):

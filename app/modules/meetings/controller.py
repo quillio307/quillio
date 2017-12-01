@@ -56,7 +56,6 @@ def home():
 
     return render_template('meeting/dashboard.html', meetings=user.meetings, form=form)
 
-
 @meetings.route('/create', methods=['POST'])
 @login_required
 def create_meeting(form=None):
@@ -503,3 +502,11 @@ def get_transcription(meeting_id):
         chunk['user'] = chunk['user']['$oid']
 
     return json.dumps(payload)
+
+
+@meetings.route('/<meeting_id>/getSummary', methods=['GET'])
+@login_required
+def get_summary(meeting_id):
+    """ gets transcript of a given meeting """
+    meeting = Meeting.objects.get(id=meeting_id)
+    return json.dumps(meeting.get_summary())
