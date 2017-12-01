@@ -1,11 +1,23 @@
+#import ginger
 import json
 import string
 import re
 import requests
+#import language_check
+import subprocess
 
 from rake_nltk import Rake
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import RegexpTokenizer
+#import gevent.monkey, gevent.socket
+#gevent.monkey.patch_all(thread=False)
+#from gingerit.gingerit import GingerIt
+#import language_check
+
+
+#monkey.patch_all()
+
+
 
 
 from app.modules.auth.model import User
@@ -35,6 +47,7 @@ def filter_form(form):
 @meetings.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
+    #monkey.patch_all()
     """ Displays All of the Current Users Meetings on the Meeting Dashboard """
     if request.method == 'POST':
         return filter_form(request.form)
@@ -401,6 +414,31 @@ def update_tags(meeting_id):
 
     return json.dumps({'status': 'success'})
 
+
+@meetings.route('/<meeting_id>/updateGrammarSuggestions', methods=['GET'])
+def update_grammar(meeting_id):
+    if request.form is None:
+        print('Form is invalid')
+
+    meeting = Meeting.objects.get(id=meeting_id)
+    transcripts = meeting.transcript
+
+    print(transcripts)
+    for transcript in transcripts:
+        transString = transcript.transcription
+        parseObj = subprocess.getoutput("python ginger.py "+ transString)
+        if parseObj == "Good English :)":
+            transcript.grammarErrors = True
+        else:
+            transcript.grammarErrors = False
+
+        print(transcript.grammarErrors)
+
+        #print(retText)
+    meeting.save()
+    return redirect(url_for('meetings.edit_meeting', id=meeting_id))
+
+
 @meetings.route('/<meeting_id>/updateObjectives', methods=['POST'])
 def update_objectives(meeting_id):
     if request.form is None:
@@ -446,6 +484,7 @@ def admin_update_objectives(meeting_id):
     meeting.save()
 
     return json.dumps({'status': 'success'})
+
 
 @meetings.route('/<meeting_id>/getTranscript', methods=['GET'])
 @login_required

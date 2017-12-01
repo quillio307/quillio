@@ -9,6 +9,7 @@ from wtforms import Form, validators, StringField, RadioField
 class Transcription(db.EmbeddedDocument):
     user = db.ReferenceField(User)
     transcription = db.StringField()
+    grammarErrors = db.BooleanField(default=True)
     meta = {'strict': False}
 
 

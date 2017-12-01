@@ -211,6 +211,7 @@
   }
 
     function addChunk(chnk) {
+        let grammarErr = chnk.grammarErrors;
         let option;
         if (!chnk) {
             option = `<select class="mdb-select"><option value="" disabled selected>Choose your speaker</option>`;
@@ -231,6 +232,8 @@
 
         let chunkElem;
         if (chnk && chnk.user && chnk.transcription) {
+          if(chnk.grammarErrors)
+          {
             chunkElem = `<div style="padding-top:20px"><div class="card card-body chunk">
                             <i class="fa fa-arrows handle" aria-hidden="true"></i>
                          ${option}
@@ -238,6 +241,17 @@
                         <small class="activator text-muted remove"><i class="fa fa-times"></i></small>
                         <textarea type="text" class="md-textarea">${chnk.transcription}</textarea>
                     </div></div>`;
+          }
+          else {
+            chunkElem = `<div style="padding-top:20px"><div class="card card-body chunk red">
+                            <i class="fa fa-arrows handle" aria-hidden="true"></i>
+                         ${option}
+
+                        <small class="activator text-muted remove"><i class="fa fa-times"></i></small>
+                        <textarea type="text" class="md-textarea">${chnk.transcription}</textarea>
+                    </div></div>`;
+
+          }
         } else {
             let prp;
             for (var prop in memberToName) {
@@ -353,6 +367,9 @@
         })
         .then(function() {
                 window.location.href = "/meetings/{{ meeting.id }}/topics"
+        })
+        .then(function() {
+                window.location.href = "/meetings/{{ meeting.id }}/updateGrammarSuggestions"
         })
 
   }
