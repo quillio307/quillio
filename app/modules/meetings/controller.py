@@ -1,25 +1,11 @@
-#import ginger
 import json
 import string
 import re
 import requests
-#import language_check
 import subprocess
-
 from rake_nltk import Rake
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import RegexpTokenizer
-#import gevent.monkey, gevent.socket
-#gevent.monkey.patch_all(thread=False)
-#from gingerit.gingerit import GingerIt
-#import language_check
-
-
-#monkey.patch_all()
-
-
-
-
 from app.modules.auth.model import User
 from app.modules.meetings.model import Meeting, MeetingCreateForm, MeetingUpdateForm, MeetingDeleteForm
 from app.modules.groups.model import Group
@@ -47,7 +33,7 @@ def filter_form(form):
 @meetings.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    #monkey.patch_all()
+    # monkey.patch_all()
     """ Displays All of the Current Users Meetings on the Meeting Dashboard """
     if request.method == 'POST':
         return filter_form(request.form)
@@ -300,7 +286,7 @@ def search_meetings(query):
     # get the other search criteria
     search = list(set(search) - set(users) - set(tags) - set(natures))
 
-    #filter the meetings to only contain meetings with desired nature
+    # filter the meetings to only contain meetings with desired nature
     for n in natures:
         if n.lower() == "professional":
             meetings = list(filter(lambda x: x.meeting_nature == "professional", meetings))
@@ -317,7 +303,7 @@ def search_meetings(query):
                             x.tags or t[1:] in x.topics, meetings))
 
         except Exception as e:
-            return render_template('meeting/dashboard.html', meetings=[])
+            return render_template('meeting/dashboard.html', meetings=[], form=form)
 
     # filter the meetings to only contain meetings with desired members
     for u in users:
@@ -325,7 +311,7 @@ def search_meetings(query):
             user = User.objects.get(email=u[1:])
             meetings = list(filter(lambda x: user in x.members, meetings))
         except Exception as e:
-            return render_template('meeting/dashboard.html', meetings=[])
+            return render_template('meeting/dashboard.html', meetings=[], form=form)
 
     # filter the meetings to only contain meetings created through desired group
     # for g in groups:
@@ -334,7 +320,7 @@ def search_meetings(query):
             group = Group.objects.get(name=group[2:-1])
             meetings = [val for val in group.meetings if val in meetings]
         except Exception as e:
-            return render_template('meeting/dashboard.html', meetings=[])
+            return render_template('meeting/dashboard.html', meetings=[], form=form)
 
     # filter the meetings to only contain meetings with the desired text
     for c in search:
@@ -441,16 +427,13 @@ def update_grammar(meeting_id):
     for transcript in transcripts:
         transString = transcript.transcription
         #   used from https://github.com/zoncoen/python-ginger
-        parseObj = subprocess.getoutput("python ginger.py \""+ transString+"\"")
+        parseObj = subprocess.getoutput("python ginger.py \"" + transString + "\"")
         print(parseObj)
         if parseObj == "Good English :)":
             transcript.grammarErrors = True
         else:
             transcript.grammarErrors = False
 
-        #print(transcript.grammarErrors)
-
-        #print(retText)
     meeting.save()
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
 
@@ -466,7 +449,6 @@ def update_objectives(meeting_id):
     if objectives is None:
         return json.dumps({'error': 'invalid objective'})
 
-
     objectives = objectives.split(",")
     objectives = [s.strip() for s in objectives]
 
@@ -479,6 +461,7 @@ def update_objectives(meeting_id):
 
     return json.dumps({'status': 'success'})
 
+
 @meetings.route('/<meeting_id>/adminUpdateObjectives', methods=['POST'])
 def admin_update_objectives(meeting_id):
     if request.form is None:
@@ -488,7 +471,6 @@ def admin_update_objectives(meeting_id):
     print(objectives)
     if objectives is None:
         return json.dumps({'error': 'invalid objective'})
-
 
     objectives = objectives.split(",")
     objectives = [s.strip() for s in objectives]
