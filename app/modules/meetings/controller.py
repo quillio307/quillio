@@ -278,13 +278,18 @@ def search_meetings(query):
         return redirect(request.args.get('next') or url_for('meetings.home'))
 
     # get the list of groups to search for
+    group = ""
     for x in search:
         if "$" in x and "(" in x:
             group = x
-        elif ")" not in group:
+        elif "$" in group and ")" not in group:
             group = group + " " + x
-    for r in group.split(" "):
-        search.remove(r)
+    if group != "":
+        for r in group.split(" "):
+            search.remove(r)
+
+    print(group)
+    print(search)
 
     # get the list of users to search for
     users = list(filter(lambda x: "@" in x, search))
