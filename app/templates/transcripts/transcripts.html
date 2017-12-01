@@ -82,8 +82,9 @@
                         </a>
                     </div>
                     <div id="collapseThree" class="collapse show" role="tabpanel" aria-labelledby="headingThree">
-                        <div id="reloadTags" class="card-body">
+                        <div id="reloadTopics" class="card-body">
                             <textarea readonly style="height:auto" class="form-control" id="currTopics" rows="8">{% for topic in meeting.topics %}{{ topic }} {% endfor %}</textarea>
+                            <button onclick="generateTopics()" id="generateNewTops" class="btn quillioColor flex-center">Generate Topics</button>
                         </div>
                     </div>
                 </div>
@@ -189,7 +190,7 @@
                 <ul id="summaryList" class="list-group">
                 </ul>
             </div>
-            
+
         </div>
         <!--/.Content-->
     </div>
@@ -371,6 +372,10 @@
             })
     }
 
+    function generateTopics() {
+      window.location.href = "/meetings/{{ meeting.id }}/topics"
+    }
+
     function saveTranscript() {
         let payload = [];
         $('#transcriptEditor .chunk').each(function(index) {
@@ -393,9 +398,6 @@
 
             },
             contentType: "application/json"
-        })
-        .then(function() {
-                window.location.href = "/meetings/{{ meeting.id }}/topics"
         })
         .then(function() {
                 window.location.href = "/meetings/{{ meeting.id }}/updateGrammarSuggestions"
