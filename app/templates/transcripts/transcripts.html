@@ -103,10 +103,74 @@
                         </div>
                     </div>
                 </div>
+                <div class="card">
+                    <div class="card-header quillioColor" role="tab" id="headingFive">
+                        <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                          <h5 class="white-text">
+                              Objectives
+                              {% if user.id == meeting.owner.id %}
+                                <i onclick="loadObj()" class="fa fa-edit" data-toggle="modal" data-target="#editObjectiveForm"></i>
+                              {% endif %}
+                              <i class="fa fa-angle-down rotate-icon"></i>
+                          </h5>
+                        </a>
+                    </div>
+                    <div id="collapseFive" class="collapse show" role="tabpanel" aria-labelledby="headingFive">
+                        <div id="meetingObjs" class="card-body">
+                          {% set count = 0 %}
+                          {% for obj in meeting.objectives %}
+                            {% if obj.lower() in meeting.topics %}
+                            <div class="form-group">
+                                <input type="checkbox" id="checkbox{{count}}" checked="checked" disabled>
+                                <label for="checkbox{{count}}">{{ obj }}</label>
+                            </div>
+                            {% else %}
+                            <div class="form-group">
+                                <input type="checkbox" id="checkbox{{count}}" disabled>
+                                <label for="checkbox{{count}}">{{ obj }}</label>
+                            </div>
+                            {% endif %}
+                            {% set count = count + 1 %}
+                          {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <!-- \column for sidebar -->
+    <!-- Edit Objectives Modal -->
+    <div class="modal fade" id="editObjectiveForm" tabindex="-1" role="dialog" aria-labelledby="editObjectiveForm" aria-hidden="true">
+        <div class="modal-dialog cascading-modal" role="document">
+            <div class="modal-content">
+                <div class="modal-header darken-3 white-text" style="background-color: #45526E">
+                    <h4 class=" title">
+                        <i class="fa fa-pencil"></i> Edit Objectives
+                    </h4>
+                    <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form>
+                    <div class="modal-body mb-0">
+                        <div class="md-form form-sm">
+                            <input type="text" id="newObjectives" class="form-control" required>
+                            <label for="name"></label>
+                        </div>
+                        <div class="text-center mt-1-half">
+                            <button onclick="saveObjs()" id="saveMeetingObjectives" class="btn btn-mdb mdb-2">
+                                Save Objectives
+                                <i class="fa fa-send ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- \Edit Objectives Modal -->
+
 </div>
 <!-- \Row -->
 <div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-labelledby="summaryModal" aria-hidden="true">
@@ -152,7 +216,31 @@
 
 
 
+    function loadObj() {
+      var listObj = "{% for x in meeting.objectives %}{{ x }}, {% endfor %}"
+      if(listObj.substr(-2) == ', '){
+        listObj = listObj.substring(0, listObj.length-2);
+      }
+      document.getElementById("newObjectives").value = listObj;
+    }
+
+    function saveObjs()  {
+      var objectives = $('#newObjectives').val();
+      var id = `{{meeting.id}}`
+      console.log(objectives);
+      const params = new URLSearchParams()
+      params.append('objectives', objectives)
+      fetch(`/meetings/${id}/adminUpdateObjectives`, {
+              method: 'POST',
+              body: params
+          })
+          .then(function(res) {
+              console.log(JSON.stringify(res, undefined, 2))
+        })
+  }
+
     function addChunk(chnk) {
+
         let option;
         if (!chnk) {
             option = `<select class="mdb-select"><option value="" disabled selected>Choose your speaker</option>`;
@@ -173,6 +261,8 @@
 
         let chunkElem;
         if (chnk && chnk.user && chnk.transcription) {
+          if(chnk.grammarErrors)
+          {
             chunkElem = `<div style="padding-top:20px"><div class="card card-body chunk">
                             <i class="fa fa-arrows handle" aria-hidden="true"></i>
                          ${option}
@@ -180,6 +270,17 @@
                         <small class="activator text-muted remove"><i class="fa fa-times"></i></small>
                         <textarea type="text" class="md-textarea">${chnk.transcription}</textarea>
                     </div></div>`;
+          }
+          else {
+            chunkElem = `<div style="padding-top:20px"><div class="card card-body chunk red">
+                            <i class="fa fa-arrows handle" aria-hidden="true"></i>
+                         ${option}
+
+                        <small class="activator text-muted remove"><i class="fa fa-times"></i></small>
+                        <textarea type="text" class="md-textarea">${chnk.transcription}</textarea>
+                    </div></div>`;
+
+          }
         } else {
             let prp;
             for (var prop in memberToName) {
@@ -295,6 +396,9 @@
         })
         .then(function() {
                 window.location.href = "/meetings/{{ meeting.id }}/topics"
+        })
+        .then(function() {
+                window.location.href = "/meetings/{{ meeting.id }}/updateGrammarSuggestions"
         })
 
   }

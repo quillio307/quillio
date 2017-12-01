@@ -2,106 +2,106 @@
 {% block landing_content %}
 {% for meeting_row in group.meetings | batch(3) %}
 <div class="container">
-    <br>
-    <div class="row">
-        {% for meeting in meeting_row %}
-        <div class="card col-md-4">
-            <div class=" view overlay hm-white-slight">
-                <img src="https://mdbootstrap.com/img/Photos/Others/food.jpg" class="img-fluid" alt="">
-                <a>
-                    <div class="mask"></div>
-                </a>
-            </div>
+  <br>
+  <div class="row">
+    {% for meeting in meeting_row %}
+    <div class="card col-md-4">
+      <div class=" view overlay hm-white-slight">
+        <img src="https://mdbootstrap.com/img/Photos/Others/food.jpg" class="img-fluid" alt="">
+        <a>
+          <div class="mask"></div>
+        </a>
+      </div>
 
-            {% if meeting.status() == 2 %}
-            <a href="/meetings/edit/{{ meeting.id }}" style="background-color:#696773" class="btn-floating btn-action">
-                <i class="fa fa-chevron-right"></i>
+      {% if meeting.status() == 2 %}
+      <a href="/meetings/edit/{{ meeting.id }}" style="background-color:#696773" class="btn-floating btn-action">
+        <i class="fa fa-chevron-right"></i>
+      </a>
+      {% else %}
+
+      <a href="/meeting/{{ meeting.id }}" style="background-color:#06D6A0" class="btn-floating btn-action">
+        <i class="fa fa-chevron-right"></i>
+      </a>
+      {% endif %}
+
+      <div class="card-body">
+        <h4 class="card-title">{{ meeting.name }}</h4>
+        <hr>
+        <p class="card-text"> {{ meeting.description }} </p>
+      </div>
+      <div class="card-data flex-center">
+        <ul>
+          <li>
+            <i class="fa fa-clock-o"></i> {{ meeting.created_at_str }}</li>
+          <li>
+            <a href="#">
+              <i class="fa fa-users"> </i>{{ meeting.members|length }}</a>
+          </li>
+          <!-- Add Edit Meeting Option if Current user is the owner of the Meeting -->
+          {% if current_user.id == meeting.owner.id %}
+          <li>
+            <a data-toggle="modal" data-target="#editMeetingForm" id="{{ meeting.id }}" onclick="setMeeting('{{ meeting.id }}', '{{ meeting.name }}')">
+              Edit
             </a>
-            {% else %}
-
-            <a href="/meeting/{{ meeting.id }}" style="background-color:#06D6A0" class="btn-floating btn-action">
-                <i class="fa fa-chevron-right"></i>
-            </a>
-            {% endif %}
-
-            <div class="card-body">
-                <h4 class="card-title">{{ meeting.name }}</h4>
-                <hr>
-                <p class="card-text"> {{ meeting.description }} </p>
-            </div>
-            <div class="card-data flex-center">
-                <ul>
-                    <li>
-                        <i class="fa fa-clock-o"></i> {{ meeting.created_at_str }}</li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-users"> </i>{{ meeting.members|length }}</a>
-                    </li>
-                    <!-- Add Edit Meeting Option if Current user is the owner of the Meeting -->
-                    {% if current_user.id == meeting.owner.id %}
-                    <li>
-                        <a data-toggle="modal" data-target="#editMeetingForm" id="{{ meeting.id }}" onclick="setMeeting('{{ meeting.id }}', '{{ meeting.name }}')">
-                            Edit
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-        {% endfor %}
+          </li>
+          {% endif %}
+        </ul>
+      </div>
     </div>
+    {% endfor %}
+  </div>
 </div>
 {% endfor %}
 
 
 <!-- Create Meeting Button -->
 <a class="btn-floating btn-lg quillioButton" style="position: fixed; right: 35px; bottom: 35px;" data-toggle="modal" data-target="#createMeetingForm">
-	<i class="fa fa-plus"></i>
+  <i class="fa fa-plus"></i>
 </a>
 <!-- /Create Meeting Button -->
 
 
 <!-- Create Meeting Modal -->
 <div class="modal fade" id="createMeetingForm" tabindex="-1" role="dialog" aria-labelledby="createMeetingForm" aria-hidden="true">
-    <div class="modal-dialog cascading-modal" role="document">
-        <div class="modal-content">
-            <div class="modal-header darken-3 white-text" style="background-color: #45526E">
-                <h4 class=" title">
-                    <i class="fa fa-penci1l"></i> Create Meeting
-                </h4>
-                <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+  <div class="modal-dialog cascading-modal" role="document">
+    <div class="modal-content">
+      <div class="modal-header darken-3 white-text" style="background-color: #45526E">
+        <h4 class=" title">
+          <i class="fa fa-penci1l"></i> Create Meeting
+        </h4>
+        <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
 
-            <form>
-                <div class="modal-body mb-0">
-                    <div class="md-form form-sm">
-                        <input type="text" id="name" name="name" value="{{ request.form.name }}" class="form-control" required>
-                        <label for="name"> Meeting Name </label>
-                    </div>
+      <form>
+        <div class="modal-body mb-0">
+          <div class="md-form form-sm">
+            <input type="text" id="name" name="name" value="{{ request.form.name }}" class="form-control" required>
+            <label for="name"> Meeting Name </label>
+          </div>
 
-                    <div class="md-form form-sm">
-                        <input type="text" id="emails" name="emails" value="{{ emails }}" class="form-control" required>
-                        <label for="emails"> Member Emails </label>
-                    </div>
+          <div class="md-form form-sm">
+            <input type="text" id="emails" name="emails" value="{{ emails }}" class="form-control" required>
+            <label for="emails"> Member Emails </label>
+          </div>
 
-                    <legend> Set nature of meeting: </legend>
-                    {% for subfield in form.nature %}
-                    <div class="form-group">
-                      {{ subfield }} {{ subfield.label }}
-                    </div>
-                    {% endfor %}
-                    <div class="text-center mt-1-half">
-                        <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="create" formmethod="post">
-                            Create
-                            <i class="fa fa-send ml-1"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
+          <legend> Set nature of meeting: </legend>
+          {% for subfield in form.nature %}
+          <div class="form-group">
+            {{ subfield }} {{ subfield.label }}
+          </div>
+          {% endfor %}
+          <div class="text-center mt-1-half">
+            <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="create" formmethod="post">
+              Create
+              <i class="fa fa-send ml-1"></i>
+            </button>
+          </div>
         </div>
+      </form>
     </div>
+  </div>
 </div>
 
 <!-- /Create Meeting Modal -->
@@ -109,57 +109,158 @@
 {% endblock %}
 {% block sidebar_content %}
 <div class="container">
-    <div class="accordion" id="" role="tablist" aria-multiselectable="true">
-        <div class="card">
-            <div class="card-header quillioColor" role="tab" id="headingOne">
-                <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                    <h5 class="white-text">
-                        {{ group.name }}
-                        <i class="fa fa-angle-down rotate-icon"></i>
-                    </h5>
-                </a>
+  <div class="accordion" id="" role="tablist" aria-multiselectable="true">
+    <div class="card">
+      <div class="card-header quillioColor" role="tab" id="headingOne">
+        <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+          <h5 class="white-text">
+            {{ group.name }}
+            <i class="fa fa-angle-down rotate-icon"></i>
+          </h5>
+        </a>
+      </div>
+      <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne">
+        <div class="card-body">
+          {% for member in group.members %} {{ member.name }} {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header quillioColor" role="tab" id="headingTwo">
+        <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          <h5 class="white-text">
+            Meeting Date<i class="fa fa-angle-down rotate-icon"></i>
+          </h5>
+        </a>
+      </div>
+      <div id="collapseTwo" class="collapse show" role="tabpanel" aria-labelledby="headingTwo">
+        <div class="card-body">
+          random date
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Update Meeting Modal -->
+<div class="modal fade right" id="editMeetingForm" tabindex="-1" role="dialog" aria-labelledby="createMeetingForm" aria-hidden="true">
+  <div class="modal-dialog modal-full-height modal-right" role="document">
+    <div class="modal-content">
+      <div class="modal-header darken-3 white-text" style="background-color: #45526E">
+        <h4 class="title">
+          Edit Meeting&emsp;
+          <i class="fa fa-pencil"></i>
+        </h4>
+        <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form>
+        <div class="modal-body mb-0">
+          <div class="md-form form-sm">
+            <input type="text" class="form-control" id="updateMeetingId" name="meeting_id" value="{{ request.form.meeting_id }}" readonly>
+          </div>
+
+          <div class="md-form form-sm">
+            <input type="text" class="form-control" id="updateName" name="name" value="{{ request.form.name }}">
+          </div>
+
+          <div class="md-form form-sm">
+            <input type="text" class="form-control" id="updateEmailsToAdd" name="emails_to_add" value="{{ request.form.emails_to_add }}">
+            <label for="add_emails"> Users to Add </label>
+          </div>
+
+          <div class="md-form form-sm">
+            <input type="text" class="form-control" id="updateEmailsToRemove" name="emails_to_remove" value="{{ request.form.emails_to_remove }}">
+            <label for="del_emails"> Users to Remove </label>
+          </div>
+
+          <div class="text-center mt-1-half">
+            <button id="meetingEditButton" type="submit" name="submit" value="update" class="btn btn-mdb mdb-2" formmethod="post">
+              Update
+              <i class="fa fa-send ml-1"></i>
+            </button>
+            <button id="meetingDeleteButton" type="submit" name="submit" value="delete" class="btn btn-danger mdb-2" formmethod="post">
+              Delete
+              <i class="fa fa-trash-o ml-1"></i>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- /Update Meeting Modal -->
+
+<a class="btn-floating btn-lg" style="position: fixed; margin-right: 10px; right: 120px; bottom: 35px;" data-toggle="modal"
+    data-target="#modalGroupStats">
+    <i class="fa fa-bar-chart" aria-hidden="true"></i>
+</a>
+
+<div class="modal fade show" id="modalGroupStats" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+    data-backdrop="false">
+    <div class="modal-dialog modal-notify modal-info" role="document">
+        <!--Content-->
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header quillioColor">
+                <p class="heading">
+                    Group Statistics
+                </p>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="white-text">&times;</span>
+                </button>
             </div>
-            <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne">
-                <div class="card-body">
-                    {% for member in group.members %} {{ member.name }} {% endfor %}
+
+            <!--Body-->
+            <div class="modal-body">
+                <div>
+                    <h4> Members with most contributions: </h4>
+                    <ol>
+                    {% for member in stats.contributors %}
+                        <li> {{ member }} </li>
+                    {% endfor %}
+                    </ol>
+                </div>
+                <div>
+                    <h4> Most frequent meeting topics: </h4>
+                    <ol>
+                    {% for topic in stats.topics %}
+                        <li> {{ topic }} </li>
+                    {% endfor %}
+                    </ol>
+                </div>
+                <div>
+                    <h4> Most frequent meeting tags: </h4>
+                    <ol>
+                    {% for tag in stats.tags %}
+                        <li> {{ tag }} </li>
+                    {% endfor %}
+                    </ol>
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-header quillioColor" role="tab" id="headingTwo">
-                <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    <h5 class="white-text">
-                        Meeting Date<i class="fa fa-angle-down rotate-icon"></i>
-                    </h5>
-                </a>
-            </div>
-            <div id="collapseTwo" class="collapse show" role="tabpanel" aria-labelledby="headingTwo">
-                <div class="card-body">
-                    random date
-                </div>
-            </div>
-        </div>
-		  <div class="card">
-				<div class="card-header quillioColor" role="tab" id="headingThree">
-					<a data-toggle="collapse" data-parent="#accordianEx" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-						<h5 class="white-text">
-							Analytics<i class="fa fa-angle-down rotate-icon"></i>
-						</h5>
-					</a>
-				</div>
-				<div id="collapseThree" class="collapse show" role="tabpanel" arira-labelledby="headingThree">
-					<div class="card-body">
-						this will be a modal later
-					</div>
-				</div>
-		  </div>
+        <!--/.Content-->
     </div>
 </div>
 {% endblock %}
 {% block js_import %}
 <!-- script for sidenav collapse -->
-<script>
-    $(".button-collapse").sideNav();
+<script type="text/javascript">
+
+/**
+* initialize edit meeting form for the meeting that was clicked
+*/
+
+function setMeeting(id, name){
+  document.getElementById('updateMeetingId').value = id
+  document.getElementById('updateName').value = name
+  console.log(name)
+}
+
+$(".button-collapse").sideNav();
 </script>
 <!-- \script for sidenav collapse -->
 {% endblock %}

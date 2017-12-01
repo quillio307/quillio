@@ -5,7 +5,7 @@
     <ul id="msgboard" style="list-style-type: none;padding-left:0;"></ul>
     <p id="tempChunk"></p>
     <br>
-    <a class="btn-floating btn-lg pkColor" id="mic" style="background:gray;">
+    <a class="btn-floating btn-lg quillioColor" id="mic" style="background:gray;">
         <i class="fa fa-microphone fa-5x"></i>
     </a>
     <button type="button" class="btn btn-success" id="start">Start</button>
@@ -19,7 +19,7 @@
         <div class="modal-content">
             <!--Header-->
             <div class="modal-header darken-3 white-text" style="background-color: #45526E">
-                <h4 class=" title"><i class="fa fa-pencil"></i>Insert Keywords</h4>
+                <h4 class="title"><i class="fa fa-pencil"></i>Insert Keywords and Objectives</h4>
                 <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -30,12 +30,16 @@
                     <input type="text" id="keywords" name="keywords" value="" class="form-control" required>
                     <label for="keywords"> Insert Keywords </label>
                 </div>
+                <div class="md-form form-sm">
+                    <input type="text" id="objectives" name="objectives" value="" class="form-control" required>
+                    <label for="objectives"> Insert Objectives/Agenda </label>
+                </div>
             </div>
             <div class="text-center mt-1-half">
-                <button id="keywordAddButton" class="btn btn-mdb mdb-2">
+                <button onclick="getID()" id="keywordAddButton" class="btn btn-mdb mdb-2">
                             Enter
                             <i class="fa fa-send ml-1"></i>
-                        </button>
+                </button>
             </div>
         </div>
         <!--/.Content-->
@@ -43,6 +47,22 @@
 </div>
 
 {% endblock %} {% block js_import %}
+<script>
+    function getID()  {
+    var objectives = $('#objectives').val();
+    var id = `{{meeting.id}}`
+    console.log(objectives);
+    const params = new URLSearchParams()
+    params.append('objectives', objectives)
+    fetch(`/meetings/${id}/updateObjectives`, {
+            method: 'POST',
+            body: params
+        })
+        .then(function(res) {
+            console.log(JSON.stringify(res, undefined, 2))
+      })
+  }
+</script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 <script type="text/javascript" src="/static/js/in_meeting.js"></script>
 <script>

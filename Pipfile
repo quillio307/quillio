@@ -22,4 +22,7 @@ gunicorn = "*"
 gevent = "*"
 "rake-nltk" = "*"
 pycodestyle = "*"
+nltk = "*"
+requests = "*"
 sendgrid = "==3.6.5"
+
