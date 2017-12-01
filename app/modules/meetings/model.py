@@ -72,13 +72,9 @@ class Meeting(db.Document):
         for topic in topic_data:
             for t in cmp:
                 if topic[0] > 5 and topic[1] in t['transcription']:
-                    t['rank'] += topic[0]
-
-        print("Topics ranked")
+                    t['score'] += topic[0]
 
         arr = sorted(cmp, key=lambda k: k['score'])
-        print("Sorted")
-        print(arr)
         if len(arr) > 3:
             return [arr[-1]['transcription'], arr[-2]['transcription'], arr[-3]['transcription']]
         else:
