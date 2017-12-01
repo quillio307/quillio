@@ -7,8 +7,8 @@ import language_check
 from rake_nltk import Rake
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import RegexpTokenizer
-import gevent.monkey, gevent.socket
-gevent.monkey.patch_all(thread=False)
+#import gevent.monkey, gevent.socket
+#gevent.monkey.patch_all(thread=False)
 from gingerit.gingerit import GingerIt
 
 #monkey.patch_all()
@@ -45,7 +45,7 @@ def filter_form(form):
 @meetings.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    monkey.patch_all()
+    #monkey.patch_all()
     """ Displays All of the Current Users Meetings on the Meeting Dashboard """
     if request.method == 'POST':
         return filter_form(request.form)
