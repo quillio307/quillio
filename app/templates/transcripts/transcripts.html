@@ -5,7 +5,7 @@
     <div class="col-md-8">
         <div class="container" style="background:white;padding-top: 10px; padding-bottom: 10px">
             <div class="row">
-                <div class="col-md-9">
+                <div class="col-md-8">
                     <h3 class="flex-center"> {{ meeting.name }}
                     </h3>
                 </div>
@@ -17,6 +17,11 @@
                 <div class="col-md-1">
                     <a id="add" class="btn-floating btn-md quillioButton" onclick="addChunk()">
                         <i class="fa fa-plus"></i>
+                    </a>
+                </div>
+                <div class="col-md-1">
+                    <a id="smmry" class="btn-floating btn-md quillioButton" onclick="getSummary()">
+                        <i class="fa fa-commenting"></i>
                     </a>
                 </div>
             </div>
@@ -77,8 +82,9 @@
                         </a>
                     </div>
                     <div id="collapseThree" class="collapse show" role="tabpanel" aria-labelledby="headingThree">
-                        <div id="reloadTags" class="card-body">
+                        <div id="reloadTopics" class="card-body">
                             <textarea readonly style="height:auto" class="form-control" id="currTopics" rows="8">{% for topic in meeting.topics %}{{ topic }} {% endfor %}</textarea>
+                            <button onclick="generateTopics()" id="generateNewTops" class="btn quillioColor flex-center">Generate Topics</button>
                         </div>
                     </div>
                 </div>
@@ -168,6 +174,28 @@
 
 </div>
 <!-- \Row -->
+<div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-labelledby="summaryModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <!--Content-->
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header">
+                <h4 class="modal-title w-100" id="myModalLabel">Summary</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+            </div>
+            <!--Body-->
+            <div class="modal-body">
+                <ul id="summaryList" class="list-group">
+                </ul>
+            </div>
+
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
+
 
 {% endblock %} {% block js_import %}
 <!-- script for quill.js -->
@@ -344,6 +372,10 @@
             })
     }
 
+    function generateTopics() {
+      window.location.href = "/meetings/{{ meeting.id }}/topics"
+    }
+
     function saveTranscript() {
         let payload = [];
         $('#transcriptEditor .chunk').each(function(index) {
@@ -368,12 +400,23 @@
             contentType: "application/json"
         })
         .then(function() {
-                window.location.href = "/meetings/{{ meeting.id }}/topics"
-        })
-        .then(function() {
                 window.location.href = "/meetings/{{ meeting.id }}/updateGrammarSuggestions"
         })
 
+  }
+  function getSummary() {
+      $('#summaryList').empty();
+      $.ajax({
+        type: 'GET',
+        url: `/meetings/${meeting_id}/getSummary`,
+        dataType: 'json',
+        success: function(result) {
+            for(let i = 0; i < result.length; i++){
+                $('#summaryList').append(`<li class="list-group-item">${result[i]}</li>`);
+            }
+        }
+        });
+      $('#summaryModal').modal();
   }
 </script>
 
