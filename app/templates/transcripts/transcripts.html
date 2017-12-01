@@ -201,7 +201,7 @@
       console.log(objectives);
       const params = new URLSearchParams()
       params.append('objectives', objectives)
-      fetch(`/meetings/${id}/updateObjectives`, {
+      fetch(`/meetings/${id}/adminUpdateObjectives`, {
               method: 'POST',
               body: params
           })

@@ -417,37 +417,35 @@ def update_objectives(meeting_id):
     objectives = [s.strip() for s in objectives]
 
     for x in objectives:
-        if x not in currObjs:
-            currObjs.append(x)
+        if x.lower() not in currObjs:
+            currObjs.append(x.lower())
 
     meeting.objectives = currObjs
     meeting.save()
 
     return json.dumps({'status': 'success'})
 
-# @meetings.route('/<meeting_id>/adminObjs', methods=['POST'])
-# def update_objectives(meeting_id):
-#     if request.form is None:
-#         print('Form is invalid')
-#     meeting = Meeting.objects.get(id=meeting_id)
-#     currObjs = meeting.objectives
-#     objectives = request.form['objectives']
-#     print(objectives)
-#     if objectives is None:
-#         return json.dumps({'error': 'invalid objective'})
-#
-#
-#     objectives = objectives.split(",")
-#     objectives = [s.strip() for s in objectives]
-#
-#     for x in objectives:
-#         if x not in currObjs:
-#             currObjs.append(x)
-#
-#     meeting.objectives = currObjs
-#     meeting.save()
-#
-#     return json.dumps({'status': 'success'})
+@meetings.route('/<meeting_id>/adminUpdateObjectives', methods=['POST'])
+def admin_update_objectives(meeting_id):
+    if request.form is None:
+        print('Form is invalid')
+    meeting = Meeting.objects.get(id=meeting_id)
+    objectives = request.form['objectives']
+    print(objectives)
+    if objectives is None:
+        return json.dumps({'error': 'invalid objective'})
+
+
+    objectives = objectives.split(",")
+    objectives = [s.strip() for s in objectives]
+
+    for x in objectives:
+        x = x.lower()
+
+    meeting.objectives = objectives
+    meeting.save()
+
+    return json.dumps({'status': 'success'})
 
 @meetings.route('/<meeting_id>/getTranscript', methods=['GET'])
 @login_required
