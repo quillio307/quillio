@@ -1,5 +1,6 @@
-{% extends"helpers/landing_page.html" %} {% block title %} {{ group.name }}{% endblock %} {% block landing_content %} 
-{%for meeting_row in group.meetings | batch(3) %}
+{% extends"helpers/landing_page.html" %} {% block title %} {{ group.name }}{% endblock %}
+{% block landing_content %}
+{% for meeting_row in group.meetings | batch(3) %}
 <div class="container">
   <br>
   <div class="row">
@@ -42,9 +43,11 @@
             <a data-toggle="modal" data-target="#editMeetingForm" id="{{ meeting.id }}" onclick="setMeeting('{{ meeting.id }}', '{{ meeting.name }}')">
               Edit
             </a>
-
-            {% endif %}
-        </div>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
     {% endfor %}
   </div>
 </div>
@@ -53,103 +56,48 @@
 
 <!-- Create Meeting Button -->
 <a class="btn-floating btn-lg quillioButton" style="position: fixed; right: 35px; bottom: 35px;" data-toggle="modal" data-target="#createMeetingForm">
-    <i class="fa fa-plus"></i>
+  <i class="fa fa-plus"></i>
 </a>
 <!-- /Create Meeting Button -->
 
-<!-- Group Stats Button -->
-<a class="btn-floating btn-lg" style="position: fixed; margin-right: 10px; right: 120px; bottom: 35px;" data-toggle="modal"
-    data-target="#modalGroupStats">
-    <i class="fa fa-bar-chart" aria-hidden="true"></i>
-</a>
-<!-- Group Stats Modal -->
-<div class="modal fade show" id="modalGroupStats" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
-    data-backdrop="false">
-    <div class="modal-dialog modal-notify modal-info" role="document">
-        <!--Content-->
-        <div class="modal-content">
-            <!--Header-->
-            <div class="modal-header darken-3 white-text" style="background-color: #45526E">
-                <p class="heading">
-                    Group Statistics
-                </p>
-
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true" class="white-text">&times;</span>
-                </button>
-            </div>
-
-            <!--Body-->
-            <div class="modal-body">
-                <div>
-                    <h4> Members with most contributions: </h4>
-                    <ol>
-                    {% for member in stats.contributors %}
-                        <li> {{ member }} </li>
-                    {% endfor %}
-                    </ol>
-                </div>
-                <div>
-                    <h4> Most frequent meeting topics: </h4>
-                    <ol>
-                    {% for topic in stats.topics %}
-                        <li> {{ topic }} </li>
-                    {% endfor %}
-                    </ol>
-                </div>
-                <div>
-                    <h4> Most frequent meeting tags: </h4>
-                    <ol>
-                    {% for tag in stats.tags %}
-                        <li> {{ tag }} </li>
-                    {% endfor %}
-                    </ol>
-                </div>
-            </div>
-        </div>
-        <!--/.Content-->
-    </div>
-</div>
 
 <!-- Create Meeting Modal -->
 <div class="modal fade" id="createMeetingForm" tabindex="-1" role="dialog" aria-labelledby="createMeetingForm" aria-hidden="true">
-    <div class="modal-dialog cascading-modal" role="document">
-        <div class="modal-content">
-            <div class="modal-header darken-3 white-text" style="background-color: #45526E">
-                <h4 class=" title">
-                    <i class="fa fa-penci1l"></i> Create Meeting
-                </h4>
-                <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+  <div class="modal-dialog cascading-modal" role="document">
+    <div class="modal-content">
+      <div class="modal-header darken-3 white-text" style="background-color: #45526E">
+        <h4 class=" title">
+          <i class="fa fa-penci1l"></i> Create Meeting
+        </h4>
+        <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
 
-            <form>
-                <div class="modal-body mb-0">
-                    <div class="md-form form-sm">
-                        <input type="text" id="name" name="name" value="{{ request.form.name }}" class="form-control" required>
-                        <label for="name"> Meeting Name </label>
-                    </div>
+      <form>
+        <div class="modal-body mb-0">
+          <div class="md-form form-sm">
+            <input type="text" id="name" name="name" value="{{ request.form.name }}" class="form-control" required>
+            <label for="name"> Meeting Name </label>
+          </div>
 
-                    <div class="md-form form-sm">
-                        <input type="text" id="emails" name="emails" value="{{ emails }}" class="form-control" required>
-                        <label for="emails"> Member Emails </label>
-                    </div>
+          <div class="md-form form-sm">
+            <input type="text" id="emails" name="emails" value="{{ emails }}" class="form-control" required>
+            <label for="emails"> Member Emails </label>
+          </div>
 
-                    <legend> Set nature of meeting: </legend>
-                    {% for subfield in form.nature %}
-                    <div class="form-group">
-                        {{ subfield }} {{ subfield.label }}
-                    </div>
-                    {% endfor %}
-                    <div class="text-center mt-1-half">
-                        <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="create" formmethod="post">
-                            Create
-                            <i class="fa fa-send ml-1"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
+          <legend> Set nature of meeting: </legend>
+          {% for subfield in form.nature %}
+          <div class="form-group">
+            {{ subfield }} {{ subfield.label }}
+          </div>
+          {% endfor %}
+          <div class="text-center mt-1-half">
+            <button id="meetingCreateButton" type="submit" name="submit" class="btn btn-mdb mdb-2" value="create" formmethod="post">
+              Create
+              <i class="fa fa-send ml-1"></i>
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -157,7 +105,9 @@
 </div>
 
 <!-- /Create Meeting Modal -->
-{% endblock %} {% block sidebar_content %}
+
+{% endblock %}
+{% block sidebar_content %}
 <div class="container">
   <div class="accordion" id="" role="tablist" aria-multiselectable="true">
     <div class="card">
@@ -187,9 +137,11 @@
         <div class="card-body">
           random date
         </div>
-     </div>
+      </div>
+    </div>
   </div>
 </div>
+
 
 <!-- Update Meeting Modal -->
 <div class="modal fade right" id="editMeetingForm" tabindex="-1" role="dialog" aria-labelledby="createMeetingForm" aria-hidden="true">
@@ -241,18 +193,73 @@
   </div>
 </div>
 <!-- /Update Meeting Modal -->
+
+<a class="btn-floating btn-lg" style="position: fixed; margin-right: 10px; right: 120px; bottom: 35px;" data-toggle="modal"
+    data-target="#modalGroupStats">
+    <i class="fa fa-bar-chart" aria-hidden="true"></i>
+</a>
+
+<div class="modal fade show" id="modalGroupStats" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+    data-backdrop="false">
+    <div class="modal-dialog modal-notify modal-info" role="document">
+        <!--Content-->
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header quillioColor">
+                <p class="heading">
+                    Group Statistics
+                </p>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="white-text">&times;</span>
+                </button>
+            </div>
+
+            <!--Body-->
+            <div class="modal-body">
+                <div>
+                    <h4> Members with most contributions: </h4>
+                    <ol>
+                    {% for member in stats.contributors %}
+                        <li> {{ member }} </li>
+                    {% endfor %}
+                    </ol>
+                </div>
+                <div>
+                    <h4> Most frequent meeting topics: </h4>
+                    <ol>
+                    {% for topic in stats.topics %}
+                        <li> {{ topic }} </li>
+                    {% endfor %}
+                    </ol>
+                </div>
+                <div>
+                    <h4> Most frequent meeting tags: </h4>
+                    <ol>
+                    {% for tag in stats.tags %}
+                        <li> {{ tag }} </li>
+                    {% endfor %}
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
 {% endblock %}
 {% block js_import %}
 <!-- script for sidenav collapse -->
 <script type="text/javascript">
+
 /**
 * initialize edit meeting form for the meeting that was clicked
 */
+
 function setMeeting(id, name){
   document.getElementById('updateMeetingId').value = id
   document.getElementById('updateName').value = name
   console.log(name)
 }
+
 $(".button-collapse").sideNav();
 </script>
 <!-- \script for sidenav collapse -->
