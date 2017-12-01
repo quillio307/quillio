@@ -427,13 +427,14 @@ def update_grammar(meeting_id):
     for transcript in transcripts:
         transString = transcript.transcription
         #   used from https://github.com/zoncoen/python-ginger
-        parseObj = subprocess.getoutput("python ginger.py "+ transString)
+        parseObj = subprocess.getoutput("python ginger.py \""+ transString+"\"")
+        print(parseObj)
         if parseObj == "Good English :)":
             transcript.grammarErrors = True
         else:
             transcript.grammarErrors = False
 
-        print(transcript.grammarErrors)
+        #print(transcript.grammarErrors)
 
         #print(retText)
     meeting.save()
