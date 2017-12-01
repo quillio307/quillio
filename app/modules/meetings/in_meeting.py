@@ -14,7 +14,8 @@ from flask import Blueprint, render_template, flash, request, redirect, \
     url_for, jsonify, abort
 from flask_security import current_user, login_required
 from flask_socketio import SocketIO, emit, join_room, leave_room, send, rooms, disconnect
-
+from flask_sendgrid import SendGrid
+from app import app
 
 meeting = Blueprint('meeting', __name__)
 
@@ -79,6 +80,19 @@ def start_meeting(data):
     meeting.transcriptText = pt
     meeting.save()
 
+    try:
+        # send the password reset email
+        for member in meeting.members:
+            mail = SendGrid(app)
+            mail.send_email(
+                from_email=app.config['SENDGRID_DEFAULT_FROM'],
+                to_email= member.email,
+                subject='Quillio Meeting Completed',
+                html=summary_html(member.name, meeting.name, meeting.get_summary())
+            )
+    except Exception as e:
+        print(str(e))
+
 
 @socketio.on('silenceAll', namespace='/meeting')
 @authenticated_only
@@ -104,3 +118,15 @@ def transcription(data):
         meeting.add_transcription(usr, tscript)
         meeting.save()
         emit('receivemsg', {'data': usr.name + ' - ' + tscript}, room=data['room_id'])
+
+
+def summary_html(name, mname, summary):
+    header = '<nav style="height:50px" class="navbar navbar-expand-lg pkColor"></nav><h2 align="center">Your Meeting Summary</h2>'
+    body = '<p>Dear ' + name + ',</p><br><p> Your meeting ' + mname + ' has been completed. Here is a quick summary:</p>'
+
+    ul = '<ul>'
+    for s in summary:
+        list += '<li>'+s+'</li>'
+    ul += '</ul>'
+    close = '<p>Thanks!</p><br><p>The Quillio Team</p>'
+    return header + body + ul + close

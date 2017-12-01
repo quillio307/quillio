@@ -41,7 +41,6 @@ def home():
     return render_template('meeting/dashboard.html', meetings=user.meetings, form=form)
 
 
-
 @meetings.route('/create', methods=['POST'])
 @login_required
 def create_meeting(form=None):
