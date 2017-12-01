@@ -288,8 +288,8 @@ def search_meetings(query):
         for r in group.split(" "):
             search.remove(r)
 
-    print(group)
-    print(search)
+    # get the list of natures to search for
+    natures = list(filter(lambda x: "!" in x, search))
 
     # get the list of users to search for
     users = list(filter(lambda x: "@" in x, search))
@@ -298,7 +298,16 @@ def search_meetings(query):
     tags = list(filter(lambda x: "#" in x, search))
 
     # get the other search criteria
-    search = list(set(search) - set(users) - set(tags))
+    search = list(set(search) - set(users) - set(tags) - set(natures))
+
+    #filter the meetings to only contain meetings with desired nature
+    for n in natures:
+        if n.lower() == "professional":
+            meetings = list(filter(lambda x: x.meeting_nature == "professional", meetings))
+        elif n.lower() == "academic":
+            meetings = list(filter(lambda x: x.meeting_nature == "academic", meetings))
+        else:
+            meetings = list(filter(lambda x: x.meeting_nature == "other", meetings))
 
     # filter the meetings to only contain meetings with desired tags
     for t in tags:
