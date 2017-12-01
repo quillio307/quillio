@@ -425,7 +425,13 @@ def update_grammar(meeting_id):
     print(transcripts)
     for transcript in transcripts:
         transString = transcript.transcription
-        #retText = parser.parse(transString)
+        #parseObj = parser.parse(transString)
+        if len(parseObj['corrections']) == 0:
+            transcript.grammarErrors = False
+        else:
+            transcript.grammarErrors = True
+            transcript.grammarSuggestions[len(transcript.grammarSuggestions-1)] = parseObj['result']
+
         #print(retText)
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
 
