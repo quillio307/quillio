@@ -240,7 +240,7 @@ def edit_meeting(id):
             flash('error You are not a member of that meeting.')
             return redirect(url_for('meetings.meetings_page'))
 
-        return render_template('transcripts/transcripts.html', meeting=meeting)
+        return render_template('transcripts/transcripts.html', meeting=meeting, user=user)
     except Exception as e:
         flash('error An Error Occured. {}'.format(str(e)))
         return redirect(request.args.get('next') or url_for('meetings.home'))
@@ -424,6 +424,30 @@ def update_objectives(meeting_id):
     meeting.save()
 
     return json.dumps({'status': 'success'})
+
+# @meetings.route('/<meeting_id>/adminObjs', methods=['POST'])
+# def update_objectives(meeting_id):
+#     if request.form is None:
+#         print('Form is invalid')
+#     meeting = Meeting.objects.get(id=meeting_id)
+#     currObjs = meeting.objectives
+#     objectives = request.form['objectives']
+#     print(objectives)
+#     if objectives is None:
+#         return json.dumps({'error': 'invalid objective'})
+#
+#
+#     objectives = objectives.split(",")
+#     objectives = [s.strip() for s in objectives]
+#
+#     for x in objectives:
+#         if x not in currObjs:
+#             currObjs.append(x)
+#
+#     meeting.objectives = currObjs
+#     meeting.save()
+#
+#     return json.dumps({'status': 'success'})
 
 @meetings.route('/<meeting_id>/getTranscript', methods=['GET'])
 @login_required
