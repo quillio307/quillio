@@ -110,7 +110,7 @@ def update_group_meeting(form=None):
         # extract form data
         name = update_form.name.data
         emails_to_add_str = update_form.emails_to_add.data
-        emails_to_remove = update_form.emails_to_remove.data
+        emails_to_remove_str = update_form.emails_to_remove.data
 
         # search for the meeting
         meeting = Meeting.objects.get(id=update_form.meeting_id.data)
@@ -146,6 +146,7 @@ def update_group_meeting(form=None):
                 if meeting not in member.meetings:
                     member.meetings.append(meeting)
                     member.save()
+
         # save all the changes
         meeting.name = name
         meeting.members = members
@@ -367,6 +368,7 @@ def update_group(form=None):
     except Exception as e:
         flash('error Unable to Update Group at this Time, Please Try Again.'
               '{}'.format(str(e)))
+        print(str(e))
 
     return redirect(request.args.get('next') or url_for('groups.home'))
 
@@ -529,7 +531,6 @@ def group_stats(group_id):
         sorted_tags = sorted(tags, key=tags.get, reverse=True)
         del(sorted_tags[3:])
 
-
         topics = group.get_frequent_topics()
         sorted_topics = sorted(topics, key=topics.get, reverse=True)
         del(sorted_topics[3:])
@@ -545,5 +546,3 @@ def group_stats(group_id):
 
     response['status'] = 'failure'
     return response
-
-    
