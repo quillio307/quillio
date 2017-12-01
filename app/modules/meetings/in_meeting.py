@@ -126,7 +126,7 @@ def summary_html(name, mname, summary):
 
     ul = '<ul>'
     for s in summary:
-        list += '<li>'+s+'</li>'
+        ul += '<li>'+s+'</li>'
     ul += '</ul>'
     close = '<p>Thanks!</p><br><p>The Quillio Team</p>'
     return header + body + ul + close
