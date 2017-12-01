@@ -4,11 +4,14 @@ from datetime import datetime as dt
 from app.modules.auth.model import User
 
 from wtforms import Form, validators, StringField, RadioField
+from rake_nltk import Rake
 
 
 class Transcription(db.EmbeddedDocument):
     user = db.ReferenceField(User)
     transcription = db.StringField()
+    score = db.FloatField()
+    meta = {'strict': False}
 
 
 class Meeting(db.Document):
@@ -56,6 +59,27 @@ class Meeting(db.Document):
         except Exception as e:
             flash('error An Error Occured')
             return
+
+    def get_summary(self):
+        rk = Rake()
+        text = ""
+        for t in self.transcript:
+            text += "{0}: {1}\n".format(t.user.name, t.transcription)
+            t.score = 0
+        rk.extract_keywords_from_text(text)
+        topic_data = rk.get_ranked_phrases_with_scores()
+
+        for topic in topic_data:
+            for t in self.transcript:
+                if topic[0] > 5 and topic[1] in t['transcription']:
+                    t['rank'] += topic[0]
+
+        arr = sorted(self.transcript, key=lambda k: k.score)
+        if len(arr) > 3:
+            return [arr[len(arr) - 1], arr[len(arr) - 2], arr[len(arr) - 3]]
+        else:
+            return arr
+
 
 
 class MeetingCreateForm(Form):

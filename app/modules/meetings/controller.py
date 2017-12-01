@@ -403,3 +403,12 @@ def get_transcription(meeting_id):
         chunk['user'] = chunk['user']['$oid']
 
     return json.dumps(payload)
+
+
+@meetings.route('/<meeting_id>/getSummary', methods=['GET'])
+@login_required
+def get_summary(meeting_id):
+    """ gets transcript of a given meeting """
+
+    meeting = Meeting.objects.get(id=meeting_id)
+    return json.dumps(meeting.get_summary())
