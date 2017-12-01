@@ -7,6 +7,13 @@ import language_check
 from rake_nltk import Rake
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import RegexpTokenizer
+import gevent.monkey, gevent.socket
+gevent.monkey.patch_all(thread=False)
+from gingerit.gingerit import GingerIt
+
+#monkey.patch_all()
+
+
 
 
 from app.modules.auth.model import User
@@ -38,6 +45,7 @@ def filter_form(form):
 @meetings.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
+    monkey.patch_all()
     """ Displays All of the Current Users Meetings on the Meeting Dashboard """
     if request.method == 'POST':
         return filter_form(request.form)
@@ -398,13 +406,17 @@ def update_grammar(meeting_id):
     if request.form is None:
         print('Form is invalid')
     print('UPDATE GRAMMAR SUGGESTIONS')
-    tool = language_check.LanguageTool('en-US')
+
+    parser = GingerIt()
     meeting = Meeting.objects.get(id=meeting_id)
-    transcripts = Meeting.transcript
+    transcripts = meeting.transcript
+    text = 'This are a sentence.'
+    parser.parse(text)
+    print(transcripts)
     for transcript in transcripts:
         transString = transcript.transcription
-        matches = tool.check(transString)
-        print(matches)
+        #retText = parser.parse(transString)
+        #print(retText)
     return redirect(url_for('meetings.edit_meeting', id=meeting_id))
 
 
