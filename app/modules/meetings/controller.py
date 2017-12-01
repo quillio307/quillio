@@ -409,6 +409,5 @@ def get_transcription(meeting_id):
 @login_required
 def get_summary(meeting_id):
     """ gets transcript of a given meeting """
-
     meeting = Meeting.objects.get(id=meeting_id)
     return json.dumps(meeting.get_summary())
