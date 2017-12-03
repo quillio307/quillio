@@ -74,7 +74,7 @@ class User(db.Document, UserMixin):
                     topics[topic] = topics[topic] + 1
                 else:
                     topics[topic] = 1
-        
+
         sorted_friends = sorted(friends, key=friends.get, reverse=True)
         sorted_topics = sorted(topics, key=topics.get, reverse=True)
 
@@ -91,12 +91,11 @@ class User(db.Document, UserMixin):
                     "name": sorted_topics[i],
                     "count": topics[sorted_topics[i]]
                 })
-        
-        result = dict()
-        result['members'] = best_friends 
-        result['topics'] = favorite_topics 
-        return result
 
+        result = dict()
+        result['members'] = best_friends
+        result['topics'] = favorite_topics
+        return result
 
 class SignupForm(Form):
     email = StringField('Email', [validators.DataRequired(),
